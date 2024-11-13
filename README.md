@@ -5,7 +5,7 @@ YT-Ads Ski system Monorepo
 
 1. Install Bun
 ```bash
-curl -fsSL https://bun.sh | sudo bash
+curl -fsSL https://bun.sh/install | bash
 ```
 
 
