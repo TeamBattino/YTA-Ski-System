@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model racer {
+  name       String?  @db.VarChar(255)
+  ldap       String?  @db.VarChar(255)
+  racer_id   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ski_passes String[]
+  run        run[]
+}
+
+model run {
+  start_time DateTime? @db.Timestamp(6)
+  duration   Int?
+  racer_id   String?   @db.Uuid
+  run_id     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  racer      racer?    @relation(fields: [racer_id], references: [racer_id], onDelete: NoAction, onUpdate: NoAction)
+}

@@ -1,11 +1,18 @@
-'use client';
-
 import LeaderboardTable from "../../ui/dashboard/leaderboard/leaderboard-table";
+import { fetchRuns } from "@/app/lib/data";
 
-export default function Page() {
+export default async function Page() {
+const data = await fetchRuns();
     return (
     <div>
-      <LeaderboardTable/>
+      <div>
+      <h2>Top speed</h2>
+      <LeaderboardTable run={data}/>
+      </div>
+      <div>
+      <h2>Top Consistency</h2>
+      <LeaderboardTable run={data}/>
+      </div>
     </div>
     );
   }

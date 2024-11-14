@@ -1,57 +1,35 @@
+'use client';
+
 import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue} from "@nextui-org/table";
-
-const rows = [
-  {
-    key: "1",
-    name: "Tony Reichert",
-    time: "9000",
-    rank: 1,
-  },
-  {
-    key: "2",
-    name: "Zoey Lang",
-    time: "8000",
-    rank: 2,
-  },
-  {
-    key: "3",
-    name: "Jane Fisher",
-    time: "7000",
-    rank: 3,
-  },
-  {
-    key: "4",
-    name: "William Howard",
-    time: "6000",
-    rank: 4,
-  },
-];
-
+import type { run } from '@prisma/client'
 const columns = [
   {
-    key: "name",
-    label: "NAME",
+    key: "racer_id",
+    label: "RACER_ID",
   },
   {
-    key: "time",
-    label: "TIME",
+    key: "duration",
+    label: "DURATION",
   },
   {
-    key: "rank",
-    label: "RANK",
+    key: "date",
+    label: "DATE",
   },
 ];
 
-export default function LeaderboardTable() {
-  
+export default function LeaderboardTable({
+  run,
+}: {
+  run: run[];
+}){
   return (
-    <Table isStriped aria-label="Example table with dynamic content">
+    <Table isStriped>
       <TableHeader columns={columns}>
         {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
       </TableHeader>
-      <TableBody items={rows}>
+      <TableBody items={run}>
         {(item) => (
-          <TableRow key={item.key}>
+          <TableRow key={item.run_id}>
             {(columnKey) => <TableCell>{getKeyValue(item, columnKey)}</TableCell>}
           </TableRow>
         )}
