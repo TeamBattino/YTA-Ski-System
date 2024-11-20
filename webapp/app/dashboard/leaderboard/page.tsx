@@ -1,5 +1,5 @@
 import LeaderboardTable from "../../ui/dashboard/leaderboard/leaderboard-table";
-import { fetchRuns } from "@/app/lib/data";
+import { fetchRuns } from "@/app/lib/actions/runs/data";
 
 export default async function Page() {
 const data = await fetchRuns();

@@ -5,15 +5,15 @@ import type { run } from '@prisma/client'
 const columns = [
   {
     key: "racer_id",
-    label: "RACER_ID",
+    label: "RACER",
   },
   {
     key: "duration",
     label: "DURATION",
   },
   {
-    key: "date",
-    label: "DATE",
+    key: "start_time",
+    label: "START TIME",
   },
 ];
 
@@ -30,7 +30,7 @@ export default function LeaderboardTable({
       <TableBody items={run}>
         {(item) => (
           <TableRow key={item.run_id}>
-            {(columnKey) => <TableCell>{getKeyValue(item, columnKey)}</TableCell>}
+            {(columnKey) => <TableCell>{JSON.stringify(getKeyValue(item, columnKey))}</TableCell>}
           </TableRow>
         )}
       </TableBody>
