@@ -1,10 +1,10 @@
 'use client';
 
-import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue} from "@nextui-org/table";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue } from "@nextui-org/table";
 import type { run } from '@prisma/client'
 const columns = [
   {
-    key: "racer_id",
+    key: "racer",
     label: "RACER",
   },
   {
@@ -21,7 +21,7 @@ export default function LeaderboardTable({
   run,
 }: {
   run: run[];
-}){
+}) {
   return (
     <Table isStriped>
       <TableHeader columns={columns}>
@@ -30,7 +30,9 @@ export default function LeaderboardTable({
       <TableBody items={run}>
         {(item) => (
           <TableRow key={item.run_id}>
-            {(columnKey) => <TableCell>{JSON.stringify(getKeyValue(item, columnKey))}</TableCell>}
+            {(columnKey) => <TableCell>{JSON.stringify(getKeyValue(item, columnKey).name != undefined ? getKeyValue(item, columnKey).name : getKeyValue(item, columnKey) ).replaceAll("\"", "")}</TableCell>}
+
+            {/* {(columnKey) => <TableCell>{JSON.stringify(item.racer_id)}</TableCell>} */}
           </TableRow>
         )}
       </TableBody>
