@@ -1,3 +1,5 @@
+import NfcReader from "./NfcReader";
+
 export default function Page() {
   return (
     <div className="flex h-screen flex-col items-center justify-start bg-gray-50 px-4 pt-8">
@@ -5,9 +7,7 @@ export default function Page() {
       <h1 className="mb-6 text-2xl font-bold text-blue-600">Registration</h1>
 
       {/* Scan Card Button */}
-      <button className="mb-6 w-60 rounded-md bg-blue-400 px-4 py-2 text-white hover:bg-sky-100 hover:text-blue-600">
-        Scan Card with Phone
-      </button>
+      <NfcReader />
 
       {/* Name Eingabefeld */}
       <div className="mb-6 w-60">
