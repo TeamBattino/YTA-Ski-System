@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { UUID } from 'crypto';
 import { racer } from '@prisma/client';
-import { Http2ServerResponse } from 'http2';
 
 const prisma = new PrismaClient();
 
@@ -13,10 +12,21 @@ export async function fetchRacerById(racer_id : UUID){
 }
 
 export async function fetchRacers(){
-    const racers = prisma.racer.findMany();
+    const racers = await prisma.racer.findMany();
     return racers;
 }
 
 export async function createRacer(racer : racer){
     const createRacer = await prisma.racer.create({data : racer});
+}
+
+export async function bruh(racer : racer){
+    const recentRuns = await prisma.run.findMany({
+        where: {racer_id: racer.racer_id},
+        select: {
+            duration: true
+        },
+        orderBy: {start_time : 'desc'},
+    });
+    return recentRuns;
 }
