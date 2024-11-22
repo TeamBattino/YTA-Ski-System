@@ -1,11 +1,12 @@
 'use client';
+
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue } from "@nextui-org/table";
-import type { run, racer } from '@prisma/client'
+import type { run, racer } from '@prisma/client';
 
 const columnsSpeed = [
   { key: "racer", label: "RACER" },
   { key: "duration", label: "DURATION" },
-  { key: "start_time", label: "START TIME" },
+  { key: "start_time", label: "DATE" },
 ];
 
 const columnsConsistency = [
@@ -13,13 +14,32 @@ const columnsConsistency = [
   { key: "consistency", label: "CONSISTENCY" },
 ];
 
-// helper function to get the value for table cells
+// format date into hh:mm:ss dd:mm:yy
+const formatTime = (date: Date | null) => {
+  if (!date) return "00:00:00 01:01:70"; // default format if the date is null
+
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const seconds = date.getSeconds().toString().padStart(2, '0');
+  
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // months are 0-indexed, so add 1
+  const year = date.getFullYear().toString().slice(-2); // extract the last 2 digits of the year
+  
+  return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
+};
+
 const getCellValue = (item: any, columnKey: string) => {
   const value = getKeyValue(item, columnKey);
+
+
+  if (columnKey === "start_time" && value) {
+    return formatTime(new Date(value));
+  }
+
   return value?.name !== undefined ? value.name : value;
 };
 
-// generic leaderboard
 const LeaderBoardTable = ({
   columns,
   items,
@@ -54,16 +74,13 @@ export function LeaderBoardTableConsistency({ bruh }: { bruh: { racer: racer; co
 }
 
 export default function LeaderboardTable({ run, bruh }: { run?: run[]; bruh?: { racer: racer; consistency: number }[] }) {
-  // if 'run' is defined, render LeaderBoardTableSpeed
   if (run) {
     return <LeaderBoardTableSpeed run={run} />;
   }
 
-  // if 'run' is undefined, but 'bruh' is defined, render LeaderBoardTableConsistency
   if (bruh) {
     return <LeaderBoardTableConsistency bruh={bruh} />;
   }
 
-  // if 'bruh' is undefined when 'run' is undefined, show an error
   return <div><p>No data provided</p></div>;
 }

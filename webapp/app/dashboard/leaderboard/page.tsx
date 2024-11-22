@@ -27,14 +27,24 @@ export default async function Page() {
   const racerConsistencyData = await calculateConsistency(racers);
 
   return (
-    <div>
+    <div className="space-y-8">
       <div>
-        <h2>Top Speed</h2>
-        <LeaderboardTable run={runs.sort((a, b) => a.duration! - b.duration!)} />
+        <h2 className="text-2xl font-semibold mb-4">Top Speed</h2>
+        <p className="mt-2 rounded-md px-4 py-2 text-gray-700 italic">Who is the fastest of all time!?</p>
+        <div className="overflow-x-auto">
+          <LeaderboardTable 
+            run={runs.sort((a, b) => a.duration! - b.duration!)} 
+          />
+        </div>
       </div>
+
       <div>
-        <h2>Top Consistency</h2>
-        <LeaderboardTable bruh={racerConsistencyData.sort((a, b) => a.consistency - b.consistency)} />
+        <h2 className="text-2xl font-semibold mb-4">Top Consistency</h2>
+        <div className="overflow-x-auto">
+          <LeaderboardTable 
+            bruh={racerConsistencyData.sort((a, b) => a.consistency - b.consistency)} 
+          />
+        </div>
       </div>
     </div>
   );
