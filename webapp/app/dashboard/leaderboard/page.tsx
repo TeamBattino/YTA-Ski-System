@@ -1,41 +1,41 @@
 import { fetchRacers, bruh } from "@/app/lib/actions/racers/data";
 import LeaderboardTable from "../../ui/dashboard/leaderboard/leaderboard-table";
 import { fetchRuns } from "@/app/lib/actions/runs/data";
-import type { racer } from '@prisma/client'
+import type { racer } from '@prisma/client';
 
-async function processBruhh(racer : racer[]){
-  const list : {racer : racer, consistency: number}[] = [];
-  for (const x of racer){
-    const runs = await bruh(x);
-    if (runs.length > 1){
-      const duration1 = runs[0].duration
-      const duration2 = runs[1].duration
-      const consistency = (duration1! - duration2!) < 0 ? ((duration1! - duration2!) * -1) : ((duration1! - duration2!));
-      const entry : {racer : racer, consistency : number}= {racer : x, consistency : consistency!};
-      list.push(entry);}
-      else {
-        const entry : {racer : racer, consistency : number}= {racer : x, consistency : 999999};
-      list.push(entry);}
-      }
-      return list;
-  }
+async function calculateConsistency(racers: racer[]) {
+  const consistencyList: { racer: racer, consistency: number }[] = [];
+
+  await Promise.all(racers.map(async (racer) => {
+    const runs = await bruh(racer);
+    let consistency = 999999;
+
+    if (runs.length > 1) {
+      const [duration1, duration2] = runs;
+      consistency = Math.abs(duration1.duration! - duration2.duration!);
+    }
+
+    consistencyList.push({ racer, consistency });
+  }));
+
+  return consistencyList;
+}
 
 export default async function Page() {
-const run = await fetchRuns();
-const racer = await fetchRacers();
-const bruh = await processBruhh(racer);
+  const runs = await fetchRuns();
+  const racers = await fetchRacers();
+  const racerConsistencyData = await calculateConsistency(racers);
 
-
-    return (
+  return (
     <div>
       <div>
-      <h2>Top speed</h2>
-      <LeaderboardTable run={run.sort((a, b) => a.duration! - b.duration!)}/>
+        <h2>Top Speed</h2>
+        <LeaderboardTable run={runs.sort((a, b) => a.duration! - b.duration!)} />
       </div>
       <div>
-      <h2>Top Consistency</h2>
-      <LeaderboardTable bruh={bruh.sort((a, b) => a.consistency! - b.consistency!)}/>
+        <h2>Top Consistency</h2>
+        <LeaderboardTable bruh={racerConsistencyData.sort((a, b) => a.consistency - b.consistency)} />
       </div>
     </div>
-    );
-  }
+  );
+}
