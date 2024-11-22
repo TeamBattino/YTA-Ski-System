@@ -42,7 +42,7 @@ export function LeaderBoardTableSpeed({
 
 
 
-export async function LeaderBoardTableConsistency({bruh} : {bruh: {racer : racer, consistency : number}[]}){
+export function LeaderBoardTableConsistency({bruh} : {bruh: {racer : racer, consistency : number}[]}){
   const columns = [
     {
       key: "racer",
