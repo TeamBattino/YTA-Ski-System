@@ -14,9 +14,9 @@ const columnsConsistency = [
   { key: "consistency", label: "CONSISTENCY" },
 ];
 
-// format date into hh:mm:ss dd:mm:yy
+
 const formatTime = (date: Date | null) => {
-  if (!date) return "00:00:00 01:01:70"; // default format if the date is null
+  if (!date) return "00:00:00 01:01:70"; 
 
   const hours = date.getHours().toString().padStart(2, '0');
   const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -24,7 +24,7 @@ const formatTime = (date: Date | null) => {
   
   const day = date.getDate().toString().padStart(2, '0');
   const month = (date.getMonth() + 1).toString().padStart(2, '0'); // months are 0-indexed, so add 1
-  const year = date.getFullYear().toString().slice(-2); // extract the last 2 digits of the year
+  const year = date.getFullYear().toString().slice(-2);
   
   return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
 };

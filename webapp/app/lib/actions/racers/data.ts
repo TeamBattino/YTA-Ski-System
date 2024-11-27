@@ -3,7 +3,6 @@ import { racer } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// Fetch a specific racer by their ID
 export async function fetchRacerById(racer_id: string) {
   const racer = await prisma.racer.findUnique({
     where: { racer_id },
@@ -16,13 +15,11 @@ export async function fetchRacerById(racer_id: string) {
   return racer;
 }
 
-// Fetch all racers
 export async function fetchRacers() {
   const racers = await prisma.racer.findMany();
   return racers;
 }
 
-// Create a new racer
 export async function createRacer(racer: racer) {
   const newRacer = await prisma.racer.create({ data: racer });
   return newRacer;
