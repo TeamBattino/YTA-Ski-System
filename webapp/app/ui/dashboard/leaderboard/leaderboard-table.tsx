@@ -57,7 +57,7 @@ const LeaderBoardTable = ({
       {(item) => (
         <TableRow key={getItemKey(item)}>
           {(columnKey) => (
-            <TableCell>{JSON.stringify(getCellValue(item, String(columnKey))).replaceAll('"', '')}</TableCell>
+            <TableCell>{String(getCellValue(item, String(columnKey)) || '').replaceAll('"', '')}</TableCell>
           )}
         </TableRow>
       )}

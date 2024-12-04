@@ -5,7 +5,11 @@ const prisma = new PrismaClient()
 
 //Fetch all runs
 export async function fetchRuns() {
-    const runs = await prisma.run.findMany();
+    const runs = await prisma.run.findMany({
+      include: {
+        racer: true,
+      }
+    });
     return runs
 }
 
