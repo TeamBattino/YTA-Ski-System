@@ -26,23 +26,34 @@ export default async function Page() {
   const racers = await fetchRacers();
   const racerConsistencyData = await calculateConsistency(racers);
 
+  const sortedRuns = runs.sort((a, b) => a.duration! - b.duration!);
+  const runsWithRank = sortedRuns.map((run, index) => ({
+    ...run,
+    rank: index + 1,
+  }));
+  
+  const sortedConsistency = racerConsistencyData.sort((a, b) => a.consistency - b.consistency);
+  const consistencyWithRank = sortedConsistency.map((item, index) => ({
+    ...item,
+    rank: index + 1,  
+  }));
+
   return (
     <div className="space-y-8">
+      <div>
+        <h2 className="text-2xl font-semibold mb-4">Top Consistency</h2>
+        <div className="overflow-x-auto">
+          <LeaderboardTable 
+            bruh={consistencyWithRank} 
+          />
+        </div>
+      </div>
       <div>
         <h2 className="text-2xl font-semibold mb-4">Top Speed</h2>
         <p className="mt-2 rounded-md px-4 py-2 text-gray-700 italic">Who is the fastest of all time!?</p>
         <div className="overflow-x-auto">
           <LeaderboardTable 
-            run={runs.sort((a, b) => a.duration! - b.duration!)} 
-          />
-        </div>
-      </div>
-
-      <div>
-        <h2 className="text-2xl font-semibold mb-4">Top Consistency</h2>
-        <div className="overflow-x-auto">
-          <LeaderboardTable 
-            bruh={racerConsistencyData.sort((a, b) => a.consistency - b.consistency)} 
+            run={runsWithRank} 
           />
         </div>
       </div>

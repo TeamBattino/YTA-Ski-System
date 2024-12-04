@@ -4,12 +4,14 @@ import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKey
 import type { run, racer } from '@prisma/client';
 
 const columnsSpeed = [
+  { key: "rank", label: "RANK" },
   { key: "racer", label: "RACER" },
   { key: "duration", label: "DURATION" },
   { key: "start_time", label: "DATE" },
 ];
 
 const columnsConsistency = [
+  { key: "rank", label: "RANK" },
   { key: "racer", label: "RACER" },
   { key: "consistency", label: "CONSISTENCY" },
 ];
