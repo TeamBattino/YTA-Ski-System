@@ -39,7 +39,7 @@ const getCellValue = (item: any, columnKey: string) => {
     return formatTime(new Date(value));
   }
 
-  return value?.name !== undefined ? value.name : value;
+  return value?.ldap !== undefined ? value.ldap : value;
 };
 
 const LeaderBoardTable = ({
@@ -59,7 +59,7 @@ const LeaderBoardTable = ({
       {(item) => (
         <TableRow key={getItemKey(item)}>
           {(columnKey) => (
-            <TableCell>{String(getCellValue(item, String(columnKey)) || '').replaceAll('"', '')}</TableCell>
+            <TableCell>{String(getCellValue(item, String(columnKey)) || '').replaceAll('"', '')}</TableCell> // String in case of undefined data
           )}
         </TableRow>
       )}

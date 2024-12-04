@@ -26,12 +26,23 @@ export default async function Page() {
   const racers = await fetchRacers();
   const racerConsistencyData = await calculateConsistency(racers);
 
-  const sortedRuns = runs.sort((a, b) => a.duration! - b.duration!);
+  const bestRunsMap = new Map<any, any>();
+
+  runs.forEach(run => {
+    const existingRun = bestRunsMap.get(run.racer_id);
+    if (!existingRun || run.duration! < existingRun.duration!) {
+      bestRunsMap.set(run.racer_id, run); // Keep the fastest run for each racer
+    }
+  });
+  
+  const bestRuns = Array.from(bestRunsMap.values());
+
+  const sortedRuns = bestRuns.sort((a, b) => a.duration! - b.duration!);
   const runsWithRank = sortedRuns.map((run, index) => ({
     ...run,
     rank: index + 1,
   }));
-  
+
   const sortedConsistency = racerConsistencyData.sort((a, b) => a.consistency - b.consistency);
   const consistencyWithRank = sortedConsistency.map((item, index) => ({
     ...item,
@@ -42,6 +53,7 @@ export default async function Page() {
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl font-semibold mb-4">Top Consistency</h2>
+        <p className="mt-2 rounded-md px-4 py-2 text-gray-700 italic">aka the difference in milliseconds between the most recent 2 runs</p>
         <div className="overflow-x-auto">
           <LeaderboardTable 
             bruh={consistencyWithRank} 
