@@ -7,6 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model admin {
+  username String  @id @db.VarChar(255)
+  password String? @db.VarChar(255)
+}
+
 model racer {
   name       String?  @db.VarChar(255)
   ldap       String?  @db.VarChar(255)

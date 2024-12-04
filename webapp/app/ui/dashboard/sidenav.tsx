@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import NavLink from './navlink';
+import Logo from './logo';
 
 export default function SideNav() {
   return (
@@ -9,11 +10,7 @@ export default function SideNav() {
         href="/dashboard"
       >
         <div className="w-32 text-white md:w-40">
-          <img 
-            src="/ytads_logo.png" 
-            alt="YTADS Logo" 
-            className="w-full h-auto object-contain"
-          />
+          <Logo />
         </div>
       </Link>
       <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">

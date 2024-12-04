@@ -8,6 +8,9 @@ export default function Home() {
         <Link href="/dashboard/registration">
           <button>Enter</button>
         </Link>
+        <Link href="/dashboard/login">
+          <button>Admin</button>
+        </Link>
       </div>
     </main>
   );
