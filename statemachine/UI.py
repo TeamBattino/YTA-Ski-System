@@ -1,0 +1,58 @@
+import tkinter as tk
+
+class AlpenhundeUI:
+    def __init__(self, alpenhunde):
+        self.alpenhunde = alpenhunde
+        self.root = tk.Tk()
+        self.root.title("Alpenhunde State")
+        
+        self._setup_ui()
+        self._bind_events()
+        self.update_state()
+
+    def _setup_ui(self):
+        self.state_text = tk.Text(self.root, font=("Helvetica", 32), height=1, width=20, bd=0, bg=self.root.cget("bg"))
+        self.state_text.pack(expand=True)
+        self._configure_text_tags()
+        self.state_text.insert(tk.END, "State: ", "state")
+        self.state_text.config(state=tk.DISABLED)
+        
+        self.last_time_label = tk.Label(self.root, font=("Helvetica", 20))
+        self.last_time_label.pack()
+        
+        self.root.attributes('-fullscreen', True)
+
+    def _configure_text_tags(self):
+        self.state_text.tag_configure("state", font=("Helvetica", 32))
+        self.state_text.tag_configure("running", foreground="red")
+        self.state_text.tag_configure("not_running", foreground="green")
+
+    def _bind_events(self):
+        self.root.bind('<Escape>', lambda e: self.root.destroy())
+
+    def update_state(self):
+        
+        self._update_last_time_label()
+        self._update_state_text()
+        self.root.update()
+
+    def _update_state_text(self):
+        state, tag = self._get_state_and_tag()
+        self.state_text.config(state=tk.NORMAL)
+        self.state_text.delete("1.7", tk.END)
+        self.state_text.insert(tk.END, state, tag)
+        self.state_text.config(state=tk.DISABLED)
+
+    def _get_state_and_tag(self):
+        if self.alpenhunde.race_running:
+            return "RUNNING", "running"
+        else:
+            return "NOT RUNNING", "not_running"
+
+    def _update_last_time_label(self):
+        if self.alpenhunde.last_time is not None:
+            if self.alpenhunde.last_time == -1:
+                self.last_time_label.config(text="Last Time: Did Not Finish")
+            else:
+                self.last_time_label.config(text=f"Last Time: {self.alpenhunde.last_time}")
+            self.alpenhunde.last_time = None
