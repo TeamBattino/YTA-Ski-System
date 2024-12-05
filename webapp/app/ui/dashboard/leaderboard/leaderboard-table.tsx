@@ -43,7 +43,11 @@ const getCellValue = (item: any, columnKey: string) => {
   }
 
   if (columnKey === "duration" && value) {
-    return formatDuration(value);
+    return formatDuration(value) + 's';
+  }
+
+  if (columnKey === "consistency" && value) {
+    return value + 'ms';
   }
 
   return value?.ldap !== undefined ? value.ldap : value;
