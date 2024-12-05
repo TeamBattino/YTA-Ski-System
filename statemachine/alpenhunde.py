@@ -1,5 +1,4 @@
 import requests
-import time
 
 class Alpenhunde:
     def __init__(self):
@@ -7,7 +6,12 @@ class Alpenhunde:
         self.base_index = None
         self.previous_highest_index = None
         self.prev_len = None
-        self.init_values()
+        self.last_time = None
+
+        times = self.get_race_results()["times"]
+        self.previous_highest_index = self.get_highest_timing_index(times)
+        self.prev_len = len(times)
+        self.race_running = self.is_race_running()
 
     def get_race_status(self):
         try:
@@ -48,12 +52,6 @@ class Alpenhunde:
             for curr in currently_running:
                 self.send_post_request("http://192.168.4.1/timing/?action=cancel&index=" + curr["index"])
 
-    def init_values(self):
-        times = self.get_race_results()["times"]
-        self.previous_highest_index = self.get_highest_timing_index(times)
-        self.prev_len = len(times)
-        self.race_running = False
-
     def run(self):
         try:
             self.race_running = self.is_race_running()
@@ -67,9 +65,10 @@ class Alpenhunde:
             if len(times) != self.prev_len:
                 print("New entry detected")
                 new_time = times[len(times)-1]["t"]
-                if new_time < "0":
+                self.prev_len = len(times)
+                if int(new_time) > 0:
                     print("times: ", new_time)
-                    self.prev_len = len(times)
+                    self.last_time = new_time
 
             if highest_index > self.previous_highest_index and self.race_running:
                 print("stopping all running")
@@ -78,7 +77,6 @@ class Alpenhunde:
 
             self.previous_highest_index = highest_index
 
-            time.sleep(1)
         except Exception as e:
             print(f"Flo made an oopsie: {e}")
 
