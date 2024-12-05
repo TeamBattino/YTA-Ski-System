@@ -13,11 +13,13 @@ model admin {
 }
 
 model racer {
-  name       String?  @db.VarChar(255)
-  ldap       String?  @db.VarChar(255) @unique
-  racer_id   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ski_pass   String?  @db.VarChar(255) @unique
-  run        run[]
+  name     String? @db.VarChar(255)
+  ldap     String? @unique @db.VarChar(255)
+  racer_id String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ski_pass String? @unique @db.VarChar(255)
+  run      run[]
+  location String? @db.VarChar(255)
+  site     site?   @relation(fields: [location], references: [location], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model run {
@@ -25,5 +27,10 @@ model run {
   duration   Int?
   ski_pass   String?   @db.VarChar(255)
   run_id     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  racer      racer?    @relation(fields: [ski_pass], references: [ski_pass], onDelete: NoAction, onUpdate: NoAction)
+  racer      racer?    @relation(fields: [ski_pass], references: [ski_pass], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model site {
+  location String  @id @unique @db.VarChar(255)
+  racer    racer[]
 }

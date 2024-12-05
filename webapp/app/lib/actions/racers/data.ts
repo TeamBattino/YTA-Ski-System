@@ -33,12 +33,14 @@ export async function updateOrCreateRacer(racer: racer) {
       ldap: racer.ldap,
       name: racer.name,
       ski_pass: racer.ski_pass,
+      location: racer.location,
     },
     create: {
       racer_id: racer.racer_id,
       ldap: racer.ldap,
       name: racer.name,
       ski_pass: racer.ski_pass,
+      location: racer.location,
     },
    });
   return newRacer;
