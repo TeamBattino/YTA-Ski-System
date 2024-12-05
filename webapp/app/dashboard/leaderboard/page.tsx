@@ -2,6 +2,7 @@ import { fetchRacers, bruh } from "@/app/lib/actions/racers/data";
 import LeaderboardTable from "../../ui/dashboard/leaderboard/leaderboard-table";
 import { fetchRuns } from "@/app/lib/actions/runs/data";
 import type { racer } from '@prisma/client';
+import FilterableLeaderboard from "../../ui/dashboard/leaderboard/filterable-leaderboard";
 
 async function calculateConsistency(racers: racer[]) {
   const consistencyList: { racer: racer, consistency: number }[] = [];
@@ -29,18 +30,11 @@ function rankWithTies(sortedList: any[], key: string) {
     const item = sortedList[i];
     const previousItem = sortedList[i - 1];
 
-    // If the current item has the same value as the previous item, it gets the same rank
     if (i > 0 && item[key] === previousItem[key]) {
-      rankedList.push({
-        ...item,
-        rank: currentRank
-      });
+      rankedList.push({ ...item, rank: currentRank });
     } else {
-      rankedList.push({
-        ...item,
-        rank: currentRank
-      });
-      currentRank = currentRank + 1;  // Increment rank for the next unique value
+      rankedList.push({ ...item, rank: currentRank });
+      currentRank++;
     }
   }
 
@@ -57,39 +51,42 @@ export default async function Page() {
   runs.forEach(run => {
     const existingRun = bestRunsMap.get(run.ski_pass);
     if (!existingRun || run.duration! < existingRun.duration!) {
-      bestRunsMap.set(run.ski_pass, run); // Keep the fastest run for each racer
+      bestRunsMap.set(run.ski_pass, run);
     }
   });
 
   const bestRuns = Array.from(bestRunsMap.values());
 
   const sortedRuns = bestRuns.sort((a, b) => a.duration! - b.duration!);
-  const runsWithRank = rankWithTies(sortedRuns, 'duration'); // Rank runs with ties
+  const runsWithRank = rankWithTies(sortedRuns, 'duration');
 
   const sortedConsistency = racerConsistencyData.sort((a, b) => a.consistency - b.consistency);
-  const consistencyWithRank = rankWithTies(sortedConsistency, 'consistency'); // Rank consistency with ties
-
+  const consistencyWithRank = rankWithTies(sortedConsistency, 'consistency');
 
   return (
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl font-semibold mb-4">Top Consistency</h2>
-        <p className="mt-2 rounded-md px-4 py-2 text-gray-700 italic">aka the difference in milliseconds between the most recent 2 runs</p>
+        <p className="mt-2 rounded-md px-4 py-2 text-gray-700 italic">Consistency is the difference in milliseconds between the most recent 2 runs</p>
         <div className="overflow-x-auto">
-          <LeaderboardTable 
-            bruh={consistencyWithRank} 
-          />
+          <LeaderboardTable bruh={consistencyWithRank} />
         </div>
       </div>
+
       <div>
         <h2 className="text-2xl font-semibold mb-4">Top Speed</h2>
-        <p className="mt-2 rounded-md px-4 py-2 text-gray-700 italic">Who is the fastest of all time!?</p>
+        <p className="mt-2 rounded-md px-4 py-2 text-gray-700 italic">Who is the fastest of all time?</p>
         <div className="overflow-x-auto">
-          <LeaderboardTable 
-            run={runsWithRank} 
-          />
+          <LeaderboardTable run={runsWithRank} />
         </div>
       </div>
+
+      {/* Pass the data to the FilterableLeaderboard client component */}
+      <FilterableLeaderboard 
+        runsWithRank={runsWithRank}
+        consistencyWithRank={consistencyWithRank}
+        racers={racers}
+      />
     </div>
   );
 }

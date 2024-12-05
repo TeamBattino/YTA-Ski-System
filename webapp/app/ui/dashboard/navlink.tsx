@@ -12,7 +12,6 @@ export default function NavLink() {
     { name: 'Leaderboard', href: '/dashboard/leaderboard', icon: <FaFlagCheckered /> },
     { name: 'Registration', href: '/dashboard/registration', icon: <FaUserPlus /> },
     { name: 'Faq', href: '/dashboard/faq', icon: <FaQuestion /> },
-    { name: 'Admin', href: '/dashboard/admin', icon: <FaLock /> },
   ];
 
   return (
