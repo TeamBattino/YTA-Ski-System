@@ -18,7 +18,7 @@ const columnsConsistency = [
 ];
 
 const formatTime = (date: Date | null) => {
-  if (!date) return "00:00:00 01:01:70"; 
+  if (!date) return null; 
 
   const hours = date.getHours().toString().padStart(2, '0');
   const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -31,11 +31,19 @@ const formatTime = (date: Date | null) => {
   return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
 };
 
+const formatDuration = (duration: number | null) => {
+  if(!duration) return null;
+  return duration / 1000;
+}
 const getCellValue = (item: any, columnKey: string) => {
   const value = getKeyValue(item, columnKey);
 
   if (columnKey === "start_time" && value) {
     return formatTime(new Date(value));
+  }
+
+  if (columnKey === "duration" && value) {
+    return formatDuration(value);
   }
 
   return value?.ldap !== undefined ? value.ldap : value;
