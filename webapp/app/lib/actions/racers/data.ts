@@ -46,6 +46,19 @@ export async function updateOrCreateRacer(racer: racer) {
   return newRacer;
 }
 
+//Create racer without racer_id
+export async function createRacer(name: string, ldap: string, ski_pass: string, location: string){
+  const newRacer = await prisma.racer.create({
+    data: {
+      location: location,
+      name: name,
+      ski_pass: ski_pass,
+      ldap: ldap,
+    }
+  })
+  return newRacer;
+}
+
 //Delete racer
 export async function deleteRacer(ski_pass: string){
   const deleteRacer = await prisma.racer.delete({
