@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useState } from 'react';
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue } from "@nextui-org/table";
 import type { run, racer } from '@prisma/client';
 
@@ -15,7 +16,6 @@ const columnsConsistency = [
   { key: "racer", label: "RACER" },
   { key: "consistency", label: "CONSISTENCY" },
 ];
-
 
 const formatTime = (date: Date | null) => {
   if (!date) return "00:00:00 01:01:70"; 
@@ -33,7 +33,6 @@ const formatTime = (date: Date | null) => {
 
 const getCellValue = (item: any, columnKey: string) => {
   const value = getKeyValue(item, columnKey);
-
 
   if (columnKey === "start_time" && value) {
     return formatTime(new Date(value));
@@ -67,12 +66,61 @@ const LeaderBoardTable = ({
   </Table>
 );
 
+const PaginatedTable = ({
+  columns,
+  items,
+  getItemKey,
+}: {
+  columns: { key: string; label: string }[];
+  items: any[];
+  getItemKey: (item: any) => string;
+}) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  // Get paginated items
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Calculate total pages
+  const totalPages = Math.ceil(items.length / itemsPerPage);
+
+  // Change page
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  return (
+    <div>
+      <LeaderBoardTable columns={columns} items={currentItems} getItemKey={getItemKey} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+        <button onClick={prevPage} disabled={currentPage === 1}>
+          Previous
+        </button>
+        <span>Page {currentPage} of {totalPages}</span>
+        <button onClick={nextPage} disabled={currentPage === totalPages}>
+          Next
+        </button>
+      </div>
+    </div>
+  );
+};
+
 export function LeaderBoardTableSpeed({ run }: { run: run[] }) {
-  return <LeaderBoardTable columns={columnsSpeed} items={run} getItemKey={(item) => item.run_id} />;
+  return <PaginatedTable columns={columnsSpeed} items={run} getItemKey={(item) => item.run_id} />;
 }
 
 export function LeaderBoardTableConsistency({ bruh }: { bruh: { racer: racer; consistency: number }[] }) {
-  return <LeaderBoardTable columns={columnsConsistency} items={bruh} getItemKey={(item) => item.racer.racer_id} />;
+  return <PaginatedTable columns={columnsConsistency} items={bruh} getItemKey={(item) => item.racer.racer_id} />;
 }
 
 export default function LeaderboardTable({ run, bruh }: { run?: run[]; bruh?: { racer: racer; consistency: number }[] }) {

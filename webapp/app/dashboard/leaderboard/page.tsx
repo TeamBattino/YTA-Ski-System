@@ -21,6 +21,32 @@ async function calculateConsistency(racers: racer[]) {
   return consistencyList;
 }
 
+function rankWithTies(sortedList: any[], key: string) {
+  const rankedList = [];
+  let currentRank = 1;
+
+  for (let i = 0; i < sortedList.length; i++) {
+    const item = sortedList[i];
+    const previousItem = sortedList[i - 1];
+
+    // If the current item has the same value as the previous item, it gets the same rank
+    if (i > 0 && item[key] === previousItem[key]) {
+      rankedList.push({
+        ...item,
+        rank: currentRank
+      });
+    } else {
+      rankedList.push({
+        ...item,
+        rank: currentRank
+      });
+      currentRank = currentRank + 1;  // Increment rank for the next unique value
+    }
+  }
+
+  return rankedList;
+}
+
 export default async function Page() {
   const runs = await fetchRuns();
   const racers = await fetchRacers();
@@ -29,25 +55,20 @@ export default async function Page() {
   const bestRunsMap = new Map<any, any>();
 
   runs.forEach(run => {
-    const existingRun = bestRunsMap.get(run.racer_id);
+    const existingRun = bestRunsMap.get(run.ski_pass);
     if (!existingRun || run.duration! < existingRun.duration!) {
-      bestRunsMap.set(run.racer_id, run); // Keep the fastest run for each racer
+      bestRunsMap.set(run.ski_pass, run); // Keep the fastest run for each racer
     }
   });
-  
+
   const bestRuns = Array.from(bestRunsMap.values());
 
   const sortedRuns = bestRuns.sort((a, b) => a.duration! - b.duration!);
-  const runsWithRank = sortedRuns.map((run, index) => ({
-    ...run,
-    rank: index + 1,
-  }));
+  const runsWithRank = rankWithTies(sortedRuns, 'duration'); // Rank runs with ties
 
   const sortedConsistency = racerConsistencyData.sort((a, b) => a.consistency - b.consistency);
-  const consistencyWithRank = sortedConsistency.map((item, index) => ({
-    ...item,
-    rank: index + 1,  
-  }));
+  const consistencyWithRank = rankWithTies(sortedConsistency, 'consistency'); // Rank consistency with ties
+
 
   return (
     <div className="space-y-8">

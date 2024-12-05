@@ -23,7 +23,7 @@ model racer {
 model run {
   start_time DateTime? @db.Timestamp(6)
   duration   Int?
-  racer_id   String?   @db.Uuid
+  ski_pass   String?   @db.VarChar(255)
   run_id     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  racer      racer?    @relation(fields: [racer_id], references: [racer_id], onDelete: NoAction, onUpdate: NoAction)
+  racer      racer?    @relation(fields: [ski_pass], references: [ski_pass], onDelete: NoAction, onUpdate: NoAction)
 }

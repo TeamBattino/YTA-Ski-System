@@ -34,14 +34,14 @@ export async function updateOrCreateRun(run: run) {
       update: {
         run_id: run.run_id,
         duration: run.duration,
-        racer_id: run.racer_id,
+        ski_pass: run.ski_pass,
         start_time: run.start_time,
 
       },
       create: {
         run_id: run.run_id,
         duration: run.duration,
-        racer_id: run.racer_id,
+        ski_pass: run.ski_pass,
         start_time: run.start_time,
       },
      });

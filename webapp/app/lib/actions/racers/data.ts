@@ -26,7 +26,7 @@ export async function fetchRacers() {
 export async function updateOrCreateRacer(racer: racer) {
   const newRacer = await prisma.racer.upsert({ 
     where: {
-      racer_id: racer.racer_id,
+      racer_id: racer.racer_id
     },
     update: {
       racer_id: racer.racer_id,
@@ -45,10 +45,10 @@ export async function updateOrCreateRacer(racer: racer) {
 }
 
 //Delete racer
-export async function deleteRacer(racer: racer){
+export async function deleteRacer(ski_pass: string){
   const deleteRacer = await prisma.racer.delete({
     where: {
-      racer_id: racer.racer_id
+      ski_pass: ski_pass,
     }
   }).then((res) => console.log(res))
 }
@@ -56,7 +56,7 @@ export async function deleteRacer(racer: racer){
 // Fetch recent runs for a given racer
 export async function bruh(racer: racer) {
   const recentRuns = await prisma.run.findMany({
-    where: { racer_id: racer.racer_id },
+    where: { ski_pass: racer.ski_pass },
     select: {
       duration: true,
     },
