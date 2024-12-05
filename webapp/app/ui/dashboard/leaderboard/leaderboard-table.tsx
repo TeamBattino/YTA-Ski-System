@@ -39,25 +39,26 @@ function rankWithTies(sortedList: any[], key: string) {
 }
 
 const formatTime = (date: Date | null) => {
-  if (!date) return null; 
+  if (!date) return null;
 
   const hours = date.getHours().toString().padStart(2, '0');
   const minutes = date.getMinutes().toString().padStart(2, '0');
   const seconds = date.getSeconds().toString().padStart(2, '0');
   
   const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // months are 0-indexed, so add 1
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // months are 0-indexed, so add 1 
   const year = date.getFullYear().toString().slice(-2);
   
   return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
 };
 
 const formatDuration = (duration: number | null) => {
-  if(!duration) return null;
+  if (!duration) return null;
   return duration / 1000;
 }
+
 const getCellValue = (item: any, columnKey: string) => {
-  const value = columnKey === "racername" || columnKey === "racersite" ? getKeyValue(item, "racer"): getKeyValue(item, columnKey);
+  const value = columnKey === "racername" || columnKey === "racersite" ? getKeyValue(item, "racer") : getKeyValue(item, columnKey);
 
   switch (columnKey) {
     case "start_time":
@@ -104,20 +105,22 @@ const LeaderBoardTable = ({
   items: any[];
   getItemKey: (item: any) => string;
 }) => (
-  <Table isStriped>
-    <TableHeader columns={columns}>
-      {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
-    </TableHeader>
-    <TableBody items={items}>
-      {(item) => (
-        <TableRow key={getItemKey(item)}>
-          {(columnKey) => (
-            <TableCell>{String(getCellValue(item, String(columnKey)) || '').replaceAll('"', '')}</TableCell> // String in case of undefined data
-          )}
-        </TableRow>
-      )}
-    </TableBody>
-  </Table>
+  <div className="overflow-x-auto">
+    <Table aria-label="Leaderboard" className="min-w-full">
+      <TableHeader columns={columns}>
+        {(column) => <TableColumn key={column.key} className="text-left">{column.label}</TableColumn>}
+      </TableHeader>
+      <TableBody items={items}>
+        {(item) => (
+          <TableRow key={getItemKey(item)}>
+            {(columnKey) => (
+              <TableCell className="text-left">{String(getCellValue(item, String(columnKey)) || '').replaceAll('"', '')}</TableCell>
+            )}
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+  </div>
 );
 
 const PaginatedTable = ({
@@ -154,14 +157,20 @@ const PaginatedTable = ({
   };
 
   return (
-    <div>
+    <div className="space-y-4">
       <LeaderBoardTable columns={columns} items={currentItems} getItemKey={getItemKey} />
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
-        <button onClick={prevPage} disabled={currentPage === 1}>
+      <div className="flex justify-between items-center mt-4 space-x-4">
+        <button 
+          onClick={prevPage} 
+          disabled={currentPage === 1} 
+          className="px-4 py-2 bg-blue-300 text-white rounded-md disabled:opacity-50">
           Previous
         </button>
-        <span>Page {currentPage} of {totalPages}</span>
-        <button onClick={nextPage} disabled={currentPage === totalPages}>
+        <span className="text-sm">Page {currentPage} of {totalPages}</span>
+        <button 
+          onClick={nextPage} 
+          disabled={currentPage === totalPages} 
+          className="px-4 py-2 bg-blue-300 text-white rounded-md disabled:opacity-50">
           Next
         </button>
       </div>

@@ -63,14 +63,14 @@ export default function FilterableLeaderboard({
   }, [ldapSearch, racers]);
 
   return (
-    <div>
+    <div className="p-4">
       <h2 className="text-2xl font-semibold mb-4">Filter Racers</h2>
-      <div className="flex space-x-4 mb-4">
+      <div className="flex flex-wrap gap-4 mb-4">
         {/* Site filter dropdown */}
         <select
           onChange={(e) => setSelectedLocation(e.target.value)}
           value={selectedLocation}
-          className="p-2 border rounded"
+          className="p-2 border rounded w-full sm:w-auto"
         >
           <option value="">Select Site</option>
           <option value="ZH">ZH</option>
@@ -80,13 +80,13 @@ export default function FilterableLeaderboard({
         </select>
 
         {/* LDAP search input */}
-        <div className="relative">
+        <div className="relative flex justify-center py-4 w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
           <input
             type="text"
             value={ldapSearch}
             onChange={(e) => setLdapSearch(e.target.value)}
             placeholder="Search by LDAP"
-            className="p-2 border rounded w-72"
+            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {ldapSuggestions.length > 0 && (
             <div className="absolute left-0 right-0 mt-1 bg-white border rounded shadow-md max-h-60 overflow-y-auto z-10">

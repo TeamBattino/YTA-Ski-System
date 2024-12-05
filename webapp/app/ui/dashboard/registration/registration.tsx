@@ -7,7 +7,7 @@ export default function Registration() {
   const [name, setName] = useState<string>("");
   const [ldap, setLdap] = useState<string>("");
   const [location, setLocation] = useState<string>("");
-  const [ski_pass, setSkiPass] = useState<string>("bruhhhh");
+  const [ski_pass, setSkiPass] = useState<string>("prrthiusdfhg");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string>(""); // for nfc reader
   
@@ -48,10 +48,12 @@ export default function Registration() {
     setIsSubmitting(true);
     if (ldap && ldap.includes("@")) {
         alert("LDAP cannot contain '@'.");
+        setIsSubmitting(false);
         return;
       }
       if (!name || !ldap || !ski_pass || !location) {
         alert("All fields are required.");
+        setIsSubmitting(false);
         return;
       }
 
