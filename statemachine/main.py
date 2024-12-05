@@ -1,10 +1,12 @@
 from panic_button import PanicButton
 from alpenhunde import Alpenhunde
 from UI import AlpenhundeUI
-import os
 from websocket import create_connection
-ENV_PANIC_BUTTON_PIN = int(os.environ["PANIC_BUTTON_PIN"])
-ENV_API_URL = os.environ["API_URL"]
+from dotenv import load_dotenv
+import os
+load_dotenv()
+ENV_PANIC_BUTTON_PIN = int(os.getenv("PANIC_BUTTON_PIN"))
+ENV_API_URL = os.getenv("API_URL")
 
 
 alpenhunde = Alpenhunde()
