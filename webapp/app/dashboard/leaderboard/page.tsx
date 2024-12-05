@@ -22,24 +22,7 @@ async function calculateConsistency(racers: racer[]) {
   return consistencyList;
 }
 
-function rankWithTies(sortedList: any[], key: string) {
-  const rankedList = [];
-  let currentRank = 1;
 
-  for (let i = 0; i < sortedList.length; i++) {
-    const item = sortedList[i];
-    const previousItem = sortedList[i - 1];
-
-    if (i > 0 && item[key] === previousItem[key]) {
-      rankedList.push({ ...item, rank: currentRank });
-    } else {
-      rankedList.push({ ...item, rank: currentRank });
-      currentRank++;
-    }
-  }
-
-  return rankedList;
-}
 
 export default async function Page() {
   const runs = await fetchRuns();
@@ -58,10 +41,7 @@ export default async function Page() {
   const bestRuns = Array.from(bestRunsMap.values());
 
   const sortedRuns = bestRuns.sort((a, b) => a.duration! - b.duration!);
-  const runsWithRank = rankWithTies(sortedRuns, 'duration');
-
   const sortedConsistency = racerConsistencyData.sort((a, b) => a.consistency - b.consistency);
-  const consistencyWithRank = rankWithTies(sortedConsistency, 'consistency');
 
   return (
     <div className="space-y-8">
@@ -69,7 +49,7 @@ export default async function Page() {
         <h2 className="text-2xl font-semibold mb-4">Top Consistency</h2>
         <p className="mt-2 rounded-md px-4 py-2 text-gray-700 italic">Consistency is the difference in milliseconds between the most recent 2 runs</p>
         <div className="overflow-x-auto">
-          <LeaderboardTable bruh={consistencyWithRank} />
+          <LeaderboardTable bruh={sortedConsistency} />
         </div>
       </div>
 
@@ -77,14 +57,14 @@ export default async function Page() {
         <h2 className="text-2xl font-semibold mb-4">Top Speed</h2>
         <p className="mt-2 rounded-md px-4 py-2 text-gray-700 italic">Who is the fastest of all time?</p>
         <div className="overflow-x-auto">
-          <LeaderboardTable run={runsWithRank} />
+          <LeaderboardTable run={sortedRuns} />
         </div>
       </div>
 
       {/* Pass the data to the FilterableLeaderboard client component */}
       <FilterableLeaderboard 
-        runsWithRank={runsWithRank}
-        consistencyWithRank={consistencyWithRank}
+        runsWithRank={runs}
+        consistencyWithRank={sortedConsistency}
         racers={racers}
       />
     </div>

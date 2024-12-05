@@ -19,6 +19,25 @@ const columnsConsistency = [
   { key: "consistency", label: "CONSISTENCY" },
 ];
 
+function rankWithTies(sortedList: any[], key: string) {
+  const rankedList = [];
+  let currentRank = 1;
+
+  for (let i = 0; i < sortedList.length; i++) {
+    const item = sortedList[i];
+    const previousItem = sortedList[i - 1];
+
+    if (i > 0 && item[key] === previousItem[key]) {
+      rankedList.push({ ...item, rank: currentRank });
+    } else {
+      rankedList.push({ ...item, rank: currentRank });
+      currentRank++;
+    }
+  }
+
+  return rankedList;
+}
+
 const formatTime = (date: Date | null) => {
   if (!date) return null; 
 
@@ -151,11 +170,13 @@ const PaginatedTable = ({
 };
 
 export function LeaderBoardTableSpeed({ run }: { run: run[] }) {
-  return <PaginatedTable columns={columnsSpeed} items={run} getItemKey={(item) => item.run_id} />;
+  const runsWithRank = rankWithTies(run, 'duration');
+  return <PaginatedTable columns={columnsSpeed} items={runsWithRank} getItemKey={(item) => item.run_id} />;
 }
 
 export function LeaderBoardTableConsistency({ bruh }: { bruh: { racer: racer; consistency: number }[] }) {
-  return <PaginatedTable columns={columnsConsistency} items={bruh} getItemKey={(item) => item.racer.racer_id} />;
+  const consistencyWithRank = rankWithTies(bruh, 'consistency');
+  return <PaginatedTable columns={columnsConsistency} items={consistencyWithRank} getItemKey={(item) => item.racer.racer_id} />;
 }
 
 export default function LeaderboardTable({ run, bruh }: { run?: run[]; bruh?: { racer: racer; consistency: number }[] }) {
