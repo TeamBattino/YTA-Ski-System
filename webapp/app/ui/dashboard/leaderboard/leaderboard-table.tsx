@@ -6,14 +6,16 @@ import type { run, racer } from '@prisma/client';
 
 const columnsSpeed = [
   { key: "rank", label: "RANK" },
-  { key: "racer", label: "RACER" },
+  { key: "racername", label: "NAME" },
+  { key: "racersite", label: "SITE" },
   { key: "duration", label: "DURATION" },
   { key: "start_time", label: "DATE" },
 ];
 
 const columnsConsistency = [
   { key: "rank", label: "RANK" },
-  { key: "racer", label: "RACER" },
+  { key: "racername", label: "NAME" },
+  { key: "racersite", label: "SITE" },
   { key: "consistency", label: "CONSISTENCY" },
 ];
 
@@ -36,21 +38,42 @@ const formatDuration = (duration: number | null) => {
   return duration / 1000;
 }
 const getCellValue = (item: any, columnKey: string) => {
-  const value = getKeyValue(item, columnKey);
+  const value = columnKey === "racername" || columnKey === "racersite" ? getKeyValue(item, "racer"): getKeyValue(item, columnKey);
 
-  if (columnKey === "start_time" && value) {
-    return formatTime(new Date(value));
+  switch (columnKey) {
+    case "start_time":
+      if (value) {
+        return formatTime(new Date(value));
+      }
+      break;
+  
+    case "duration":
+      if (value) {
+        return formatDuration(value) + 's';
+      }
+      break;
+  
+    case "consistency":
+      if (value) {
+        return value + 'ms';
+      }
+      break;
+
+    case "racername":
+      if (value) {
+        return value.ldap;
+      }
+      break;
+
+    case "racersite":
+      if (value) {
+        return value.location;
+      }
+      break;
+  
+    default:
+      return value;
   }
-
-  if (columnKey === "duration" && value) {
-    return formatDuration(value) + 's';
-  }
-
-  if (columnKey === "consistency" && value) {
-    return value + 'ms';
-  }
-
-  return value?.ldap !== undefined ? value.ldap : value;
 };
 
 const LeaderBoardTable = ({
