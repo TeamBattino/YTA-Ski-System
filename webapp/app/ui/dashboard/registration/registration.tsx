@@ -1,8 +1,6 @@
 'use client'
 
 import React, {useState } from "react";
-import NfcReader from "@/app/lib/NfcReader";
-import { createRacer } from "@/app/lib/actions/racers/data";
 
 
 export default function Registration() {
@@ -11,11 +9,39 @@ export default function Registration() {
   const [location, setLocation] = useState<string>("");
   const [ski_pass, setSkiPass] = useState<string>("bruhhhh");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [message, setMessage] = useState<string>(""); // for nfc reader
   
-//   const handleScan = (ski_pass: string) => {
-//     setSkiPass(ski_pass);
-//   };
+    const handleScan = async () => {
+      if ("NDEFReader" in window) {
+        try {
+          const ndef = new (window as any).NDEFReader(); // Use `as any` to avoid TypeScript errors for NDEFReader.
+          await ndef.scan();
+  
+          console.log("Scan started successfully.");
+          setMessage("Scanning...");
+  
+          ndef.onreadingerror = () => {
+            console.log("Cannot read data from the NFC tag. Try another one?");
+            setMessage("Try again!");
+          };
+  
+          ndef.onreading = (event: any) => {
+            console.log("NDEF message read.");
+            const serialNumber = event.serialNumber || "Unknown";
+            setMessage(`Scan successful:\n ${serialNumber}`);
+            setSkiPass(serialNumber);
+          };
+        } catch (error) {
+          console.log(`Error! Scan failed to start: ${error}.`);
+          setMessage("Error starting NFC scan. Try again!");
+        }
+      } else {
+        console.log("NFC is not supported on this device.");
+        setMessage("NFC is not supported on this device.\nPlease use Chrome on an Android device.");
+    }
+    
+    };
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,8 +82,8 @@ export default function Registration() {
         return;
       }}
     } catch (error) {
-      console.error("Error registering racer:", error);
-      alert("An error occurred. Please try again." + error);
+      console.error("Error registering racer: ", error);
+      alert("An error occurred. Please try again.: " + error);
     } finally {
       setIsSubmitting(false);
     }
@@ -68,7 +94,15 @@ export default function Registration() {
       <h1 className="mb-6 text-2xl font-bold text-blue-600">Registration</h1>
 
       {/* NFC Reader */}
-      <NfcReader  />
+      <div className="flex flex-col items-center mb-6 w-60">
+        <button
+          onClick={handleScan}
+          className="w-full rounded-md bg-blue-400 px-4 py-2 text-white hover:bg-sky-100 hover:text-blue-600"
+        >
+          Scan Card with Phone
+        </button>
+        {message && <p className="mt-4 text-sm text-gray-700">{message}</p>}
+      </div>
 
       {/* Name Field */}
       <div className="mb-6 w-60">
