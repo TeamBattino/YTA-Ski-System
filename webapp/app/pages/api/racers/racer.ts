@@ -1,4 +1,4 @@
-import { deleteRacer, fetchRacerById, fetchRacers, updateOrCreateRacer } from '@/app/lib/actions/racers/data';
+import { deleteRacer, fetchRacerBySkiPass, fetchRacers, updateOrCreateRacer } from '@/app/lib/actions/racers/data';
 import { racer } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next'
  
@@ -10,7 +10,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
        if(req.body == null){
         res.json(fetchRacers())
        } else {
-        res.json(fetchRacerById(data.racer_id))
+         if(data.ski_pass)
+        res.json(fetchRacerBySkiPass(data.ski_pass))
        }
        break; 
     } 

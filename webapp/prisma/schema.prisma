@@ -14,9 +14,9 @@ model admin {
 
 model racer {
   name       String?  @db.VarChar(255)
-  ldap       String?  @db.VarChar(255)
+  ldap       String?  @db.VarChar(255) @unique
   racer_id   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ski_passes String[]
+  ski_pass   String?  @db.VarChar(255) @unique
   run        run[]
 }
 

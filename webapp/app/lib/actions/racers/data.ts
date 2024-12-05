@@ -4,13 +4,13 @@ import { racer } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // Fetch by Id
-export async function fetchRacerById(racer_id: string) {
+export async function fetchRacerBySkiPass(ski_pass: string) {
   const racer = await prisma.racer.findUnique({
-    where: { racer_id },
+    where: { ski_pass: ski_pass },
   });
 
   if (!racer) {
-    throw new Error(`Racer with ID ${racer_id} not found.`);
+    throw new Error(`Racer with ski passs ${ski_pass} not found.`);
   }
 
   return racer;
@@ -32,13 +32,13 @@ export async function updateOrCreateRacer(racer: racer) {
       racer_id: racer.racer_id,
       ldap: racer.ldap,
       name: racer.name,
-      ski_passes: racer.ski_passes,
+      ski_pass: racer.ski_pass,
     },
     create: {
       racer_id: racer.racer_id,
       ldap: racer.ldap,
       name: racer.name,
-      ski_passes: racer.ski_passes,
+      ski_pass: racer.ski_pass,
     },
    });
   return newRacer;
