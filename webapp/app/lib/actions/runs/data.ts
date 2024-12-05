@@ -42,7 +42,7 @@ export async function updateOrCreateRun(run: run) {
         run_id: run.run_id,
         duration: run.duration,
         ski_pass: run.ski_pass,
-        start_time: run.start_time,
+        start_time: new Date(),
       },
      });
     return newrun;
