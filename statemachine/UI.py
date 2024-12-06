@@ -20,6 +20,9 @@ class AlpenhundeUI:
         self.last_time_label = tk.Label(self.root, font=("Helvetica", 20))
         self.last_time_label.pack()
         
+        self.debug_log_label = tk.Label(self.root, font=("Helvetica", 12), fg="blue", anchor='ne', justify='right')
+        self.debug_log_label.place(relx=1.0, rely=0.0, anchor='ne')
+        
         self.root.attributes('-fullscreen', True)
 
     def _configure_text_tags(self):
@@ -28,10 +31,9 @@ class AlpenhundeUI:
         self.state_text.tag_configure("not_running", foreground="green")
 
     def _bind_events(self):
-        self.root.bind('<Escape>', lambda e: self.root.destroy())
+        self.root.bind('<Escape>', lambda e: self.root.quit())
 
     def update_state(self):
-        
         self._update_last_time_label()
         self._update_state_text()
         self.root.update()
@@ -56,3 +58,10 @@ class AlpenhundeUI:
             else:
                 self.last_time_label.config(text=f"Last Time: {self.alpenhunde.last_time}")
             self.alpenhunde.last_time = None
+
+    def log_debug_message(self, message):
+        self.debug_log_label.config(text=message)
+        self.root.after(5000, self.clear_debug_message)
+
+    def clear_debug_message(self):
+        self.debug_log_label.config(text="")
