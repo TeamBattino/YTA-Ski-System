@@ -1,32 +1,63 @@
 from panic_button import PanicButton
 from alpenhunde import Alpenhunde
 from UI import AlpenhundeUI
-from websocket import create_connection
 from dotenv import load_dotenv
+from alpenhundeWS import AlpenhundeWS
 import os
+from queue import Queue
+from threading import Thread, Event
+from global_types import StateMachine, StateMachineState
+
 load_dotenv()
 ENV_PANIC_BUTTON_PIN = int(os.getenv("PANIC_BUTTON_PIN"))
-ENV_API_URL = os.getenv("API_URL")
+ENV_API_URL = os.getenv("API_DOMAIN")    
+
+""" Shared state variables here """
+
+statemachne = StateMachine(StateMachineState.IDLE, -1)
+
+""" Threads created here """
+panic_event = Event()
+def run_panic_button():
+    PanicButton(ENV_PANIC_BUTTON_PIN, lambda pin: panic_event.set())
 
 
-alpenhunde = Alpenhunde()
-ui = AlpenhundeUI(alpenhunde)
+panic_thread = Thread(target=run_panic_button, daemon=True)
+panic_thread.start()
 
-def panic_button_pressed(arg):
-    alpenhunde.last_time = -1
-    alpenhunde.stop_all_running()
-    print("Panic button pressed")
-    ui.update_state()
+message_queue = Queue(maxsize=1)
+websocket_thread = Thread(target=AlpenhundeWS(message_queue).connect_websocket, daemon=True)
+websocket_thread.start()
 
-panic_button = PanicButton(21, panic_button_pressed)
+alpenhunde_update_event = Event()
+def run_alpenhunde():
+    Alpenhunde(alpenhunde_update_event, statemachne).run()
 
+alpenhunde_thread = Thread(target=run_alpenhunde, daemon=True)
+alpenhunde_thread.start()
 
-ws = create_connection("ws://192.168.4.1/ws/events")
-try:
-    while True:
-        message = ws.recv()
-        if message:
-            alpenhunde.run()
-            ui.update_state()
-finally:
-    ws.close()
+""" Main thread Functions here """
+def panic_button_call():
+    statemachne.current_state = StateMachineState.REGISTERED
+
+    
+""" Main thread Loop here """
+while True:
+    if not message_queue.empty():
+        message = message_queue.get()
+        match message:
+            case "UpdateAlpenhunde":
+                print("Update Alpenhunde")
+                alpenhunde_update_event.set()
+            case "WSConnected":
+                print("WebSocket connected")
+            case "WSError":
+                print("WebSocket error")
+            case "WSClosed":
+                print("WebSocket closed")
+            case _:
+                print("Unknown message")
+        message_queue.task_done()
+    if panic_event.is_set():
+        panic_event.clear()
+        panic_button_call()
