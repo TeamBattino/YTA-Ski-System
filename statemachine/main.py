@@ -40,8 +40,18 @@ def panic_button_call():
     statemachne.current_state = StateMachineState.REGISTERED
 
     
+ui = AlpenhundeUI(statemachne)
+user_update_event = Event()
 """ Main thread Loop here """
 while True:
+    ui.update_state()
+    if user_update_event.is_set():
+        # TODO set user via API
+        loading = True
+        ui.update_state()
+        print("User updated: ", statemachne.user.rfid)
+        statemachne.loading = False
+        user_update_event.clear()
     if not message_queue.empty():
         message = message_queue.get()
         match message:
