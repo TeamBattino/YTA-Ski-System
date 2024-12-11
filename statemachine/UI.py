@@ -1,10 +1,12 @@
 import tkinter as tk
+from global_types import StateMachine, StateMachineState
 
 class AlpenhundeUI:
-    def __init__(self, alpenhunde):
-        self.alpenhunde = alpenhunde
+    def __init__(self, state_machine: StateMachine):
         self.root = tk.Tk()
         self.root.title("Alpenhunde State")
+        self.rfid = ""
+        self.state_machine = state_machine
         
         self._setup_ui()
         self._bind_events()
@@ -31,7 +33,16 @@ class AlpenhundeUI:
         self.state_text.tag_configure("not_running", foreground="green")
 
     def _bind_events(self):
-        self.root.bind('<Escape>', lambda e: self.root.quit())
+        self.root.bind("<Key>", self.onKeyPress)
+        
+    def onKeyPress(self, event: tk.Event):
+        if (self.state_machine.current_state == StateMachineState.IDLE):
+            self.rfid += event.char
+            if event.char == '\r':
+                clean_rfid = self.rfid.strip()
+                self.state_machine.user.rfid = clean_rfid
+                self.rfid = ""
+                self.state_machine.current_state = StateMachineState.REGISTERED
 
     def update_state(self):
         self._update_last_time_label()
@@ -46,18 +57,22 @@ class AlpenhundeUI:
         self.state_text.config(state=tk.DISABLED)
 
     def _get_state_and_tag(self):
-        if self.alpenhunde.race_running:
+        # Placeholder values for state and tag
+        race_running = False  # Replace with actual logic
+        if race_running:
             return "RUNNING", "running"
         else:
             return "NOT RUNNING", "not_running"
 
     def _update_last_time_label(self):
-        if self.alpenhunde.last_time is not None:
-            if self.alpenhunde.last_time == -1:
+        # Placeholder value for last_time
+        last_time = None  # Replace with actual logic
+        if last_time is not None:
+            if last_time == -1:
                 self.last_time_label.config(text="Last Time: Did Not Finish")
             else:
-                self.last_time_label.config(text=f"Last Time: {self.alpenhunde.last_time}")
-            self.alpenhunde.last_time = None
+                self.last_time_label.config(text=f"Last Time: {last_time}")
+            last_time = None
 
     def log_debug_message(self, message):
         self.debug_log_label.config(text=message)
