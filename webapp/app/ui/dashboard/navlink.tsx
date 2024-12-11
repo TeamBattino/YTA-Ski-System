@@ -3,7 +3,7 @@
 import Link from "next/link";
 import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
-import { FaUserPlus, FaQuestion, FaLock, FaFlagCheckered } from 'react-icons/fa';
+import { FaUserPlus, FaQuestion, FaFlagCheckered } from 'react-icons/fa';
 
 export default function NavLink() {
   const pathname = usePathname();

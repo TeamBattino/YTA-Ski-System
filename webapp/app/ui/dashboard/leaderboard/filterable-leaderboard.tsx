@@ -12,7 +12,7 @@ export default function FilterableLeaderboard({
   consistencyWithRank: any[];
   racers: any[];
 }) {
-  const [filteredRacers, setFilteredRacers] = useState<any[]>(racers);
+  // const [filteredRacers, setFilteredRacers] = useState<any[]>(racers);
   const [filteredRunsWithRank, setFilteredRunsWithRank] = useState<any[]>(runsWithRank);
   const [filteredConsistencyWithRank, setFilteredConsistencyWithRank] = useState<any[]>(consistencyWithRank);
 
@@ -34,7 +34,7 @@ export default function FilterableLeaderboard({
       filtered = filtered.filter(racer => racer.ldap.toLowerCase().includes(ldapSearch.toLowerCase()));
     }
 
-    setFilteredRacers(filtered);
+    // setFilteredRacers(filtered);
 
     // Filter runsWithRank based on filtered racers
     const filteredRuns = runsWithRank.filter(run =>

@@ -1,34 +1,75 @@
-import { deleteRun, fetchRunById, fetchRuns, updateOrCreateRun } from '@/app/lib/actions/runs/data';
+import { fetchRuns, fetchRunById, updateOrCreateRun, deleteRun } from '@/app/lib/actions/runs/data';
 import { run } from '@prisma/client';
-import type { NextApiRequest, NextApiResponse } from 'next'
- 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-    const data : run = JSON.parse(req.body)
+import { NextResponse } from 'next/server';
 
-  switch(req.method) { 
-    case 'GET': { 
-       if(req.body == null){
-        res.json(fetchRuns())
-       } else {
-        res.json(fetchRunById(data.run_id))
-       }
-       break; 
-    } 
-    case 'POST': { 
-       res.json(updateOrCreateRun(data))
-       break; 
-    } 
-    case 'PUT': { 
-        res.json(updateOrCreateRun(data))
-        break; 
-     } 
-     case 'DELETE': { 
-        res.json(deleteRun(data))
-        break; 
-     } 
-    default: { 
-       res.status(200).json({message: 'You made it to the run API! nice.'})
-       break; 
-    } 
- } 
+export async function GET(req: Request) {
+  try {
+    const data: any = await req.json();
+    if (!data.run_id) {
+      const runs = await fetchRuns();
+      return NextResponse.json(runs);
+    } else {
+      const runData = await fetchRunById(data.run_id);
+      if (!runData) {
+        return NextResponse.json({ message: 'Run not found' }, { status: 404 });
+      }
+      return NextResponse.json(runData);
+    }
+  } catch (error) {
+    console.error('Error handling GET request:', error);
+    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const data: run = await req.json();
+    
+    if (!data.run_id || !data.duration || !data.ski_pass || !data.start_time) {
+      return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
+    }
+
+    const newRun = await updateOrCreateRun(data);
+    return NextResponse.json(newRun);
+  } catch (error) {
+    console.error('Error handling POST request:', error);
+    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function PUT(req: Request) {
+  try {
+    const data: run = await req.json();
+    
+    if (!data.run_id || !data.duration || !data.ski_pass || !data.start_time) {
+      return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
+    }
+
+    const updatedRun = await updateOrCreateRun(data);
+    return NextResponse.json(updatedRun);
+  } catch (error) {
+    console.error('Error handling PUT request:', error);
+    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const data: any = await req.json();
+    
+    if (data.run_id) {
+      await deleteRun({
+         run_id: data.run_id,
+         ski_pass: null,
+         start_time: null,
+         duration: null
+      });
+      return NextResponse.json({ message: 'Run deleted successfully' });
+    } else {
+      return NextResponse.json({ message: 'Run ID is required for deletion' }, { status: 400 });
+    }
+  } catch (error) {
+    console.error('Error handling DELETE request:', error);
+    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+  }
 }

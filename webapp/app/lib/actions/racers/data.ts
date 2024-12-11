@@ -61,11 +61,12 @@ export async function createRacer(name: string, ldap: string, ski_pass: string, 
 
 //Delete racer
 export async function deleteRacer(ski_pass: string){
-  const deleteRacer = await prisma.racer.delete({
+  await prisma.racer.delete({ // const deleteRacer = 
     where: {
       ski_pass: ski_pass,
     }
   }).then((res) => console.log(res))
+  return 
 }
 
 // Fetch recent runs for a given racer
