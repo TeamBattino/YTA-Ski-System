@@ -6,11 +6,10 @@ class StateMachineState(Enum):
     REGISTERED = 2
     RUNNING = 3
 
-
+@dataclass
 class User:
     rfid: str
     name: str
-
 @dataclass
 class StateMachine:
     current_state: StateMachineState
