@@ -15,11 +15,11 @@ async function getAdmin(admin_username: string){
 
     if (!admin) {
       console.log('Admin not found');
-      return null;  // Explicitly return null if no admin is found
+      return null;
     }
 
     return {
-      id: admin?.admin_id,
+      id: '', // even if admin model doesnt have id, authorize function wont work without it
       username: admin?.username,
       password: admin?.password
     };
@@ -52,8 +52,6 @@ export const { auth, signIn, signOut } = NextAuth({
           const { username, password } = parsedCredentials.data;
           const admin = await getAdmin(username);
           if (!admin) return null;
-          console.log('THIS IS THE ADMIN PASSUWADO: ' + admin.password);
-          console.log('THIS IS THE PASSWORD U PUT HEHE: ' + password)
           const passwordsMatch = (admin.password === password);
           if(passwordsMatch){
             return admin;
