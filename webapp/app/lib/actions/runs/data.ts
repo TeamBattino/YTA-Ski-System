@@ -3,7 +3,7 @@ import { run } from '@prisma/client';
 
 const prisma = new PrismaClient()
 
-//Fetch all runs
+// Fetch all runs
 export async function fetchRuns() {
     const runs = await prisma.run.findMany({
       include: {
@@ -13,46 +13,58 @@ export async function fetchRuns() {
     return runs
 }
 
-//Fetch run by id
-export async function fetchRunById(run_id : string){
+// Fetch run by id
+export async function fetchRunById(run_id: string) {
     const run = await prisma.run.findUnique({
-        where: { run_id: run_id, },
-      });
-    
-      if (!run) {
+        where: { run_id: run_id },
+    });
+
+    if (!run) {
         throw new Error(`Run with ID ${run_id} not found.`);
-      }
-      return run;
+    }
+    return run;
 }
 
-//Update run or create run if record doesnt exist yet
-export async function updateOrCreateRun(run: run) {
-    const newrun = await prisma.run.upsert({ 
-      where: {
-        run_id: run.run_id,
-      },
-      update: {
-        run_id: run.run_id,
-        duration: run.duration,
-        ski_pass: run.ski_pass,
-        start_time: run.start_time,
+export async function createRun(run: Omit<run, 'run_id'>) {
+  // Check if the ski_pass exists in the racer table
+  const racerExists = await prisma.racer.findUnique({
+      where: { ski_pass: run.ski_pass! },
+  });
 
-      },
-      create: {
-        run_id: run.run_id,
-        duration: run.duration,
-        ski_pass: run.ski_pass,
-        start_time: new Date(),
-      },
-     });
-    return newrun;
+  if (!racerExists) {
+      throw new Error(`Racer with ski_pass ${run.ski_pass} does not exist.`);
   }
-  
-  //Delete run
-  export async function deleteRun(run: run){
-     await prisma.run.delete({  // const deleterun =
-      where: {
-        run_id: run.run_id
-      }
+
+  // If racer exists, create the run
+  const newRun = await prisma.run.create({
+      data: {
+          start_time: run.start_time,
+          duration: run.duration,
+          ski_pass: run.ski_pass,
+      },
+  });
+  return newRun;
+}
+// Update an existing run by run_id
+export async function updateRun(run: run) {
+    const updatedRun = await prisma.run.update({
+        where: {
+            run_id: run.run_id,
+        },
+        data: {
+            start_time: run.start_time,
+            duration: run.duration,
+            ski_pass: run.ski_pass,
+        },
+    });
+    return updatedRun;
+}
+
+// Delete run
+export async function deleteRun(run: run) {
+    await prisma.run.delete({
+        where: {
+            run_id: run.run_id
+        }
     }).then((res) => console.log(res))
-  }
+}

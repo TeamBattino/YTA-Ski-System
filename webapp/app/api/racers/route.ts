@@ -1,4 +1,4 @@
-import { fetchRacers, fetchRacerBySkiPass, createRacer, updateOrCreateRacer, deleteRacer } from '@/app/lib/actions/racers/data';
+import { fetchRacers, fetchRacerBySkiPass, createRacer, updateRacer, deleteRacer } from '@/app/lib/actions/racers/data';
 import { racer } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
@@ -24,7 +24,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  if(!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 }); 
+  if (!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 }); 
   try {
     const data: racer = await req.json();
     
@@ -41,16 +41,16 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req: Request) {
-  if(!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 }); 
+  if (!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 }); 
   try {
     const data: racer = await req.json();
     
-    if (!data.name || !data.ldap || !data.location || !data.ski_pass) {
+    if (!data.racer_id || !data.ski_pass || !data.name || !data.ldap || !data.location) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
-    const newRacer = await updateOrCreateRacer(data);
-    return NextResponse.json(newRacer);
+    const updatedRacer = await updateRacer(data);
+    return NextResponse.json(updatedRacer);
   } catch (error) {
     console.error('Error handling PUT request:', error);
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
@@ -58,7 +58,7 @@ export async function PUT(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  if(!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 }); 
+  if (!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 }); 
   try {
     const data: any = await req.json();
     

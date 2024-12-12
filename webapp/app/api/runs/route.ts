@@ -1,4 +1,4 @@
-import { fetchRuns, fetchRunById, updateOrCreateRun, deleteRun } from '@/app/lib/actions/runs/data';
+import { fetchRuns, fetchRunById, updateRun, createRun, deleteRun } from '@/app/lib/actions/runs/data';
 import { run } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
@@ -23,21 +23,24 @@ export async function GET(req: Request) {
    }
  }
 
-export async function POST(req: Request) {
-   if(!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 }); 
-  try {
-    const data: run = await req.json();
-    
-    if (!data.run_id || !data.duration || !data.ski_pass || !data.start_time) {
-      return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
-    }
 
-    const newRun = await updateOrCreateRun(data);
-    return NextResponse.json(newRun);
-  } catch (error) {
-    console.error('Error handling POST request:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
-  }
+export async function POST(req: Request) {
+   if (!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 });
+
+   try {
+     const data: Omit<run, 'run_id'> = await req.json();  // omit run_id for create operation
+
+     if (!data.duration || !data.ski_pass || !data.start_time) {
+       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
+     }
+
+     // Try to create the run
+     const newRun = await createRun(data);
+     return NextResponse.json(newRun);
+   } catch (error) {
+     console.error('Error handling POST request:', error);
+     return NextResponse.json({ message: error.message || 'Internal Server Error' }, { status: 500 });
+   }
 }
 
 export async function PUT(req: Request) {
@@ -49,7 +52,7 @@ export async function PUT(req: Request) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
-    const updatedRun = await updateOrCreateRun(data);
+    const updatedRun = await updateRun(data);
     return NextResponse.json(updatedRun);
   } catch (error) {
     console.error('Error handling PUT request:', error);
