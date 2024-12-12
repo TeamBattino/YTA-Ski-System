@@ -7,6 +7,12 @@ class StateMachineState(Enum):
     RUNNING = 3
 
 @dataclass
+class User:
+    rfid: str
+    name: str
+@dataclass
 class StateMachine:
     current_state: StateMachineState
     last_race_time: int
+    user: User
+    loading: bool

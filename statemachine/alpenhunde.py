@@ -2,9 +2,10 @@ import requests
 from threading import Event
 from global_types import StateMachine, StateMachineState
 class Alpenhunde():
-    def __init__(self, update_event: Event, global_state: StateMachine):
+    def __init__(self, update_event: Event, race_finished_event: Event,global_state: StateMachine):
         self.race_running = False
         self.update_event = update_event
+        self.race_finished_event = race_finished_event
         self.global_state = global_state
         self.prev_result_len = None
         
@@ -58,6 +59,7 @@ class Alpenhunde():
             if int(new_time) > 0:
                 print(f"New time: {new_time}")
                 self.global_state.last_race_time = new_time
+                self.race_finished_event.set()
                 self.clear()
                 
         if (running):
