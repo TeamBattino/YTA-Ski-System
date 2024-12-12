@@ -4,6 +4,8 @@ import { fetchRuns } from "@/app/lib/actions/runs/data";
 import type { racer } from '@prisma/client';
 import FilterableLeaderboard from "../../ui/dashboard/leaderboard/filterable-leaderboard";
 
+export const dynamic = "force-dynamic";
+
 async function calculateConsistency(racers: racer[]) {
   const consistencyList: { racer: racer, consistency: number }[] = [];
 
