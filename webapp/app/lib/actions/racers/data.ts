@@ -55,3 +55,15 @@ export async function deleteRacer(ski_pass: string) {
   });
   return;
 }
+
+export async function bruh(racer: racer) {
+  const recentRuns = await prisma.run.findMany({
+    where: { ski_pass: racer.ski_pass },
+    select: {
+      duration: true,
+    },
+    orderBy: { start_time: 'desc' },
+  });
+
+  return recentRuns;
+}
