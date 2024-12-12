@@ -4,12 +4,17 @@ import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
   try {
-    const data: any = await req.json();
-    if (!data.ski_pass) {
+    const url = new URL(req.url);
+    const ski_pass = url.searchParams.get("ski_pass");
+
+    if (!ski_pass) {
       const racers = await fetchRacers();
       return NextResponse.json(racers);
     } else {
-      const racerData = await fetchRacerBySkiPass(data.ski_pass);
+      const racerData = await fetchRacerBySkiPass(ski_pass);
+      if (!racerData) {
+        return NextResponse.json({ message: 'Racer not found' }, { status: 404 });
+      }
       return NextResponse.json(racerData);
     }
   } catch (error) {
@@ -19,6 +24,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  if(!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 }); 
   try {
     const data: racer = await req.json();
     
@@ -35,6 +41,7 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req: Request) {
+  if(!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 }); 
   try {
     const data: racer = await req.json();
     
@@ -51,6 +58,7 @@ export async function PUT(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  if(!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 }); 
   try {
     const data: any = await req.json();
     

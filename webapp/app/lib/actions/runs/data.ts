@@ -16,7 +16,7 @@ export async function fetchRuns() {
 //Fetch run by id
 export async function fetchRunById(run_id : string){
     const run = await prisma.run.findUnique({
-        where: { run_id },
+        where: { run_id: run_id, },
       });
     
       if (!run) {

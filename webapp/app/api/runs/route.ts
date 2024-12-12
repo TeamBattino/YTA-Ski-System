@@ -3,25 +3,28 @@ import { run } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
-  try {
-    const data: any = await req.json();
-    if (!data.run_id) {
-      const runs = await fetchRuns();
-      return NextResponse.json(runs);
-    } else {
-      const runData = await fetchRunById(data.run_id);
-      if (!runData) {
-        return NextResponse.json({ message: 'Run not found' }, { status: 404 });
-      }
-      return NextResponse.json(runData);
-    }
-  } catch (error) {
-    console.error('Error handling GET request:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
-  }
-}
+   try {
+     const url = new URL(req.url);  
+     const run_id = url.searchParams.get("run_id");
+ 
+     if (!run_id) {
+       const runs = await fetchRuns();
+       return NextResponse.json(runs);
+     } else {
+       const runData = await fetchRunById(run_id);
+       if (!runData) {
+         return NextResponse.json({ message: 'Run not found' }, { status: 404 });
+       }
+       return NextResponse.json(runData);
+     }
+   } catch (error) {
+     console.error('Error handling GET request:', error);
+     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+   }
+ }
 
 export async function POST(req: Request) {
+   if(!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 }); 
   try {
     const data: run = await req.json();
     
@@ -38,6 +41,7 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req: Request) {
+   if(!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 }); 
   try {
     const data: run = await req.json();
     
@@ -54,6 +58,7 @@ export async function PUT(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+   if(!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 }); 
   try {
     const data: any = await req.json();
     
