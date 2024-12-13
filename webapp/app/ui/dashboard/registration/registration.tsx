@@ -29,7 +29,7 @@ export default function Registration() {
             console.log("NDEF message read.");
             const serialNumber = event.serialNumber || "Unknown";
             setMessage(`Scan successful:\n ${serialNumber}`);
-            setSkiPass(String(serialNumber).replaceAll(':','').toLowerCase);
+            setSkiPass(String(serialNumber).replaceAll(':','').toLowerCase());
           };
         } catch (error) {
           console.log(`Error! Scan failed to start: ${error}.`);
