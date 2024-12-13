@@ -65,7 +65,7 @@ class Alpenhunde():
         if (running):
             self.global_state.current_state = StateMachineState.RUNNING
 
-        else:
+        elif self.global_state.current_state == StateMachineState.RUNNING:
             self.global_state.current_state = StateMachineState.IDLE
             
     def clear(self):

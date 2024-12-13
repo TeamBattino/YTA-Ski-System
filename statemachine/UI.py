@@ -1,19 +1,21 @@
 import tkinter as tk
 from global_types import StateMachine, StateMachineState
+from threading import Event
 
 class AlpenhundeUI:
-    def __init__(self, state_machine: StateMachine):
+    def __init__(self, state_machine: StateMachine, user_update_event: Event):
         self.root = tk.Tk()
         self.root.title("Alpenhunde State")
         self.rfid = ""
         self.state_machine = state_machine
+        self.user_update_event = user_update_event
         
         self._setup_ui()
         self._bind_events()
         self.update_state()
 
     def _setup_ui(self):
-        self.state_text = tk.Text(self.root, font=("Helvetica", 32), height=1, width=20, bd=0, bg=self.root.cget("bg"))
+        self.state_text = tk.Text(self.root, font=("Helvetica", 32), height=1, bd=0, bg=self.root.cget("bg"))
         self.state_text.pack(expand=True)
         self._configure_text_tags()
         self.state_text.insert(tk.END, "State: ", "state")
@@ -29,8 +31,8 @@ class AlpenhundeUI:
 
     def _configure_text_tags(self):
         self.state_text.tag_configure("state", font=("Helvetica", 32))
-        self.state_text.tag_configure("running", foreground="red")
-        self.state_text.tag_configure("not_running", foreground="green")
+        self.state_text.tag_configure("NOT_READY", foreground="red")
+        self.state_text.tag_configure("READY", foreground="green")
 
     def _bind_events(self):
         self.root.bind("<Key>", self.onKeyPress)
@@ -39,10 +41,11 @@ class AlpenhundeUI:
         if (self.state_machine.current_state == StateMachineState.IDLE):
             self.rfid += event.char
             if event.char == '\r':
+                print("registering user")
                 clean_rfid = self.rfid.strip()
                 self.state_machine.user.rfid = clean_rfid
                 self.rfid = ""
-                self.state_machine.current_state = StateMachineState.REGISTERED
+                self.user_update_event.set()
 
     def update_state(self):
         self._update_last_time_label()
@@ -57,12 +60,19 @@ class AlpenhundeUI:
         self.state_text.config(state=tk.DISABLED)
 
     def _get_state_and_tag(self):
-        # Placeholder values for state and tag
-        race_running = False  # Replace with actual logic
-        if race_running:
-            return "RUNNING", "running"
-        else:
-            return "NOT RUNNING", "not_running"
+        if (self.state_machine.loading):
+            return "Loading...", "NOT_READY"
+        
+        match self.state_machine.current_state:
+            # TODO leftoff wednesday, do UI while waiting for jessica
+            case StateMachineState.IDLE:
+                return "Please Close the gate Then Scan your Badge on the NFC reader below", "READY"
+            case StateMachineState.REGISTERED:
+                if (self.state_machine.user.name == "Unregistered User"):
+                    return "User not found. Please register yourself online and press the red button", "NOT_READY"
+                return f"Hey, {self.state_machine.user.name} You're ready to race!", "READY"
+            case StateMachineState.RUNNING:
+                return f"{self.state_machine.user.name} is Racing...", "NOT_READY"
 
     def _update_last_time_label(self):
         # Placeholder value for last_time

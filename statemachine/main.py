@@ -6,7 +6,8 @@ from alpenhundeWS import AlpenhundeWS
 import os
 from queue import Queue
 from threading import Thread, Event
-from global_types import StateMachine, StateMachineState
+from global_types import StateMachine, StateMachineState, User
+from api import ApiClient
 
 load_dotenv()
 ENV_PANIC_BUTTON_PIN = int(os.getenv("PANIC_BUTTON_PIN"))
@@ -36,21 +37,27 @@ alpenhunde_thread = Thread(target=run_alpenhunde, daemon=True)
 alpenhunde_thread.start()
 
 """ Main thread Functions here """
-def panic_button_call():
-    statemachne.current_state = StateMachineState.REGISTERED
+api = ApiClient(ENV_API_URL)
 
-    
-ui = AlpenhundeUI(statemachne)
+def panic_button_call():
+    statemachne.current_state = StateMachineState.IDLE
+
+def update_user():
+    user = api.getUser(statemachne.user.rfid)
+    statemachne.user = user
+
 user_update_event = Event()
+ui = AlpenhundeUI(statemachne, user_update_event)
 """ Main thread Loop here """
 while True:
     ui.update_state()
     if user_update_event.is_set():
-        # TODO set user via API
-        loading = True
+        alpenhunde_update_event.set()
+        statemachne.loading = True
         ui.update_state()
-        print("User updated: ", statemachne.user.rfid)
+        update_user()
         statemachne.loading = False
+        statemachne.current_state = StateMachineState.REGISTERED
         user_update_event.clear()
     if not message_queue.empty():
         message = message_queue.get()
@@ -67,11 +74,12 @@ while True:
             case _:
                 print("Unknown message")
         message_queue.task_done()
-        if race_finished_event.is_set():
-            statemachne.loading = True
-            ui.update_state()
-            # TODO: Send Race to API
-            statemachne.loading = False
-            race_finished_event.clear()
+    if race_finished_event.is_set():
+        statemachne.loading = True
+        ui.update_state()
+        api.postRace(statemachne.user.rfid, statemachne.last_race_time)
+        statemachne.loading = False
+        race_finished_event.clear()
     if panic_event.is_set():
         panic_button_call()
+        panic_event.clear()
