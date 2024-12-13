@@ -54,7 +54,7 @@ const formatTime = (date: Date | null) => {
 
 const formatDuration = (duration: number | null) => {
   if (!duration) return null;
-  return duration / 1000;
+  return duration / 10000;
 }
 
 const getCellValue = (item: any, columnKey: string) => {
