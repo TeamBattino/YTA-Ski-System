@@ -11,11 +11,13 @@ export async function GET(req: Request) {
       const racers = await fetchRacers();
       return NextResponse.json(racers);
     } else {
-      const racerData = await fetchRacerBySkiPass(ski_pass);
-      if (!racerData) {
+      try {
+        const racerData = await fetchRacerBySkiPass(ski_pass);
+        return NextResponse.json(racerData);
+      }
+      catch (error) {
         return NextResponse.json({ message: 'Racer not found' }, { status: 404 });
       }
-      return NextResponse.json(racerData);
     }
   } catch (error) {
     console.error('Error handling GET request:', error);
