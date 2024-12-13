@@ -141,8 +141,8 @@ export default function Registration() {
       {/* Site Selection */}
       <div className="mb-6 w-60">
         <p className="mb-4 text-sm font-medium text-gray-700">Choose Your Site</p>
-        <div className="grid grid-cols-3 gap-3">
-          {["ZH", "PO", "US", "DE"].map((location) => (
+        <div className="grid grid-cols-2 gap-3">
+          {["ZRH", "WAW", "US", "DE"].map((location) => (
             <button
               key={location}
               onClick={() => {setLocation(location)}}

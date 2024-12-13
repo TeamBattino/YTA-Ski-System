@@ -20,7 +20,7 @@ model racer {
   ski_pass String? @unique @db.VarChar(255)
   run      run[]
   location String? @db.VarChar(255)
-  site     site?   @relation(fields: [location], references: [location], onDelete: Cascade, onUpdate: Cascade)
+  site     String? @db.VarChar(255)
 }
 
 model run {
@@ -29,9 +29,4 @@ model run {
   ski_pass   String?   @db.VarChar(255)
   run_id     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   racer      racer?    @relation(fields: [ski_pass], references: [ski_pass], onDelete: Cascade, onUpdate: Cascade)
-}
-
-model site {
-  location String  @id @unique @db.VarChar(255)
-  racer    racer[]
 }
