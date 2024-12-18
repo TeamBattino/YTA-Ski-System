@@ -1,25 +1,23 @@
 'use client';
 
 import React, { useState } from 'react';
-import { signOut } from '@/auth';
+import { signOutAction } from '@/app/lib/actions/signOutAction'; // Importiere die Server Action
 
 export default function AdminPage() {
-  // separati Zustände für jede Sektion
   const [replaceSkiPassQuery, setReplaceSkiPassQuery] = useState('');
   const [deleteRaceQuery, setDeleteRaceQuery] = useState('');
   const [deletePeopleQuery, setDeletePeopleQuery] = useState('');
-  
   const [searchResult, setSearchResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [newSkiPass, setNewSkiPass] = useState(''); 
+  const [newSkiPass, setNewSkiPass] = useState('');
 
   const handleSearch = async (endpoint: string, query: string) => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`/api/admin/${endpoint}?query=${query}`);//muss arangiere, api endpoints entweder erstelle oder alti verwende. han jetzt nur mal die als platzhalter gno.
+      const response = await fetch(`/api/admin/${endpoint}?query=${query}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch data: ${response.statusText}`);
       }
@@ -34,7 +32,7 @@ export default function AdminPage() {
 
   const handleAction = async (endpoint: string, action: string, body?: any) => {
     try {
-      const response = await fetch(`/api/admin/${endpoint}`, {//dasselbe da und bi de andere
+      const response = await fetch(`/api/admin/${endpoint}`, {
         method: action,
         headers: {
           'Content-Type': 'application/json',
@@ -81,7 +79,7 @@ export default function AdminPage() {
             <input
               type="text"
               placeholder="Enter New Ski Pass"
-              value={newSkiPass} 
+              value={newSkiPass}
               onChange={(e) => setNewSkiPass(e.target.value)}
               className="border px-3 py-2 rounded-md w-full mt-2"
             />
@@ -160,20 +158,16 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+
+      {/* Sign Out */}
       <div className="flex h-full flex-col px-3 py-4 md:px-2">
-      <p>ADMIN PAGE! sign out if you want to go back</p>
-        <form
-          action={async () => {
-            'use server';
-            await signOut();
-          }}
-        >
+        <p>ADMIN PAGE! Sign out if you want to go back</p>
+        <form action={signOutAction}>
           <button className="flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
             <div className="hidden md:block">Sign Out</div>
           </button>
         </form>
+      </div>
     </div>
-    </div>
-    
   );
 }
