@@ -2,23 +2,31 @@ import { fetchRuns, fetchRunById, updateRun, createRun, deleteRun } from '@/app/
 import { run } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
-export async function GET(req: Request) {
+export async function GET(req : Request) {
   try {
     const url = new URL(req.url);
-    const run_id = url.searchParams.get("run_id");
+    const query = url.searchParams.get("query");  // Fetch the query string from URL
+    
+    if (query && query.trim() !== '') {
+      // If query is provided and not empty, filter based on the query
+      const runs = await fetchRuns();
 
-    if (!run_id) {
+      // Filter runs by query (ski_pass or run_id)
+      const filteredRuns = runs.filter(run => {
+        return (
+          (run.ski_pass && run.ski_pass.toLowerCase().includes(query.toLowerCase())) || 
+          (run.run_id && run.run_id.toString().includes(query))
+        );
+      });
+
+      return NextResponse.json(filteredRuns);
+    } else {
+      // If no query or empty query, return all runs
       const runs = await fetchRuns();
       return NextResponse.json(runs);
-    } else {
-      const runData = await fetchRunById(run_id);
-      if (!runData) {
-        return NextResponse.json({ message: 'Run not found' }, { status: 404 });
-      }
-      return NextResponse.json(runData);
     }
   } catch (error) {
-    console.error('Error handling GET request:', error);
+    console.error('Error handling GET request for runs:', error);
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -72,21 +80,17 @@ export async function PUT(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  if (!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 });
-  try {
-    const data: any = await req.json();
 
-    if (data.run_id) {
-      await deleteRun({
-        run_id: data.run_id,
-        ski_pass: null,
-        start_time: null,
-        duration: null
-      });
-      return NextResponse.json({ message: 'Run deleted successfully' });
-    } else {
+  const url = new URL(req.url);
+  const id = url.searchParams.get("id");  // Fetch the query string from URL
+
+  try {
+    if (!id) {
       return NextResponse.json({ message: 'Run ID is required for deletion' }, { status: 400 });
     }
+    await deleteRun(id);
+
+    return NextResponse.json({ message: 'Run deleted successfully' });
   } catch (error) {
     console.error('Error handling DELETE request:', error);
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });

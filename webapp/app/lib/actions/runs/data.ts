@@ -61,10 +61,10 @@ export async function updateRun(run: run) {
 }
 
 // Delete run
-export async function deleteRun(run: run) {
+export async function deleteRun(run_id : string) {
     await prisma.run.delete({
         where: {
-            run_id: run.run_id
+            run_id: run_id
         }
     }).then((res) => console.log(res))
 }

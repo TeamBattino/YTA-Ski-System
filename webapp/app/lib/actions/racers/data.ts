@@ -47,10 +47,10 @@ export async function updateRacer(racerData: racer) {
   return updatedRacer;
 }
 
-export async function deleteRacer(ski_pass: string) {
+export async function deleteRacer(racer_id: string) {
   await prisma.racer.delete({
     where: {
-      ski_pass: ski_pass,
+      racer_id: racer_id,
     },
   });
   return;
