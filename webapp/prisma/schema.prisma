@@ -20,7 +20,6 @@ model racer {
   ski_pass String? @unique @db.VarChar(255)
   run      run[]
   location String? @db.VarChar(255)
-  site     String? @db.VarChar(255)
 }
 
 model run {
