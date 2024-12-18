@@ -3,6 +3,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { signOutAction } from '@/app/lib/actions/signOutAction'; // Importiere die Server Action
 
 export default function AdminPage() {
   const [viewMode, setViewMode] = useState<'runs' | 'racers' | null>(null);
@@ -242,6 +243,15 @@ export default function AdminPage() {
       {searchResult && !Array.isArray(searchResult) && viewMode === 'runs' && renderRunForm()}
 
       {searchResult && Array.isArray(searchResult) && renderTable(searchResult, viewMode === 'racers' ? 'racer' : 'run')}
+      {/* Sign Out */}
+      <div className="flex h-full flex-col px-3 py-4 md:px-2">
+        <p>ADMIN PAGE! Sign out if you want to go back</p>
+        <form action={signOutAction}>
+          <button className="flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
+            <div className="hidden md:block">Sign Out</div>
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
