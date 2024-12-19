@@ -31,8 +31,7 @@ export async function createRacer(name: string, ldap: string, ski_pass: string, 
   });
   return newRacer;
 }
-
-export async function updateRacer(racerData: racer) {
+export async function updateRacer(racerData: Partial<racer> & { racer_id: string }) {
   const updatedRacer = await prisma.racer.update({
     where: {
       racer_id: racerData.racer_id,

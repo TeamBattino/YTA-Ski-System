@@ -1,9 +1,7 @@
-// yo i lowk chatgpt'd this shit dont come for me 😭😭😭
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { signOutAction } from '@/app/lib/actions/signOutAction'; // Importiere die Server Action
+import { signOutAction } from '@/app/lib/actions/signOutAction';
 
 export default function AdminPage() {
   const [viewMode, setViewMode] = useState<'runs' | 'racers' | null>(null);
@@ -37,13 +35,13 @@ export default function AdminPage() {
     }
   }, [viewMode]);
 
-  useEffect(() => {
-    if (viewMode && searchQuery === '') {
-      fetchData(viewMode === 'racers' ? 'racers' : 'runs', '');
+  const handleSearch = () => {
+    if (viewMode) {
+      fetchData(viewMode === 'racers' ? 'racers' : 'runs', searchQuery);
     }
-  }, [searchQuery, viewMode]);
+  };
 
-  const handleSearch = async (item: any) => {
+  const handleEditClick = (item: any) => {
     setSearchResult(item);
     setUpdatedFields({});
   };
@@ -135,34 +133,6 @@ export default function AdminPage() {
     </div>
   );
 
-  const renderRunForm = () => (
-    <div className="mt-4">
-      <h3 className="text-xl font-semibold">Edit Run</h3>
-      <input
-        type="number"
-        placeholder="Duration (seconds)"
-        value={updatedFields.duration || searchResult.duration}
-        onChange={(e) => handleFieldChange('duration', e.target.value)}
-        className="border px-3 py-2 rounded-md w-full mt-2"
-      />
-      <input
-        type="text"
-        placeholder="Ski Pass"
-        value={updatedFields.ski_pass || searchResult.ski_pass}
-        onChange={(e) => handleFieldChange('ski_pass', e.target.value)}
-        className="border px-3 py-2 rounded-md w-full mt-2"
-      />
-      <button
-        onClick={() =>
-          handleAction('runs', 'PUT', { ...searchResult, ...updatedFields })
-        }
-        className="mt-2 bg-green-500 text-white px-4 py-2 rounded-md"
-      >
-        Save Run Changes
-      </button>
-    </div>
-  );
-
   const renderTable = (data: any, type: 'racer' | 'run') => (
     <table className="min-w-full table-auto border-collapse border border-gray-200 mt-4">
       <thead>
@@ -176,14 +146,14 @@ export default function AdminPage() {
       </thead>
       <tbody>
         {data.map((item: any) => (
-          <tr key={item.id}>
+          <tr key={`${item.racer_id || item.run_id}_${item.name || item.duration}`}>
             <td className="border p-2">{item.racer_id || item.run_id}</td>
             <td className="border p-2">{item.name || item.duration}</td>
             <td className="border p-2">{item.ski_pass}</td>
             <td className="border p-2">{item.location || item.start_time}</td>
             <td className="border p-2">
               <button
-                onClick={() => handleSearch(item)}
+                onClick={() => handleEditClick(item)}
                 className="bg-yellow-500 text-white px-4 py-2 rounded-md"
               >
                 Edit
@@ -232,7 +202,7 @@ export default function AdminPage() {
           onClick={handleSearch}
           className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md"
         >
-          Search {viewMode === 'racers' ? 'Racer' : 'Run'}
+          Search
         </button>
       </div>
 
@@ -243,7 +213,6 @@ export default function AdminPage() {
       {searchResult && !Array.isArray(searchResult) && viewMode === 'runs' && renderRunForm()}
 
       {searchResult && Array.isArray(searchResult) && renderTable(searchResult, viewMode === 'racers' ? 'racer' : 'run')}
-      {/* Sign Out */}
       <div className="flex h-full flex-col px-3 py-4 md:px-2">
         <p>ADMIN PAGE! Sign out if you want to go back</p>
         <form action={signOutAction}>
