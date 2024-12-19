@@ -2,12 +2,13 @@ import requests
 from threading import Event
 from global_types import StateMachine, StateMachineState
 class Alpenhunde():
-    def __init__(self, update_event: Event, race_finished_event: Event,global_state: StateMachine):
+    def __init__(self, update_event: Event, silent_update_event:Event ,race_finished_event: Event,global_state: StateMachine):
         self.race_running = False
         self.update_event = update_event
+        self.silent_update_event = silent_update_event
         self.race_finished_event = race_finished_event
         self.global_state = global_state
-        self.prev_result_len = None
+        self.prev_result_len = len(self.get_race_results())
         
         
 
@@ -32,6 +33,9 @@ class Alpenhunde():
 
     def is_race_running(self):
         response = self.get_running_races()
+        if (response == None):
+            print("please restart everything")
+            return False
         return int(response[0]["index"]) != 65535
 
     def stop_race(self,index):
@@ -44,11 +48,18 @@ class Alpenhunde():
         while True:
             self.update_event.wait()
             self.update_event.clear()
-            match self.global_state.current_state:
-                case StateMachineState.IDLE:
-                    self.clear()
-                case _:
-                    self.update()
+            if (self.silent_update_event.is_set()):
+                self.silent_update()
+                self.silent_update_event.clear()
+            else:
+                match self.global_state.current_state:
+                    case StateMachineState.IDLE:
+                        self.clear()
+                    case _:
+                        self.update()
+    def silent_update(self):
+        self.prev_result_len = len(self.get_race_results())
+        self.update()
 
     def update(self):
         running = self.is_race_running()

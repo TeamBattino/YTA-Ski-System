@@ -29,9 +29,10 @@ websocket_thread = Thread(target=AlpenhundeWS(message_queue).connect_websocket, 
 websocket_thread.start()
 
 alpenhunde_update_event = Event()
+alpenhunde_silent_update_event = Event()
 race_finished_event = Event()
 def run_alpenhunde():
-    Alpenhunde(alpenhunde_update_event,race_finished_event,  statemachne).run()
+    Alpenhunde(alpenhunde_update_event, alpenhunde_silent_update_event, race_finished_event,  statemachne).run()
 
 alpenhunde_thread = Thread(target=run_alpenhunde, daemon=True)
 alpenhunde_thread.start()

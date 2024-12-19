@@ -20,6 +20,9 @@ class AlpenhundeWS:
 
     def on_message(self, ws, message):
         self.message_queue.put("UpdateAlpenhunde")
+    
+    
+
 
     def connect_websocket(self):
         ws = websocket.WebSocketApp(
@@ -27,7 +30,7 @@ class AlpenhundeWS:
             on_message=self.on_message,
             on_error=self.on_error,
             on_close=self.on_close,
-            on_open=self.on_open
+            on_open=self.on_open,
         )
         self.message_queue.put("WSConnected")
-        ws.run_forever(ping_interval=3, ping_timeout=1)
+        ws.run_forever(ping_interval=5, ping_timeout=2, ping_payload="2")
