@@ -39,9 +39,7 @@ export async function getConsistency(page: number = 0) {
     )
     SELECT *
     FROM Consistency
-    ORDER BY consistency DESC
-    LIMIT 10
-    OFFSET ${page * 10}
+    ORDER BY consistency ASC
   `;
   return consistency;
 }

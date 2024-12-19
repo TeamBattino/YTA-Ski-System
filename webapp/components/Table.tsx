@@ -12,19 +12,20 @@ import {
   Button,
 } from "@nextui-org/react";
 
-const tableColumns = [
-  { key: "name", label: "Name" },
-  { key: "email", label: "Email" },
-  { key: "phone", label: "Phone" },
-  { key: "website", label: "Website" },
-];
+type Column = {
+  key: string,
+  label: string,
+  allowsSorting: boolean,
+}
+
 export type TableComponentProps = {
-  columns: Array<{ key: string; label: string }>;
+  columns: Array<Column>;
   list: { items: Iterable<any> };
   isLoading: boolean;
+  tableProps?: React.ComponentProps<typeof Table>;
 };
 
-export default function TableComponent({columns, list, isLoading }: TableComponentProps) {
+export default function TableComponent({ columns, list, isLoading, tableProps }: TableComponentProps) {
   return (
     <Table
       isHeaderSticky
@@ -33,10 +34,11 @@ export default function TableComponent({columns, list, isLoading }: TableCompone
         base: "max-h-[520px] overflow-scroll",
         table: "min-h-[420px]",
       }}
+      {...tableProps}
     >
       <TableHeader>
         {columns.map((column) => (
-          <TableColumn key={column.key}>{column.label}</TableColumn>
+          <TableColumn allowsSorting={column.allowsSorting} key={column.key}>{column.label}</TableColumn>
         ))}
       </TableHeader>
       <TableBody
