@@ -31,7 +31,7 @@ export default function SkipassRunsTable({ski_pass}: SkipassRunsTableProps) {
     const [searchValue, setSearchValue] = useState("");
     const [selectedLocation, setSelectedLocation] = useState("ALL");
     const hasSearch = Boolean(searchValue);
-    let list = useAsyncList<Run>({
+    let list = useAsyncList<FormattedRun>({
         async load() {
             const runs = await getRacerRunsBySkipass(ski_pass);
             const formattedRuns = runs.map((run: Run) => {
@@ -49,9 +49,9 @@ export default function SkipassRunsTable({ski_pass}: SkipassRunsTableProps) {
         },
         async sort({ items, sortDescriptor }) {
             return {
-                items: items.sort((a: Run, b: Run) => {
-                    let first = a[sortDescriptor.column as keyof Run];
-                    let second = b[sortDescriptor.column as keyof Run];
+                items: items.sort((a: FormattedRun, b: FormattedRun) => {
+                    let first = a[sortDescriptor.column as keyof FormattedRun];
+                    let second = b[sortDescriptor.column as keyof FormattedRun];
                     let cmp = (parseInt(first as string) || first) < (parseInt(second as string) || second) ? -1 : 1;
 
                     if (sortDescriptor.direction === "descending") {
