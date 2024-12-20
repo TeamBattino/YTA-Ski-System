@@ -1,16 +1,19 @@
 "use client";
 import { useAsyncList } from "react-stately";
 import TableComponent from "./Table";
-import { Consistency, getAllConsistency } from "@/lib/db-helper";
-import { Key, useCallback, useMemo, useState } from "react";
+import { Consistency, getAllConsistency, getRacerRunsBySkicard, getTopRuns, Run } from "@/lib/db-helper";
+import { useCallback, useMemo, useState } from "react";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input } from "@nextui-org/react";
 import { SearchIcon } from "./icons/SearchIcon";
-import { redirect } from "next/navigation";
 
-export default function ConsistencyTable() {
+type SkipassRunsTableProps = {
+    ski_pass: string;
+}
+
+export default function SkipassRunsTable({ski_pass}: SkipassRunsTableProps) {
     const columns = [
         { key: "name", label: "Name", allowsSorting: true },
-        { key: "consistency", label: "Consistency", allowsSorting: true },
+        { key: "duration", label: "Duration", allowsSorting: true },
         { key: "location", label: "Location", allowsSorting: true },
     ];
 
@@ -20,19 +23,19 @@ export default function ConsistencyTable() {
     const [searchValue, setSearchValue] = useState("");
     const [selectedLocation, setSelectedLocation] = useState("ALL");
     const hasSearch = Boolean(searchValue);
-    let list = useAsyncList<Consistency>({
+    let list = useAsyncList<Run>({
         async load() {
-            const consistency = await getAllConsistency();
+            const runs = await getRacerRunsBySkicard(ski_pass);
             setIsLoading(false);
             return {
-                items: consistency,
+                items: runs,
             };
         },
         async sort({ items, sortDescriptor }) {
             return {
-                items: items.sort((a: Consistency, b: Consistency) => {
-                    let first = a[sortDescriptor.column as keyof Consistency];
-                    let second = b[sortDescriptor.column as keyof Consistency];
+                items: items.sort((a: Run, b: Run) => {
+                    let first = a[sortDescriptor.column as keyof Run];
+                    let second = b[sortDescriptor.column as keyof Run];
                     let cmp = (parseInt(first as string) || first) < (parseInt(second as string) || second) ? -1 : 1;
 
                     if (sortDescriptor.direction === "descending") {
@@ -68,10 +71,6 @@ export default function ConsistencyTable() {
         });
     }, [list.items, searchValue, selectedLocation]);
 
-    const onRowClick = (item: Key) => {
-        const personToView = list.items.find((i) => i.name === item);
-        personToView && redirect(`/dashboard/leaderboard/${personToView?.ski_pass}`);
-    };
     return (
         <div>
             <div className="flex flex-row gap-2 py-2">
@@ -113,12 +112,10 @@ export default function ConsistencyTable() {
                 list={{ items: filterList }}
                 isLoading={isLoading}
                 tableProps={{
-                    sortDescriptor: list.sortDescriptor || { column: 'consistency', direction: 'ascending' },
+                    sortDescriptor: list.sortDescriptor || { column: 'duration', direction: 'ascending' },
                     onSortChange: list.sort,
-                    onRowAction: onRowClick,
                 }}
             />
-            <span className="px-6 text-xs">*consistency is shown in 10ths of a milisecond</span>
         </div>
     );
 }

@@ -10,7 +10,9 @@ import {
   getKeyValue,
   Spinner,
   Button,
+  ScrollShadow,
 } from "@nextui-org/react";
+import Link from "next/link";
 
 type Column = {
   key: string,
@@ -29,9 +31,10 @@ export default function TableComponent({ columns, list, isLoading, tableProps }:
   return (
     <Table
       isHeaderSticky
+      removeWrapper
       aria-label="Example table with client side sorting"
       classNames={{
-        base: "max-h-[520px] overflow-scroll",
+        base: "max-h-[520px] overflow-scroll border border-gray-200 rounded-xl border-width-",
         table: "min-h-[420px]",
       }}
       {...tableProps}
@@ -55,4 +58,3 @@ export default function TableComponent({ columns, list, isLoading, tableProps }:
     </Table>
   );
 }
-

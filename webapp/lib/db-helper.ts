@@ -4,13 +4,14 @@ import prisma from "./prisma";
 
 
 export interface Consistency {
-    ski_pass: string;
-    name: string;
-    ldap: string;
-    location: string;
-    consistency: number;
+  ski_pass: string;
+  name: string;
+  ldap: string;
+  location: string;
+  consistency: number;
 }
-export async function getConsistency(page: number = 0) {
+
+export async function getAllConsistency() {
   const consistency = await prisma.$queryRaw<Consistency[]>`
     WITH RankedRuns AS (
       SELECT
@@ -45,7 +46,7 @@ export async function getConsistency(page: number = 0) {
 }
 
 export async function getConsistencyCount() {
-    const count = await prisma.$queryRaw<number>`
+  const count = await prisma.$queryRaw<number>`
         SELECT COUNT(DISTINCT ski_pass)
         FROM (
             SELECT ski_pass
@@ -54,23 +55,21 @@ export async function getConsistencyCount() {
             HAVING COUNT(*) >= 2
         ) AS subquery
     `;
-    return count;
+  return count;
 }
 
-type Run = {
-    name: string;
-    ski_pass: string;
-    duration: number;
-    ldap: string;
-    location: string;
-}
-type TopRunProps = {
-    page?: number;
+export type Run = {
+  name: string;
+  ski_pass: string;
+  duration: number;
+  ldap: string;
+  location: string;
+  start_time: Date;
 }
 
 // Sorted by duration Decending only showinng best run per skipass
-export async function getTopRuns({ page = 0 }: TopRunProps) {
-const runs = await prisma.$queryRaw<Run[]>`
+export async function getTopRuns() {
+  const topRuns = await prisma.$queryRaw<Run[]>`
     SELECT
         r.*,
         racer.name,
@@ -88,9 +87,47 @@ const runs = await prisma.$queryRaw<Run[]>`
         )
     ORDER BY
         r.duration DESC
-    LIMIT 10
-    OFFSET ${page * 10}
 `;
+  return topRuns;
+}
 
-    return runs;
-}   
+export async function getRacerRunsBySkicard(ski_pass: string) {
+  const runs = await prisma.$queryRaw<Run[]>`
+        SELECT
+            r.*,
+            racer.name,
+            racer.ldap,
+            racer.location
+        FROM
+            run r
+        JOIN
+            racer ON r.ski_pass = racer.ski_pass
+        WHERE
+            r.ski_pass = ${ski_pass}
+        ORDER BY
+            r.start_time DESC
+    `;
+  return runs;
+}
+
+export type Racer = {
+  ski_pass: string;
+  name: string;
+  ldap: string;
+  location: string;
+}
+export async function getRacer(ski_pass: string): Promise<Racer> {
+  const racer = await prisma.$queryRaw<Racer[]>`
+        SELECT
+            *
+        FROM
+            racer
+        WHERE
+            ski_pass = ${ski_pass}
+            ;
+    `;
+  if (racer.length === 0) {
+    throw new Error("Racer not found");
+  }
+  return racer[0];
+}
