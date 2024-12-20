@@ -1,4 +1,5 @@
+import { redirect } from "next/navigation";
+
 export default function Page() {
-    return <p>Dashboard Page</p>;
-  }
-  
+  redirect("/dashboard/leaderboard");
+}
