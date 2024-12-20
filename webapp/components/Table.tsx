@@ -32,7 +32,7 @@ export default function TableComponent({ columns, list, isLoading, tableProps }:
     <Table
       isHeaderSticky
       removeWrapper
-      aria-label="Example table with client side sorting"
+      aria-label="Table"
       classNames={{
         base: "max-h-[520px] overflow-scroll border border-gray-200 rounded-xl border-width-",
         table: "min-h-[420px]",
