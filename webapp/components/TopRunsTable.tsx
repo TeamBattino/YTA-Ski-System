@@ -34,9 +34,12 @@ export default function TopRunsTable() {
         async load() {
             const topRuns = await getTopRuns();
             const formattedRuns = topRuns.map((run: Run) => {
+                const durationMilliseconds = run.duration / 10;
+                const duration = moment.duration(durationMilliseconds);
+                const formattedDuration = moment.utc(duration.asMilliseconds()).format('mm:ss.SSSS')
                 return {
                     ...run,
-                    duration: moment.utc(run.duration * 100).format('HH:mm:ss'),
+                    duration: formattedDuration,
                     start_time: moment(run.start_time).format('HH:mm D/M/YY'),
                 };
             }
@@ -53,6 +56,17 @@ export default function TopRunsTable() {
                         let first = moment(a[sortDescriptor.column as keyof FormattedRun], 'HH:mm D/M/YY');
                         let second = moment(b[sortDescriptor.column as keyof FormattedRun], 'HH:mm D/M/YY');
                         let cmp = first.isBefore(second) ? -1 : 1;
+
+                        if (sortDescriptor.direction === "descending") {
+                            cmp *= -1;
+                        }
+
+                        return cmp;
+                    } 
+                    if (sortDescriptor.column === "duration") {
+                        let first = moment.duration(a[sortDescriptor.column as keyof FormattedRun]);
+                        let second = moment.duration(b[sortDescriptor.column as keyof FormattedRun]);
+                        let cmp = first.asMilliseconds() > second.asMilliseconds() ? -1 : 1;
 
                         if (sortDescriptor.direction === "descending") {
                             cmp *= -1;

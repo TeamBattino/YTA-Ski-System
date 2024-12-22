@@ -24,6 +24,10 @@ export default function ConsistencyTable() {
         async load() {
             const consistency = await getAllConsistency();
             setIsLoading(false);
+            consistency.map((run: Consistency) => {
+                run.consistency = (run.consistency / 1000);
+            }
+            );
             return {
                 items: consistency,
             };
@@ -118,7 +122,7 @@ export default function ConsistencyTable() {
                     onRowAction: onRowClick,
                 }}
             />
-            <span className="px-6 text-xs">*consistency is shown in 10ths of a milisecond</span>
+            <span className="px-6 text-xs">*consistency is shown in Seconds, to 10^(-4) precision</span>
         </div>
     );
 }

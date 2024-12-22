@@ -19,7 +19,7 @@ type FormattedRun = {
     start_time: string,
 }
 
-export default function SkipassRunsTable({ski_pass}: SkipassRunsTableProps) {
+export default function SkipassRunsTable({ ski_pass }: SkipassRunsTableProps) {
     const columns = [
         { key: "duration", label: "Duration", allowsSorting: true },
         { key: "start_time", label: "Date", allowsSorting: true },
@@ -35,9 +35,12 @@ export default function SkipassRunsTable({ski_pass}: SkipassRunsTableProps) {
         async load() {
             const runs = await getRacerRunsBySkipass(ski_pass);
             const formattedRuns = runs.map((run: Run) => {
+                const durationMilliseconds = run.duration / 10;
+                const duration = moment.duration(durationMilliseconds);
+                const formattedDuration = moment.utc(duration.asMilliseconds()).format('mm:ss.SSSS')
                 return {
                     ...run,
-                    duration: moment.utc(run.duration * 100).format('HH:mm:ss'),
+                    duration: formattedDuration,
                     start_time: moment(run.start_time).format('HH:mm D/M/YY'),
                 };
             }
@@ -76,7 +79,7 @@ export default function SkipassRunsTable({ski_pass}: SkipassRunsTableProps) {
                 list={{ items: list.items }}
                 isLoading={isLoading}
                 tableProps={{
-                    sortDescriptor: list.sortDescriptor || { column: 'duration', direction: 'ascending' },
+                    sortDescriptor: list.sortDescriptor || { column: 'start_time', direction: 'ascending' },
                     onSortChange: list.sort,
                 }}
             />
