@@ -62,11 +62,37 @@ export default function TopRunsTable() {
                         }
 
                         return cmp;
-                    } 
-                    if (sortDescriptor.column === "duration") {
-                        let first = moment.duration(a[sortDescriptor.column as keyof FormattedRun]);
-                        let second = moment.duration(b[sortDescriptor.column as keyof FormattedRun]);
-                        let cmp = first.asMilliseconds() > second.asMilliseconds() ? -1 : 1;
+                    } else if (sortDescriptor.column === "duration") {
+                        const parseDuration = (durationString: string): number => {
+                            const [minutes, secondsAndMilliseconds] = durationString.split(":");
+                            const [seconds, millisecondsPart] = secondsAndMilliseconds.split(".");
+                            const minutesInSeconds = parseInt(minutes, 10) * 60;
+                            const secondsValue = parseInt(seconds, 10);
+                            let millisecondsValue = 0;
+
+                            if (millisecondsPart) {
+                                // Treat the milliseconds part as a fraction of a second
+                                const multiplier = Math.pow(10, 3 - millisecondsPart.length);
+                                millisecondsValue = parseInt(millisecondsPart, 10) * multiplier;
+                            }
+
+                            return (minutesInSeconds + secondsValue) * 1000 + millisecondsValue;
+                        };
+
+                        const durationA = parseDuration(a.duration);
+                        const durationB = parseDuration(b.duration);
+                        let cmp = durationA < durationB ? -1 : 1;
+
+                        if (sortDescriptor.direction === "descending") {
+                            cmp *= -1;
+                        }
+                        return cmp;
+                    }
+                    else {
+
+                        let first = a[sortDescriptor.column as keyof FormattedRun];
+                        let second = b[sortDescriptor.column as keyof FormattedRun];
+                        let cmp = (parseInt(first as string) || first) < (parseInt(second as string) || second) ? -1 : 1;
 
                         if (sortDescriptor.direction === "descending") {
                             cmp *= -1;
@@ -74,15 +100,6 @@ export default function TopRunsTable() {
 
                         return cmp;
                     }
-                    let first = a[sortDescriptor.column as keyof FormattedRun];
-                    let second = b[sortDescriptor.column as keyof FormattedRun];
-                    let cmp = (parseInt(first as string) || first) < (parseInt(second as string) || second) ? -1 : 1;
-
-                    if (sortDescriptor.direction === "descending") {
-                        cmp *= -1;
-                    }
-
-                    return cmp;
                 }),
             };
         },

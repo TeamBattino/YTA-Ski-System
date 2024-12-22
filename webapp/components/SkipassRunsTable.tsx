@@ -53,15 +53,42 @@ export default function SkipassRunsTable({ ski_pass }: SkipassRunsTableProps) {
         async sort({ items, sortDescriptor }) {
             return {
                 items: items.sort((a: FormattedRun, b: FormattedRun) => {
-                    let first = a[sortDescriptor.column as keyof FormattedRun];
-                    let second = b[sortDescriptor.column as keyof FormattedRun];
-                    let cmp = (parseInt(first as string) || first) < (parseInt(second as string) || second) ? -1 : 1;
+                    if (sortDescriptor.column === "start_time") {
+                        let first = moment(a[sortDescriptor.column as keyof FormattedRun], 'HH:mm D/M/YY');
+                        let second = moment(b[sortDescriptor.column as keyof FormattedRun], 'HH:mm D/M/YY');
+                        let cmp = first.isBefore(second) ? -1 : 1;
 
-                    if (sortDescriptor.direction === "descending") {
-                        cmp *= -1;
+                        if (sortDescriptor.direction === "descending") {
+                            cmp *= -1;
+                        }
+
+                        return cmp;
+                    } else {
+                        const parseDuration = (durationString: string): number => {
+                            const [minutes, secondsAndMilliseconds] = durationString.split(":");
+                            const [seconds, millisecondsPart] = secondsAndMilliseconds.split(".");
+                            const minutesInSeconds = parseInt(minutes, 10) * 60;
+                            const secondsValue = parseInt(seconds, 10);
+                            let millisecondsValue = 0;
+
+                            if (millisecondsPart) {
+                                // Treat the milliseconds part as a fraction of a second
+                                const multiplier = Math.pow(10, 3 - millisecondsPart.length);
+                                millisecondsValue = parseInt(millisecondsPart, 10) * multiplier;
+                            }
+
+                            return (minutesInSeconds + secondsValue) * 1000 + millisecondsValue;
+                        };
+
+                        const durationA = parseDuration(a.duration);
+                        const durationB = parseDuration(b.duration);
+                        let cmp = durationA < durationB ? -1 : 1;
+
+                        if (sortDescriptor.direction === "descending") {
+                            cmp *= -1;
+                        }
+                        return cmp;
                     }
-
-                    return cmp;
                 }),
             };
         },

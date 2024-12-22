@@ -13,34 +13,45 @@ export interface Consistency {
 
 export async function getAllConsistency() {
   const consistency = await prisma.$queryRaw<Consistency[]>`
-    WITH RankedRuns AS (
-      SELECT
-        r.*,
-        racer.name,
-        racer.ldap,
-        racer.location,
-        ROW_NUMBER() OVER (PARTITION BY r.ski_pass ORDER BY r.start_time DESC) as rn
-      FROM
-        run r
-      JOIN
-        racer ON r.ski_pass = racer.ski_pass
-    ),
-    Consistency AS (
-      SELECT
-        ski_pass,
-        name,
-        ldap,
-        location,
-        ABS(MAX(duration) - MIN(duration)) as consistency
-      FROM
-        RankedRuns
-      WHERE rn <= 2
-      GROUP BY
-        ski_pass, name, ldap, location
-    )
-    SELECT *
-    FROM Consistency
-    ORDER BY consistency ASC
+        WITH RunCounts AS (
+          SELECT
+              ski_pass,
+              COUNT(*) as run_count
+          FROM
+              run
+          GROUP BY
+              ski_pass
+          HAVING COUNT(*) >= 2
+        ),
+        RankedRuns AS (
+            SELECT
+                r.*,
+                racer.name,
+                racer.ldap,
+                racer.location,
+                ROW_NUMBER() OVER (PARTITION BY r.ski_pass ORDER BY r.start_time DESC) as rn
+            FROM
+              run r
+              JOIN racer ON r.ski_pass = racer.ski_pass
+            JOIN RunCounts rc ON r.ski_pass = rc.ski_pass
+
+        ),
+        Consistency AS (
+            SELECT
+                ski_pass,
+                name,
+                ldap,
+                location,
+                ABS(MAX(duration) - MIN(duration)) as consistency
+            FROM
+                RankedRuns
+            WHERE rn <= 2
+            GROUP BY
+                ski_pass, name, ldap, location
+        )
+        SELECT *
+        FROM Consistency
+        ORDER BY consistency ASC
   `;
   return consistency;
 }
@@ -67,7 +78,7 @@ export type Run = {
   start_time: Date;
 }
 
-// Sorted by duration Decending only showinng best run per skipass
+// Sorted by duration Decending only showinng shortest run per skipass
 export async function getTopRuns() {
   const topRuns = await prisma.$queryRaw<Run[]>`
     SELECT
@@ -81,12 +92,12 @@ export async function getTopRuns() {
         racer ON r.ski_pass = racer.ski_pass
     WHERE
         r.start_time = (
-            SELECT MAX(r2.start_time)
+            SELECT MIN(r2.start_time)
             FROM run r2
             WHERE r2.ski_pass = r.ski_pass
         )
     ORDER BY
-        r.duration DESC
+        r.duration ASC
 `;
   return topRuns;
 }
