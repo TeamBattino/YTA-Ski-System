@@ -77,6 +77,15 @@ export type Run = {
   location: string;
   start_time: Date;
 }
+export type RunWithDupilcates = {
+  run_id: string;
+  name: string;
+  ski_pass: string;
+  duration: number;
+  ldap: string;
+  location: string;
+  start_time: Date;
+}
 
 export async function getTopRuns() {
   const racersWithShortestRun = await prisma.$queryRaw<Run[]>`
@@ -98,7 +107,7 @@ export async function getTopRuns() {
   return racersWithShortestRun;
 }
 export async function getRecentRuns() {
-  const recentRuns = await prisma.$queryRaw<Run[]>`
+  const recentRuns = await prisma.$queryRaw<RunWithDupilcates[]>`
         SELECT
             r.*,
             racer.name,
@@ -115,7 +124,7 @@ export async function getRecentRuns() {
 }
 
 export async function getRacerRunsBySkicard(ski_pass: string) {
-  const runs = await prisma.$queryRaw<Run[]>`
+  const runs = await prisma.$queryRaw<RunWithDupilcates[]>`
         SELECT
             r.*,
             racer.name,

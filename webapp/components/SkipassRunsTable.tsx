@@ -1,7 +1,7 @@
 "use client";
 import { useAsyncList } from "react-stately";
 import TableComponent from "./Table";
-import { Consistency, getAllConsistency, getRacerRunsBySkicard as getRacerRunsBySkipass, getTopRuns, Run } from "@/lib/db-helper";
+import { Consistency, getAllConsistency, getRacerRunsBySkicard as getRacerRunsBySkipass, getTopRuns, Run, RunWithDupilcates } from "@/lib/db-helper";
 import { useCallback, useMemo, useState } from "react";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input } from "@nextui-org/react";
 import { SearchIcon } from "./icons/SearchIcon";
@@ -13,6 +13,7 @@ type SkipassRunsTableProps = {
 }
 
 type FormattedRun = {
+    run_id: string,
     name: string,
     duration: string,
     location: string,
@@ -34,7 +35,7 @@ export default function SkipassRunsTable({ ski_pass }: SkipassRunsTableProps) {
     let list = useAsyncList<FormattedRun>({
         async load() {
             const runs = await getRacerRunsBySkipass(ski_pass);
-            const formattedRuns = runs.map((run: Run) => {
+            const formattedRuns = runs.map((run: RunWithDupilcates) => {
                 const durationMilliseconds = run.duration / 10;
                 const duration = moment.duration(durationMilliseconds);
                 const formattedDuration = moment.utc(duration.asMilliseconds()).format('mm:ss.SSSS')

@@ -1,7 +1,7 @@
 "use client";
 import { useAsyncList } from "react-stately";
 import TableComponent from "./Table";
-import { getRecentRuns, Run } from "@/lib/db-helper";
+import { getRecentRuns, Run, RunWithDupilcates } from "@/lib/db-helper";
 import { Key, useCallback, useMemo, useState } from "react";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input } from "@nextui-org/react";
 import { SearchIcon } from "./icons/SearchIcon";
@@ -9,6 +9,7 @@ import moment from "moment";
 import { redirect } from "next/navigation";
 
 type FormattedRun = {
+    run_id: string,
     name: string,
     duration: string,
     location: string,
@@ -32,8 +33,8 @@ export default function RecentRunsTable() {
     const hasSearch = Boolean(searchValue);
     let list = useAsyncList<FormattedRun>({
         async load() {
-            const topRuns = await getRecentRuns();
-            const formattedRuns = topRuns.map((run: Run) => {
+            const recentRuns = await getRecentRuns();
+            const formattedRuns = recentRuns.map((run: RunWithDupilcates) => {
                 const durationMilliseconds = run.duration / 10;
                 const duration = moment.duration(durationMilliseconds);
                 const formattedDuration = moment.utc(duration.asMilliseconds()).format('mm:ss.SSSS')

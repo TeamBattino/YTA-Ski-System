@@ -35,7 +35,7 @@ export default function TableComponent({ columns, list, isLoading, tableProps }:
       aria-label="Table"
       classNames={{
         base: "max-h-[520px] overflow-scroll border border-gray-200 rounded-xl border-width-",
-        table: "min-h-[420px]",
+        table: "",
       }}
       {...tableProps}
     >
@@ -50,7 +50,8 @@ export default function TableComponent({ columns, list, isLoading, tableProps }:
         loadingContent={<Spinner label="Loading..." />}
       >
         {(item) => (
-          <TableRow key={item.name}>
+          <TableRow key={item.run_id ? item.run_id : item.name}>
+
             {(columnKey) => <TableCell>{getKeyValue(item, columnKey)}</TableCell>}
           </TableRow>
         )}
