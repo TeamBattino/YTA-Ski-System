@@ -130,7 +130,7 @@ export default function RecentRunsTable() {
     }, [list.items, searchValue, selectedLocation]);
 
     const onRowClick = (item: Key) => {
-        const personToView = list.items.find((i) => i.name === item);
+        const personToView = list.items.find((i) => i.run_id === item);
         personToView && redirect(`/dashboard/leaderboard/${personToView?.ski_pass}`);
     };
 
