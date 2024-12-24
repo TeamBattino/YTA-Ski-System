@@ -1,19 +1,18 @@
 import websocket
 import time
 from queue import Queue
+import rel
 
 class AlpenhundeWS:
     def __init__(self, message_queue: Queue):
         self.message_queue = message_queue
 
     def on_error(self, ws, error):
+        print(error)
         self.message_queue.put("WSError")
 
     def on_close(self, ws, close_status_code, close_msg):
         self.message_queue.put("WSClosed")
-        # Attempt to reconnect
-        time.sleep(5)
-        self.connect_websocket()
 
     def on_open(self, ws):
         print("WebSocket connection opened")
@@ -31,6 +30,5 @@ class AlpenhundeWS:
             on_error=self.on_error,
             on_close=self.on_close,
             on_open=self.on_open,
-        )
-        self.message_queue.put("WSConnected")
-        ws.run_forever(ping_interval=5, ping_timeout=2, ping_payload="2")
+        ) 
+        ws.run_forever(ping_interval=3, ping_timeout=1, reconnect=2)
