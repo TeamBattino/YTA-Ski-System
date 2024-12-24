@@ -78,28 +78,40 @@ export type Run = {
   start_time: Date;
 }
 
-// Sorted by duration Decending only showinng shortest run per skipass
 export async function getTopRuns() {
-  const topRuns = await prisma.$queryRaw<Run[]>`
+  const racersWithShortestRun = await prisma.$queryRaw<Run[]>`
     SELECT
-        r.*,
+        r.ski_pass,
         racer.name,
         racer.ldap,
-        racer.location
+        racer.location,
+        MIN(r.duration) as duration
     FROM
         run r
     JOIN
         racer ON r.ski_pass = racer.ski_pass
-    WHERE
-        r.start_time = (
-            SELECT MIN(r2.start_time)
-            FROM run r2
-            WHERE r2.ski_pass = r.ski_pass
-        )
+    GROUP BY
+        r.ski_pass, racer.name, racer.ldap, racer.location
     ORDER BY
-        r.duration ASC
+        duration ASC
+  `;
+  return racersWithShortestRun;
+}
+export async function getRecentRuns() {
+  const recentRuns = await prisma.$queryRaw<Run[]>`
+        SELECT
+            r.*,
+            racer.name,
+            racer.ldap,
+            racer.location
+        FROM
+            run r
+        JOIN
+            racer ON r.ski_pass = racer.ski_pass
+        ORDER BY
+            r.start_time DESC
 `;
-  return topRuns;
+  return recentRuns;
 }
 
 export async function getRacerRunsBySkicard(ski_pass: string) {
@@ -126,17 +138,43 @@ export type Racer = {
   name: string;
   ldap: string;
   location: string;
+  consistency?: number;
 }
+
+// Get the singular racer that has this ski pass and calculate his consistency if they have more than 2 runs based on his durration
 export async function getRacer(ski_pass: string): Promise<Racer> {
   const racer = await prisma.$queryRaw<Racer[]>`
+WITH RacerRuns AS (
         SELECT
-            *
+            duration
         FROM
-            racer
+            run
         WHERE
             ski_pass = ${ski_pass}
-            ;
-    `;
+        ORDER BY
+            start_time DESC
+        LIMIT 2
+    ),
+    Consistency AS (
+        SELECT
+            ABS(MAX(duration) - MIN(duration)) as consistency
+        FROM
+            RacerRuns
+        HAVING COUNT(*) = 2
+    )
+    SELECT
+        r.ski_pass,
+        r.name,
+        r.ldap,
+        r.location,
+        c.consistency
+    FROM
+        racer r
+    LEFT JOIN
+        Consistency c ON 1=1
+    WHERE
+        r.ski_pass = ${ski_pass}    
+        `;
   if (racer.length === 0) {
     throw new Error("Racer not found");
   }
