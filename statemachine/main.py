@@ -8,7 +8,35 @@ from queue import Queue
 from threading import Thread, Event
 from global_types import StateMachine, StateMachineState, User
 from api import ApiClient
+import time
+import socket
+import requests
 
+""" INITIALIZATION """
+def is_web_reachable(url, timeout=3):
+    """Checks if a web address is reachable by making an HTTP GET request."""
+    try:
+        response = requests.get(url, timeout=timeout)
+        return response.status_code == 200
+    except requests.RequestException:
+        return False
+
+target_url = "http://192.168.4.1"
+
+while not is_web_reachable(target_url):
+    print(f"Waiting for URL {target_url} to be reachable...")
+    os.system('espeak "Waiting for internet connection"')
+    time.sleep(5)
+os.system('espeak "Internet connection established. Resetting..."')
+print("URL is reachable!")
+requests.post(f"{target_url}/system/?action=full_reset")
+while not is_web_reachable(target_url):
+    print(f"Resetting, so {target_url} to is unreachable...")
+    os.system('espeak "resetting"')
+    time.sleep(5)
+os.system('espeak "Reset was successful"')
+
+""" Environment variables here """
 load_dotenv()
 ENV_PANIC_BUTTON_PIN = int(os.getenv("PANIC_BUTTON_PIN"))
 ENV_API_URL = os.getenv("API_DOMAIN")    
