@@ -1,7 +1,6 @@
 import websocket
 import time
 from queue import Queue
-import rel
 
 class AlpenhundeWS:
     def __init__(self, message_queue: Queue):
