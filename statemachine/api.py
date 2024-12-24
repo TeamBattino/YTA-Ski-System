@@ -10,10 +10,12 @@ class ApiClient:
         params = {'ski_pass': ski_pass}
         response = requests.get(url, params=params)
         if response.status_code == 404:
+            print(f"User {ski_pass} not found")
             return User("Unregistered User","Unregistered User")
         req_user = response.json()
-        return User(req_user['ski_pass'], req_user['name'])
-    
+        print(req_user)
+        if response.status_code == 200:
+            return User(req_user['ski_pass'], req_user['name'])
 
     def postRace(self, ski_pass, duration):
         if (ski_pass == "Unregistered User"):
