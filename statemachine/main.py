@@ -71,6 +71,7 @@ api = ApiClient(ENV_API_URL)
 
 def panic_button_call():
     statemachne.current_state = StateMachineState.IDLE
+    os.system('espeak -a 400 "RESET RACER"')
 
 def update_user():
     user = api.getUser(statemachne.user.rfid)
@@ -102,6 +103,7 @@ while True:
             case "WSError":
                 print("WebSocket error")
                 statemachne.connection_issues = True
+                os.system('espeak -a 400 "Websocket disconnect detected. Reconnecting"')
             case "WSClosed":
                 print("WebSocket closed")
             case _:
