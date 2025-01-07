@@ -16,3 +16,4 @@ class StateMachine:
     last_race_time: int
     user: User
     loading: bool
+    connection_issues: bool

@@ -64,6 +64,8 @@ class AlpenhundeUI:
     def _get_state_and_tag(self):
         if (self.state_machine.loading):
             return "Loading...", "NOT_READY"
+        if (self.state_machine.connection_issues):
+            return "Experiencing Connection Issues. Reconnecting...\n Please Wait a Moment", "NOT_READY"
         
         match self.state_machine.current_state:
             case StateMachineState.IDLE:

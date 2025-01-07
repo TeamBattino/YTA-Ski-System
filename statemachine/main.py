@@ -43,7 +43,7 @@ ENV_API_URL = os.getenv("API_DOMAIN")
 ENV_AUTH_SECRET = os.getenv("AUTH_SECRET")
 
 """ Shared state variables here """
-statemachne = StateMachine(StateMachineState.IDLE, -1, User("", ""), False)
+statemachne = StateMachine(StateMachineState.IDLE, -1, User("", ""), False, False)
 
 """ Threads created here """
 panic_event = Event()
@@ -95,10 +95,13 @@ while True:
             case "UpdateAlpenhunde":
                 print("Update Alpenhunde")
                 alpenhunde_update_event.set()
+                statemachne.connection_issues = False
             case "WSConnected":
                 print("WebSocket connected")
+                statemachne.connection_issues = False
             case "WSError":
                 print("WebSocket error")
+                statemachne.connection_issues = True
             case "WSClosed":
                 print("WebSocket closed")
             case _:
