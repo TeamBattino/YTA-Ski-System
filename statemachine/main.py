@@ -40,6 +40,7 @@ os.system('espeak "Reset was successful"')
 load_dotenv()
 ENV_PANIC_BUTTON_PIN = int(os.getenv("PANIC_BUTTON_PIN"))
 ENV_API_URL = os.getenv("API_DOMAIN")    
+ENV_AUTH_SECRET = os.getenv("AUTH_SECRET")
 
 """ Shared state variables here """
 statemachne = StateMachine(StateMachineState.IDLE, -1, User("", ""), False)
