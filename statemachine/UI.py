@@ -16,7 +16,7 @@ class AlpenhundeUI:
         self.update_state()
 
     def _setup_ui(self):
-        self.state_text = tk.Text(self.root, font=("Helvetica", 32), height=2, bd=0, bg=self.root.cget("bg"))
+        self.state_text = tk.Text(self.root, font=("Helvetica", 46), height=2, bd=0, bg=self.root.cget("bg"))
         self.state_text.pack(expand=True)
         self._configure_text_tags()
         self.state_text.insert(tk.END, "State: ", "state")
