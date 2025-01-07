@@ -23,6 +23,8 @@ class AlpenhundeWS:
 
 
     def connect_websocket(self):
+        websocket.enableTrace(True)
+        websocket.setdefaulttimeout(2)
         ws = websocket.WebSocketApp(
             "ws://192.168.4.1/ws/events",
             on_message=self.on_message,
