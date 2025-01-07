@@ -25,16 +25,16 @@ target_url = "http://192.168.4.1"
 
 while not is_web_reachable(target_url):
     print(f"Waiting for URL {target_url} to be reachable...")
-    os.system('espeak "Waiting for internet connection"')
+    os.system('espeak -a 400 "Waiting for internet connection"')
     time.sleep(5)
-os.system('espeak "Internet connection established. Resetting..."')
+os.system('espeak -a 400 "Internet connection established. Resetting..."')
 print("URL is reachable!")
 requests.post(f"{target_url}/system/?action=full_reset")
 while not is_web_reachable(target_url):
     print(f"Resetting, so {target_url} to is unreachable...")
-    os.system('espeak "resetting"')
+    os.system('espeak -a 400 "resetting"')
     time.sleep(5)
-os.system('espeak "Reset was successful"')
+os.system('espeak -a 400 "Reset was successful"')
 
 """ Environment variables here """
 load_dotenv()

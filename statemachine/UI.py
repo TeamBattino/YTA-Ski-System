@@ -43,7 +43,7 @@ class AlpenhundeUI:
             self.rfid += event.char
             if event.char == '\r':
                 
-                os.system("espeak 'detected skee paass' &")
+                os.system("espeak -a 400 'detected skee paass' &")
                 clean_rfid = self.rfid.strip().lower()
                 self.state_machine.user.rfid = clean_rfid
                 self.rfid = ""
