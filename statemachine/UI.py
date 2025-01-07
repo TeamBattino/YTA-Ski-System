@@ -1,6 +1,7 @@
 import tkinter as tk
 from global_types import StateMachine, StateMachineState
 from threading import Event
+import os
 
 class AlpenhundeUI:
     def __init__(self, state_machine: StateMachine, user_update_event: Event):
@@ -15,7 +16,7 @@ class AlpenhundeUI:
         self.update_state()
 
     def _setup_ui(self):
-        self.state_text = tk.Text(self.root, font=("Helvetica", 32), height=1, bd=0, bg=self.root.cget("bg"))
+        self.state_text = tk.Text(self.root, font=("Helvetica", 32), height=2, bd=0, bg=self.root.cget("bg"))
         self.state_text.pack(expand=True)
         self._configure_text_tags()
         self.state_text.insert(tk.END, "State: ", "state")
@@ -41,8 +42,9 @@ class AlpenhundeUI:
         if (self.state_machine.current_state == StateMachineState.IDLE):
             self.rfid += event.char
             if event.char == '\r':
-                print("registering user")
-                clean_rfid = self.rfid.strip()
+                
+                os.system("espeak 'detected skee paass' &")
+                clean_rfid = self.rfid.strip().lower()
                 self.state_machine.user.rfid = clean_rfid
                 self.rfid = ""
                 self.user_update_event.set()
@@ -64,15 +66,17 @@ class AlpenhundeUI:
             return "Loading...", "NOT_READY"
         
         match self.state_machine.current_state:
-            # TODO leftoff wednesday, do UI while waiting for jessica
             case StateMachineState.IDLE:
-                return "Please Close the gate Then Scan your Badge on the NFC reader below", "READY"
+                return ("Please Close the gate (the long rod infront)\n"
+                        "<- Then Scan your Badge on the gray NFC reader on the Left", "READY")
             case StateMachineState.REGISTERED:
                 if (self.state_machine.user.name == "Unregistered User"):
-                    return "User not found. Please register yourself online and press the red button", "NOT_READY"
-                return f"Hey, {self.state_machine.user.name} You're ready to race!", "READY"
+                    return "User not found. \nPlease register yourself online and press the red button", "NOT_READY"
+                return (f"Hey, {self.state_machine.user.name} You're ready to race!\n"
+                        "Your time starts as soon as you open the gate.", "READY")
             case StateMachineState.RUNNING:
-                return f"{self.state_machine.user.name} is Racing...", "NOT_READY"
+                return (f"{self.state_machine.user.name} is Racing...\n\n"
+                "If you dont see anyone on the slope anymore press the red button", "NOT_READY")
 
     def _update_last_time_label(self):
         # Placeholder value for last_time
