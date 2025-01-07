@@ -7,11 +7,6 @@ export async function fetchRacerBySkiPass(ski_pass: string) {
   const racer = await prisma.racer.findUnique({
     where: { ski_pass: ski_pass },
   });
-
-  if (!racer) {
-    throw new Error(`Racer with ski pass ${ski_pass} not found.`);
-  }
-
   return racer;
 }
 

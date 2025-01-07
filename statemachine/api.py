@@ -1,5 +1,6 @@
 import requests
 from global_types import User
+import os
 
 class ApiClient:
     def __init__(self, base_url):
@@ -18,13 +19,14 @@ class ApiClient:
             return User(req_user['ski_pass'], req_user['name'])
 
     def postRace(self, ski_pass, duration):
-        if (ski_pass == "Unregistered User"):
+        if ski_pass == "Unregistered User":
             return
         print(f"Posting {ski_pass} with duration {duration}")
         url = f"https://{self.base_url}/api/runs"
         json_data = {'ski_pass': ski_pass, 'duration': int(duration)}
+        headers = {'secret-key': os.getenv('AUTH_SECRET')}
         print(json_data)
-        response = requests.post(url, json=json_data)
+        response = requests.post(url, json=json_data, headers=headers)
         print(response)
         response.raise_for_status()
         return response.json()

@@ -39,6 +39,9 @@ type PostRunProps = {
 }
 
 export async function POST(req: Request) {
+  if (req.headers.get('secret-key') !== process.env.AUTH_SECRET) {
+    return NextResponse.json({ message: 'Invalid secret key' }, { status: 401 });
+  }
   if (!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 });
 
   try {

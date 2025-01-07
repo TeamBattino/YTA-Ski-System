@@ -2,36 +2,27 @@ import { fetchRacers, fetchRacerBySkiPass, createRacer, updateRacer, deleteRacer
 import { racer } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
-export async function GET(req : Request) {
+export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
-    const query = url.searchParams.get("query");  // Fetch the query string from URL
-    
-    if (query && query.trim() !== '') {
-      console.log('hmm i think this query is not empty')
-      // If query is provided and not empty, filter based on the query
-      const racers = await fetchRacers();
+    const ski_pass = url.searchParams.get("ski_pass");
 
-      // Filter racers by query (ski_pass, name, or ldap)
-      const filteredRacers = racers.filter(racer => {
-        return (
-          (racer.ski_pass && racer.ski_pass.toLowerCase().includes(query.toLowerCase())) || 
-          (racer.name && racer.name.toLowerCase().includes(query.toLowerCase())) ||
-          (racer.ldap && racer.ldap.toLowerCase().includes(query.toLowerCase()))
-        );
-      });
-
-      return NextResponse.json(filteredRacers);
-    } else {
-      // If no query or empty query, return all racers
+    if (!ski_pass) {
       const racers = await fetchRacers();
       return NextResponse.json(racers);
+    } else {
+      const racerData = await fetchRacerBySkiPass(ski_pass);
+      if (!racerData) {
+        return NextResponse.json({ message: 'Racer not found' }, { status: 404 });
+      }
+      return NextResponse.json(racerData);
     }
   } catch (error) {
-    console.error('Error handling GET request for racers:', error);
+    console.error('Error handling GET request:', error);
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }
+
 export async function POST(req: Request) {
   if (!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 }); 
   try {
@@ -67,17 +58,16 @@ export async function PUT(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-
-  const url = new URL(req.url);
-  const id = url.searchParams.get("id");  // Fetch the query string from URL
-
+  if (!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 }); 
   try {
-    if (!id) {
-      return NextResponse.json({ message: 'Racer Ski pass is required for deletion' }, { status: 400 });
+    const data: any = await req.json();
+    
+    if (data.ski_pass) {
+      await deleteRacer(data.ski_pass);
+      return NextResponse.json({ message: 'Racer deleted successfully' });
+    } else {
+      return NextResponse.json({ message: 'Ski pass is required for deletion' }, { status: 400 });
     }
-    await deleteRacer(id);
-
-    return NextResponse.json({ message: 'Racer deleted successfully' });
   } catch (error) {
     console.error('Error handling DELETE request:', error);
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });

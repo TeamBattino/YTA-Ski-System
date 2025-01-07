@@ -1,16 +1,41 @@
 
 import ConsistencyTable from "@/components/ConsistencyTable";
-import { getConsistency } from "@/lib/db-helper";
+import RecentRunsTable from "@/components/RecentRunsTable";
+import TopRunsTable from "@/components/TopRunsTable";
+import { getAllConsistency } from "@/lib/db-helper";
 import { get } from "http";
 
 
 
 
 export default async function Page() {
-  return (
-    <div>
-      <h1>Leaderboard</h1>
-      <ConsistencyTable />
-    </div>
-  );
+  const showingConsistency = false;
+
+  if (showingConsistency) {
+    return (
+      <div>
+        <h1 className="py-2 text-2xl font-bold">Leaderboards</h1>
+        <h2 className="py-2 text-xl font-bold">⭐ Competitive Consistency</h2>
+        <ConsistencyTable />
+        <h2 className="py-2 text-xl font-bold">Non-Competitive Top Runs</h2>
+        <TopRunsTable />
+      </div>
+    )
+  } else {
+    return (
+      <div>
+        <h1 className="py-2 text-2xl font-bold">Leaderboards</h1>
+        <p>
+          The Aim of the challange is to have your two most recent runs be closest to eachother in time.
+        </p>
+        <p>
+          View recent runs or click on an entry to view the persons current consistency.
+        </p>
+        <h2 className="py-2 text-xl font-bold">Recent Runs</h2>
+        <RecentRunsTable />
+        <h2 className="py-2 text-xl font-bold">Non-Competitive Top Runs</h2>
+        <TopRunsTable />
+      </div>
+    )
+  }
 }

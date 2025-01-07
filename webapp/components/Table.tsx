@@ -10,33 +10,38 @@ import {
   getKeyValue,
   Spinner,
   Button,
+  ScrollShadow,
 } from "@nextui-org/react";
+import Link from "next/link";
 
-const tableColumns = [
-  { key: "name", label: "Name" },
-  { key: "email", label: "Email" },
-  { key: "phone", label: "Phone" },
-  { key: "website", label: "Website" },
-];
+type Column = {
+  key: string,
+  label: string,
+  allowsSorting: boolean,
+}
+
 export type TableComponentProps = {
-  columns: Array<{ key: string; label: string }>;
+  columns: Array<Column>;
   list: { items: Iterable<any> };
   isLoading: boolean;
+  tableProps?: React.ComponentProps<typeof Table>;
 };
 
-export default function TableComponent({columns, list, isLoading }: TableComponentProps) {
+export default function TableComponent({ columns, list, isLoading, tableProps }: TableComponentProps) {
   return (
     <Table
       isHeaderSticky
-      aria-label="Example table with client side sorting"
+      removeWrapper
+      aria-label="Table"
       classNames={{
-        base: "max-h-[520px] overflow-scroll",
-        table: "min-h-[420px]",
+        base: "max-h-[520px] overflow-scroll border border-gray-200 rounded-xl border-width-",
+        table: "",
       }}
+      {...tableProps}
     >
       <TableHeader>
         {columns.map((column) => (
-          <TableColumn key={column.key}>{column.label}</TableColumn>
+          <TableColumn allowsSorting={column.allowsSorting} key={column.key}>{column.label}</TableColumn>
         ))}
       </TableHeader>
       <TableBody
@@ -45,7 +50,8 @@ export default function TableComponent({columns, list, isLoading }: TableCompone
         loadingContent={<Spinner label="Loading..." />}
       >
         {(item) => (
-          <TableRow key={item.name}>
+          <TableRow key={item.run_id ? item.run_id : item.name}>
+
             {(columnKey) => <TableCell>{getKeyValue(item, columnKey)}</TableCell>}
           </TableRow>
         )}
@@ -53,4 +59,3 @@ export default function TableComponent({columns, list, isLoading }: TableCompone
     </Table>
   );
 }
-
