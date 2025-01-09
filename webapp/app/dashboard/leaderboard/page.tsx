@@ -9,7 +9,7 @@ import { get } from "http";
 
 
 export default async function Page() {
-  const showingConsistency = false;
+  const showingConsistency = true;
 
   if (showingConsistency) {
     return (
