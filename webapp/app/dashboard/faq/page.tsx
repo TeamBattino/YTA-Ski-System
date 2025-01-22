@@ -51,22 +51,6 @@ export default function Page() {
             Yes, the entire project was designed and developed by enthusiastic apprentices in the YT feed ads Team
           </p>
         </details>
-        <details className="group">
-          <summary className="flex cursor-pointer items-center justify-between rounded-md bg-blue-400 px-4 py-2 text-white">
-            Question2?
-          </summary>
-          <p className="mt-2 rounded-md bg-gray-100 px-4 py-2 text-gray-700">
-            ...
-          </p>
-        </details>
-        <details className="group">
-          <summary className="flex cursor-pointer items-center justify-between rounded-md bg-blue-400 px-4 py-2 text-white">
-            QUestion 3?
-          </summary>
-          <p className="mt-2 rounded-md bg-gray-100 px-4 py-2 text-gray-700">
-            ...
-          </p>
-        </details>
       </div>
     </div>
   );

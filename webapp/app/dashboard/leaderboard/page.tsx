@@ -26,10 +26,10 @@ export default async function Page() {
       <div>
         <h1 className="py-2 text-2xl font-bold">Leaderboards</h1>
         <p>
-          The Aim of the challange is to have your two most recent runs be closest to eachother in time.
+          The Aim of the challenge is to have your two most recent runs be closest to eachother in time.
         </p>
         <p>
-          View recent runs or click on an entry to view the persons current consistency.
+          View recent runs or click an entry to view the persons current consistency.
         </p>
         <h2 className="py-2 text-xl font-bold">Recent Runs</h2>
         <RecentRunsTable />

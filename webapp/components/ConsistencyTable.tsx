@@ -122,7 +122,7 @@ export default function ConsistencyTable() {
                     onRowAction: onRowClick,
                 }}
             />
-            <span className="px-6 text-xs">*consistency is shown in Seconds, to 10^(-4) precision taken from your last two runs.</span>
+            <span className="px-6 text-xs">*Consistency is shown in seconds, to 10^(-4) precision taken from your last two runs.</span>
         </div>
     );
 }

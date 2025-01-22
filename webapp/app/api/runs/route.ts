@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 export async function GET(req : Request) {
   try {
     const url = new URL(req.url);
-    const query = url.searchParams.get("query");  // Fetch the query string from URL
+    const query = url.searchParams.get("query");
     
     if (query && query.trim() !== '') {
       // If query is provided and not empty, filter based on the query
