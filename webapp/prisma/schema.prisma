@@ -15,11 +15,13 @@ model admin {
 
 model racer {
   name     String? @db.VarChar(255)
-  ldap     String? @unique @db.VarChar(255)
+  ldap     String? @db.VarChar(255)
   racer_id String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ski_pass String? @unique @db.VarChar(255)
+  ski_pass String? @db.VarChar(255)
   run      run[]
   location String? @db.VarChar(255)
+  race     race?   @relation(fileds: [race_id], references: [id])
+  race_id  String
 }
 
 model run {
@@ -28,4 +30,13 @@ model run {
   ski_pass   String?   @db.VarChar(255)
   run_id     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   racer      racer?    @relation(fields: [ski_pass], references: [ski_pass], onDelete: Cascade, onUpdate: Cascade)
+  race     race?   @relation(fileds: [race_id], references: [id])
+  race_id  String
 }
+
+model race {
+  race_id String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  racer   racer[]
+  run     run[]
+}
+
