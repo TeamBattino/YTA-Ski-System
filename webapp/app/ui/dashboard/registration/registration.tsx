@@ -1,88 +1,124 @@
-'use client'
+"use client";
 
-import React, {useState } from "react";
-
+import React, { useState, useEffect } from "react";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Button,
+} from "@heroui/react";
 
 export default function Registration() {
   const [name, setName] = useState<string>("");
   const [ldap, setLdap] = useState<string>("");
   const [location, setLocation] = useState<string>("");
+  const [race, setRace] = useState("");
+  const [races, setRaces] = useState<any[]>([]);
   const [ski_pass, setSkiPass] = useState<string>("prrthiusdfhg");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string>(""); // for nfc reader
-  
-    const handleScan = async () => {
-      if ("NDEFReader" in window) {
-        try {
-          const ndef = new (window as any).NDEFReader(); // Use `as any` to avoid TypeScript errors for NDEFReader.
-          await ndef.scan();
-  
-          console.log("Scan started successfully.");
-          setMessage("Scanning...");
-  
-          ndef.onreadingerror = () => {
-            console.log("Cannot read data from the NFC tag. Try another one?");
-            setMessage("Try again!");
-          };
-  
-          ndef.onreading = (event: any) => {
-            console.log("NDEF message read.");
-            const serialNumber = event.serialNumber || "Unknown";
-            setMessage(`Scan successful:\n ${serialNumber}`);
-            setSkiPass(String(serialNumber).replaceAll(':','').toLowerCase());
-          };
-        } catch (error) {
-          console.log(`Error! Scan failed to start: ${error}.`);
-          setMessage("Error starting NFC scan. Try again!");
-        }
-      } else {
-        console.log("NFC is not supported on this device.");
-        setMessage("NFC is not supported on this device.\nPlease use Chrome on an Android device.");
+
+  const handleScan = async () => {
+    if ("NDEFReader" in window) {
+      try {
+        const ndef = new (window as any).NDEFReader(); // Use `as any` to avoid TypeScript errors for NDEFReader.
+        await ndef.scan();
+
+        console.log("Scan started successfully.");
+        setMessage("Scanning...");
+
+        ndef.onreadingerror = () => {
+          console.log("Cannot read data from the NFC tag. Try another one?");
+          setMessage("Try again!");
+        };
+
+        ndef.onreading = (event: any) => {
+          console.log("NDEF message read.");
+          const serialNumber = event.serialNumber || "Unknown";
+          setMessage(`Scan successful:\n ${serialNumber}`);
+          setSkiPass(String(serialNumber).replaceAll(":", "").toLowerCase());
+        };
+      } catch (error) {
+        console.log(`Error! Scan failed to start: ${error}.`);
+        setMessage("Error starting NFC scan. Try again!");
+      }
+    } else {
+      console.log("NFC is not supported on this device.");
+      setMessage(
+        "NFC is not supported on this device.\nPlease use Chrome on an Android device."
+      );
     }
-    
-    };
-  
+  };
+
+  {/* TODO: Create Endpoint to get all races */}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const fetchRaces = async () => {
+ try {
+      if (name && ldap && ski_pass && location && race) {
+        const response = await fetch("/api/races", {
+          method: "GET",
+        });
+
+        if (response.ok) {
+          setRaces(response);
+        } else {
+          alert("Fetching races failed. Please try again." + response.statusText);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching races: ", error);
+      alert("An error occurred. Please try again.: " + error);
+    } 
+  }
+
+  const selectedRace = React.useMemo(
+    () => Array.from(race).join(", ").replace(/_/g, ""),
+    [race]
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     if (ldap && ldap.includes("@")) {
-        alert("LDAP cannot contain '@'.");
-        setIsSubmitting(false);
-        return;
-      }
-      if (!name || !ldap || !ski_pass || !location) {
-        alert("All fields are required.");
-        setIsSubmitting(false);
-        return;
-      }
+      alert("LDAP cannot contain '@'.");
+      setIsSubmitting(false);
+      return;
+    }
+    if (!name || !ldap || !ski_pass || !location || !race) {
+      alert("All fields are required.");
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
-        if(name && ldap && ski_pass && location)
-      {
-        const response = await fetch('/api/racers', {
-        method: 'POST',
-        body: JSON.stringify({
+      if (name && ldap && ski_pass && location && race) {
+        const response = await fetch("/api/racers", {
+          method: "POST",
+          body: JSON.stringify({
             name: name,
             ldap: ldap,
             location: location,
             ski_pass: ski_pass,
-        }),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-      });
+            race: race,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-      if (response.ok) {
-        alert("Registration successful!");
-        setName("");
-        setLdap("");
-        setLocation("");
-        setSkiPass("");
-      } else {
-        alert("Registration failed. Please try again." + response.statusText);
-        return;
-      }}
+        if (response.ok) {
+          alert("Registration successful!");
+          setName("");
+          setLdap("");
+          setLocation("");
+          setSkiPass("");
+        } else {
+          alert("Registration failed. Please try again." + response.statusText);
+          return;
+        }
+      }
     } catch (error) {
       console.error("Error registering racer: ", error);
       alert("An error occurred. Please try again.: " + error);
@@ -90,6 +126,10 @@ export default function Registration() {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    fetchRaces();
+  }, [fetchRaces]);
 
   return (
     <div className="flex h-screen flex-col items-center justify-start bg-gray-50 px-4 pt-8">
@@ -108,7 +148,10 @@ export default function Registration() {
 
       {/* Name Field */}
       <div className="mb-6 w-60">
-        <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-700">
+        <label
+          htmlFor="name"
+          className="block mb-2 text-sm font-medium text-gray-700"
+        >
           Your Name
         </label>
         <input
@@ -124,7 +167,10 @@ export default function Registration() {
 
       {/* LDAP Field */}
       <div className="mb-6 w-60">
-        <label htmlFor="ldap" className="block mb-2 text-sm font-medium text-gray-700">
+        <label
+          htmlFor="ldap"
+          className="block mb-2 text-sm font-medium text-gray-700"
+        >
           Your ldap (without @google)
         </label>
         <input
@@ -140,19 +186,49 @@ export default function Registration() {
 
       {/* Site Selection */}
       <div className="mb-6 w-60">
-        <p className="mb-4 text-sm font-medium text-gray-700">Choose Your Site</p>
+        <p className="mb-4 text-sm font-medium text-gray-700">
+          Choose Your Site
+        </p>
         <div className="grid grid-cols-2 gap-3">
           {["ZRH", "WAW", "US", "DE"].map((location) => (
             <button
               key={location}
-              onClick={() => {setLocation(location)}}
-              className={`flex h-12 w-full items-center justify-center rounded-md ${location === location ? "bg-blue-600" : "bg-blue-400"} text-white hover:bg-sky-100 hover:text-blue-600`}
+              onClick={() => {
+                setLocation(location);
+              }}
+              className={`flex h-12 w-full items-center justify-center rounded-md ${
+                location === location ? "bg-blue-600" : "bg-blue-400"
+              } text-white hover:bg-sky-100 hover:text-blue-600`}
             >
               {location}
             </button>
           ))}
         </div>
       </div>
+
+      {/* Dropdown for Race */}
+      <Dropdown>
+        <DropdownTrigger>
+          <Button className="capitalize" variant="bordered">
+            {selectedRace}
+          </Button>
+        </DropdownTrigger>
+        <DropdownMenu
+          disallowEmptySelection
+          aria-label="Single selection example"
+          selectedKeys={race}
+          selectionMode="single"
+          variant="flat"
+          onSelectionChange={setRace}
+        >
+          <DropdownItem key="text">Text</DropdownItem>
+          {
+            races.map((race) => {
+              <DropdownItem key="race.race_id">{race.name}</DropdownItem>
+            })
+          }
+        </DropdownMenu>
+      </Dropdown>
 
       {/* Register Button */}
       <button
