@@ -6,14 +6,14 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-  Button,
-} from "@heroui/react";
+} from "@heroui/dropdown";
+import { Button } from "@heroui/button"
 
 export default function Registration() {
   const [name, setName] = useState<string>("");
   const [ldap, setLdap] = useState<string>("");
-  const [location, setLocation] = useState<string>("");
-  const [race, setRace] = useState("");
+  const [location, setLocation] = useState<any>();
+  const [race, setRace] = useState(new Set(["text"]));
   const [races, setRaces] = useState<any[]>([]);
   const [ski_pass, setSkiPass] = useState<string>("prrthiusdfhg");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,27 +51,31 @@ export default function Registration() {
     }
   };
 
-  {/* TODO: Create Endpoint to get all races */}
+  {
+    /* TODO: Create Endpoint to get all races */
+  }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchRaces = async () => {
- try {
+    try {
       if (name && ldap && ski_pass && location && race) {
         const response = await fetch("/api/races", {
           method: "GET",
         });
 
         if (response.ok) {
-          setRaces(response);
+          /* TODO: set races */
         } else {
-          alert("Fetching races failed. Please try again." + response.statusText);
+          alert(
+            "Fetching races failed. Please try again." + response.statusText
+          );
           return;
         }
       }
     } catch (error) {
       console.error("Error fetching races: ", error);
       alert("An error occurred. Please try again.: " + error);
-    } 
-  }
+    }
+  };
 
   const selectedRace = React.useMemo(
     () => Array.from(race).join(", ").replace(/_/g, ""),
@@ -221,15 +225,24 @@ export default function Registration() {
           variant="flat"
           onSelectionChange={setRace}
         >
-          <DropdownItem key="text">Text</DropdownItem>
-          {
-            races.map((race) => {
-              <DropdownItem key="race.race_id">{race.name}</DropdownItem>
+          {races && races.length ? (
+            races.map((r) => {
+              const key = r.race_id ?? "2026";
+              const label = r.race_name ?? "";
+              return (
+                <DropdownItem key={String(key)} value={String(key)}>
+                  {label}
+                </DropdownItem>
+              );
             })
-          }
+          ) : (
+            <DropdownItem key="empty" disabled>
+              No races
+            </DropdownItem>
+          )}
         </DropdownMenu>
       </Dropdown>
-
+      <br /><br />
       {/* Register Button */}
       <button
         onClick={handleSubmit}

@@ -1,5 +1,5 @@
-import { fetchRuns, fetchRunById, updateRun, createRun, deleteRun } from '@/app/lib/actions/runs/data';
-import { run } from '@prisma/client';
+import { fetchRaces} from '@/app/lib/actions/races/data';
+import { race } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
