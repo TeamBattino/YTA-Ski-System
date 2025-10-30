@@ -13,7 +13,7 @@ export default function Registration() {
   const [name, setName] = useState<string>("");
   const [ldap, setLdap] = useState<string>("");
   const [location, setLocation] = useState<any>();
-  const [race, setRace] = useState(new Set(["text"]));
+  const [race, setRace] = useState(new Set(["Empty"]));
   const [races, setRaces] = useState<any[]>([]);
   const [ski_pass, setSkiPass] = useState<string>("prrthiusdfhg");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -213,7 +213,7 @@ export default function Registration() {
       {/* Dropdown for Race */}
       <Dropdown>
         <DropdownTrigger>
-          <Button className="capitalize" variant="bordered">
+          <Button className="capitalize" variant="flat">
             {selectedRace}
           </Button>
         </DropdownTrigger>
@@ -236,7 +236,7 @@ export default function Registration() {
               );
             })
           ) : (
-            <DropdownItem key="empty" disabled>
+            <DropdownItem key="empty" isDisabled>
               No races
             </DropdownItem>
           )}
