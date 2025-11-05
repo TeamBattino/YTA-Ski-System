@@ -12,7 +12,6 @@ export default function FilterableLeaderboard({
   consistencyWithRank: any[];
   racers: any[];
 }) {
-  // const [filteredRacers, setFilteredRacers] = useState<any[]>(racers);
   const [filteredRunsWithRank, setFilteredRunsWithRank] = useState<any[]>(runsWithRank);
   const [filteredConsistencyWithRank, setFilteredConsistencyWithRank] = useState<any[]>(consistencyWithRank);
 

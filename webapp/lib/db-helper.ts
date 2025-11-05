@@ -123,6 +123,18 @@ export async function getRecentRuns() {
   return recentRuns;
 }
 
+export async function getRaces() {
+    const races = await prisma.$queryRaw<RunWithDupilcates[]>`
+        SELECT
+            r.*
+        FROM
+            race r
+        ORDER BY
+            r.name
+    `;
+  return races;
+}
+
 export async function getRacerRunsBySkicard(ski_pass: string) {
   const runs = await prisma.$queryRaw<RunWithDupilcates[]>`
         SELECT

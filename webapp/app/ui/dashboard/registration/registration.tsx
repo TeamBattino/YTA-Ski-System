@@ -7,7 +7,9 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@heroui/dropdown";
-import { Button } from "@heroui/button"
+import { Button } from "@heroui/button";
+import { getRaces } from "@/lib/db-helper";
+
 
 export default function Registration() {
   const [name, setName] = useState<string>("");
@@ -51,30 +53,10 @@ export default function Registration() {
     }
   };
 
-  {
-    /* TODO: Create Endpoint to get all races */
-  }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchRaces = async () => {
-    try {
-      if (name && ldap && ski_pass && location && race) {
-        const response = await fetch("/api/races", {
-          method: "GET",
-        });
-
-        if (response.ok) {
-          /* TODO: set races */
-        } else {
-          alert(
-            "Fetching races failed. Please try again." + response.statusText
-          );
-          return;
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching races: ", error);
-      alert("An error occurred. Please try again.: " + error);
-    }
+    const races = await getRaces();
+    setRaces(races);
   };
 
   const selectedRace = React.useMemo(
@@ -242,7 +224,8 @@ export default function Registration() {
           )}
         </DropdownMenu>
       </Dropdown>
-      <br /><br />
+      <br />
+      <br />
       {/* Register Button */}
       <button
         onClick={handleSubmit}
