@@ -32,7 +32,7 @@ export default function Page() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     fetchRaces();
-  }, [fetchRaces]);
+  }, []);
 
   if (showingConsistency) {
     return (
