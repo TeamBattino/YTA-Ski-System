@@ -14,7 +14,7 @@ import { getRaces } from "@/lib/db-helper";
 export default function Registration() {
   const [name, setName] = useState<string>("");
   const [ldap, setLdap] = useState<string>("");
-  const [location, setLocation] = useState<any>();
+  const [selectedLocation, setLocation] = useState<any>();
   const [race, setRace] = useState(new Set(["Empty"]));
   const [races, setRaces] = useState<any[]>([]);
   const [ski_pass, setSkiPass] = useState<string>("prrthiusdfhg");
@@ -72,20 +72,20 @@ export default function Registration() {
       setIsSubmitting(false);
       return;
     }
-    if (!name || !ldap || !ski_pass || !location || !race) {
+    if (!name || !ldap || !ski_pass || !selectedLocation || !race) {
       alert("All fields are required.");
       setIsSubmitting(false);
       return;
     }
 
     try {
-      if (name && ldap && ski_pass && location && race) {
+      if (name && ldap && ski_pass && selectedLocation && race) {
         const response = await fetch("/api/racers", {
           method: "POST",
           body: JSON.stringify({
             name: name,
             ldap: ldap,
-            location: location,
+            location: selectedLocation,
             ski_pass: ski_pass,
             race: race,
           }),
@@ -183,7 +183,7 @@ export default function Registration() {
                 setLocation(location);
               }}
               className={`flex h-12 w-full items-center justify-center rounded-md ${
-                location === location ? "bg-blue-600" : "bg-blue-400"
+                location === selectedLocation ? "bg-blue-600" : "bg-blue-400"
               } text-white hover:bg-sky-100 hover:text-blue-600`}
             >
               {location}
