@@ -55,8 +55,8 @@ export default function Page() {
           >
             {races && races.length ? (
               races.map((r) => {
-                const key = r.race_id ?? "2026";
-                const label = r.race_name ?? "";
+                const key = r.race_id ?? "";
+                const label = r.race_name ?? "2026";
                 return (
                   <DropdownItem key={String(key)} value={String(key)}>
                     {label}
@@ -72,9 +72,9 @@ export default function Page() {
         </Dropdown>
 
         <h2 className="py-2 text-xl font-bold">⭐ Competitive Consistency</h2>
-        <ConsistencyTable />
+        <ConsistencyTable race={race} />
         <h2 className="py-2 text-xl font-bold">Non-Competitive Top Runs</h2>
-        <TopRunsTable />
+        <TopRunsTable race={race} />
       </div>
     );
   } else {

@@ -9,6 +9,7 @@ export interface Consistency {
   ldap: string;
   location: string;
   consistency: number;
+  race_id: string;
 }
 
 export async function getAllConsistency() {
