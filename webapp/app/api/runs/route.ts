@@ -35,6 +35,7 @@ type PostRunProps = {
 
   duration: number;
   ski_pass: string;
+  race_id: string;
 
 }
 
@@ -47,7 +48,7 @@ export async function POST(req: Request) {
   try {
     const data: PostRunProps = await req.json();  // omit run_id for create operation
 
-    if (!data || !data.ski_pass) {
+    if (!data || !data.ski_pass || !data) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
@@ -55,7 +56,8 @@ export async function POST(req: Request) {
     const run = {
       duration: data.duration,
       ski_pass: data.ski_pass,
-      start_time: new Date()
+      start_time: new Date(),
+      race_id: data.race_id, //TODO: make sure it is race_id of user
     }
     const newRun = await createRun(run);
     return NextResponse.json(newRun);
