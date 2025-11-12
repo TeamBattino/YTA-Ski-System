@@ -28,7 +28,12 @@ export async function fetchRunById(run_id: string) {
 export async function createRun(run: Omit<run, 'run_id'>) {
   // Check if the ski_pass exists in the racer table
   const racerExists = await prisma.racer.findUnique({
-      where: { ski_pass: run.ski_pass!, race_id: run.race_id! },
+     where: {
+      racer_identifier : {
+        ski_pass: run.ski_pass,
+        race_id: run.race_id,
+      },      
+    },
   });
 
   if (!racerExists) {

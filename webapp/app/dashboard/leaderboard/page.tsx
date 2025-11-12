@@ -36,7 +36,7 @@ export default function Page() {
 
   if (showingConsistency) {
     return (
-      <div>
+      <>
         <h1 className="py-2 text-2xl font-bold">Leaderboards</h1>
         <b>Select Race: </b>
         <Dropdown>
@@ -75,7 +75,7 @@ export default function Page() {
         <ConsistencyTable race={race} />
         <h2 className="py-2 text-xl font-bold">Non-Competitive Top Runs</h2>
         <TopRunsTable race={race} />
-      </div>
+      </>
     );
   } else {
     return (
