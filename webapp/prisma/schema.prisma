@@ -17,7 +17,7 @@ model racer {
   location String? @db.VarChar(255)
   race     race?   @relation(fields: [race_id], references: [race_id], onDelete: Cascade, onUpdate: Cascade)
   race_id  String  @db.Uuid
-  @@unique([race_id, ski_pass])
+  @@unique([race_id, ski_pass], name: "racer_identifier")
 }
 
 model run {

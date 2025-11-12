@@ -14,7 +14,7 @@
     "@heroui/theme": "^2.4.23",
     "@nextui-org/react": "^2.4.8",
     "@nextui-org/table": "^2.0.40",
-    "@prisma/client": "^6.18.0",
+    "@prisma/client": "^6.19.0",
     "@react-types/shared": "^3.26.0",
     "@vercel/postgres": "^0.10.0",
     "async": "^3.2.6",

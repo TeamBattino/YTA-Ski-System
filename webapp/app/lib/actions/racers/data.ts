@@ -1,11 +1,16 @@
-import { PrismaClient } from '@prisma/client';
-import { racer } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
+import { racer } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export async function fetchRacerBySkiPass(ski_pass: string, race_id: string) {
   const racer = await prisma.racer.findUnique({
-    where: { ski_pass: ski_pass, race_id: race_id},
+    where: {
+      racer_identifier : {
+        ski_pass: ski_pass,
+        race_id: race_id,
+      },      
+    },
   });
   return racer;
 }
@@ -15,7 +20,12 @@ export async function fetchRacers() {
   return racers;
 }
 
-export async function createRacer(name: string, ldap: string, ski_pass: string, location: string) {
+export async function createRacer(
+  name: string,
+  ldap: string,
+  ski_pass: string,
+  location: string
+) {
   const newRacer = await prisma.racer.create({
     data: {
       name: name,
@@ -26,7 +36,9 @@ export async function createRacer(name: string, ldap: string, ski_pass: string, 
   });
   return newRacer;
 }
-export async function updateRacer(racerData: Partial<racer> & { racer_id: string }) {
+export async function updateRacer(
+  racerData: Partial<racer> & { racer_id: string }
+) {
   const updatedRacer = await prisma.racer.update({
     where: {
       racer_id: racerData.racer_id,
@@ -56,7 +68,7 @@ export async function bruh(racer: racer) {
     select: {
       duration: true,
     },
-    orderBy: { start_time: 'desc' },
+    orderBy: { start_time: "desc" },
   });
 
   return recentRuns;
