@@ -51,7 +51,7 @@ export default function Page() {
             selectedKeys={race}
             selectionMode="single"
             variant="flat"
-            onSelectionChange={setRace}
+            onSelectionChange={(race: any) => setRace(race)}
           >
             {races && races.length ? (
               races.map((r) => {
