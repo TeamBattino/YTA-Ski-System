@@ -6,6 +6,8 @@ WORKDIR /app
 
 COPY . .
 
+RUN cd ..
+
 RUN bun install
 
 RUN bun run build
