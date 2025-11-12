@@ -3,9 +3,9 @@ import { racer } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function fetchRacerBySkiPass(ski_pass: string) {
+export async function fetchRacerBySkiPass(ski_pass: string, race_id: string) {
   const racer = await prisma.racer.findUnique({
-    where: { ski_pass: ski_pass },
+    where: { ski_pass: ski_pass, race_id: race_id},
   });
   return racer;
 }
