@@ -72,7 +72,7 @@ export async function PUT(req: Request) {
   try {
     const data: run = await req.json();
 
-    if (!data.run_id || !data.duration || !data.ski_pass || !data.start_time) {
+    if (!data.run_id || !data.duration || !data.ski_pass || !data.start_time || !data.race_id) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 

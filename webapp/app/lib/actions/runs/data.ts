@@ -56,6 +56,7 @@ export async function updateRun(run: run) {
             start_time: run.start_time,
             duration: run.duration,
             ski_pass: run.ski_pass,
+            race_id: run.race_id,
         },
     });
     return updatedRun;
