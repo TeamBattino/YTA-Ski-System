@@ -77,6 +77,7 @@ export type Run = {
   ldap: string;
   location: string;
   start_time: Date;
+  race_id : string;
 }
 export type RunWithDupilcates = {
   run_id: string;
@@ -86,6 +87,7 @@ export type RunWithDupilcates = {
   ldap: string;
   location: string;
   start_time: Date;
+  race_id : string;
 }
 
 export async function getTopRuns() {
