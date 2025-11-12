@@ -57,7 +57,7 @@ export async function POST(req: Request) {
       duration: data.duration,
       ski_pass: data.ski_pass,
       start_time: new Date(),
-      race_id: data.race_id, //TODO: make sure it is race_id of user
+      race_id: data.race_id,
     }
     const newRun = await createRun(run);
     return NextResponse.json(newRun);

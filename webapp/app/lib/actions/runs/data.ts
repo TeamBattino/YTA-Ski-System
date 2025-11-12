@@ -28,11 +28,11 @@ export async function fetchRunById(run_id: string) {
 export async function createRun(run: Omit<run, 'run_id'>) {
   // Check if the ski_pass exists in the racer table
   const racerExists = await prisma.racer.findUnique({
-      where: { ski_pass: run.ski_pass! },
+      where: { ski_pass: run.ski_pass!, race_id: run.race_id! },
   });
 
   if (!racerExists) {
-      throw new Error(`Racer with ski_pass ${run.ski_pass} does not exist.`);
+      throw new Error(`Racer with ski_pass ${run.ski_pass} and race_id ${run.race_id} does not exist.`);
   }
 
   // If racer exists, create the run
@@ -41,6 +41,7 @@ export async function createRun(run: Omit<run, 'run_id'>) {
           start_time: run.start_time,
           duration: run.duration,
           ski_pass: run.ski_pass,
+          race_id: run.race_id,
       },
   });
   return newRun;
