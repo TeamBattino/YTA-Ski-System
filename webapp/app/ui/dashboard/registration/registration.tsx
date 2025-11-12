@@ -205,7 +205,7 @@ export default function Registration() {
           selectedKeys={race}
           selectionMode="single"
           variant="flat"
-          onSelectionChange={setRace}
+          onSelectionChange={(race: any) => setRace(race)}
         >
           {races && races.length ? (
             races.map((r) => {
