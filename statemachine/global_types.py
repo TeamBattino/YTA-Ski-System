@@ -17,3 +17,4 @@ class StateMachine:
     user: User
     loading: bool
     connection_issues: bool
+    next_user : User

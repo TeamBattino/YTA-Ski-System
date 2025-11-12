@@ -3,32 +3,38 @@ from global_types import StateMachine, StateMachineState
 from threading import Event
 import os
 
+
 class AlpenhundeUI:
+
     def __init__(self, state_machine: StateMachine, user_update_event: Event):
         self.root = tk.Tk()
         self.root.title("Alpenhunde State")
         self.rfid = ""
         self.state_machine = state_machine
         self.user_update_event = user_update_event
-        
+
         self._setup_ui()
         self._bind_events()
         self.update_state()
 
     def _setup_ui(self):
-        self.state_text = tk.Text(self.root, font=("Helvetica", 46), height=2, bd=0, bg=self.root.cget("bg"))
+        self.state_text = tk.Text(
+            self.root, font=("Helvetica", 46), height=2, bd=0, bg=self.root.cget("bg")
+        )
         self.state_text.pack(expand=True)
         self._configure_text_tags()
         self.state_text.insert(tk.END, "State: ", "state")
         self.state_text.config(state=tk.DISABLED)
-        
+
         self.last_time_label = tk.Label(self.root, font=("Helvetica", 20))
         self.last_time_label.pack()
-        
-        self.debug_log_label = tk.Label(self.root, font=("Helvetica", 12), fg="blue", anchor='ne', justify='right')
-        self.debug_log_label.place(relx=1.0, rely=0.0, anchor='ne')
-        
-        self.root.attributes('-fullscreen', True)
+
+        self.debug_log_label = tk.Label(
+            self.root, font=("Helvetica", 12), fg="blue", anchor="ne", justify="right"
+        )
+        self.debug_log_label.place(relx=1.0, rely=0.0, anchor="ne")
+
+        self.root.attributes("-fullscreen", True)
 
     def _configure_text_tags(self):
         self.state_text.tag_configure("state", font=("Helvetica", 32))
@@ -37,12 +43,12 @@ class AlpenhundeUI:
 
     def _bind_events(self):
         self.root.bind("<Key>", self.onKeyPress)
-        
+
     def onKeyPress(self, event: tk.Event):
-        if (self.state_machine.current_state == StateMachineState.IDLE):
+        if self.state_machine.current_state == StateMachineState.IDLE:
             self.rfid += event.char
-            if event.char == '\r':
-                
+            if event.char == "\r":
+
                 os.system("espeak -a 400 'detected skee paass' &")
                 clean_rfid = self.rfid.strip().lower()
                 self.state_machine.user.rfid = clean_rfid
@@ -62,23 +68,45 @@ class AlpenhundeUI:
         self.state_text.config(state=tk.DISABLED)
 
     def _get_state_and_tag(self):
-        if (self.state_machine.loading):
+        if self.state_machine.loading:
             return "Loading...", "NOT_READY"
-        if (self.state_machine.connection_issues):
-            return "Experiencing Connection Issues. Reconnecting...\n Please Wait a Moment", "NOT_READY"
-        
+        if self.state_machine.connection_issues:
+            return (
+                "Experiencing Connection Issues. Reconnecting...\n Please Wait a Moment",
+                "NOT_READY",
+            )
+
         match self.state_machine.current_state:
             case StateMachineState.IDLE:
-                return ("Please Close the gate (the long rod infront)\n"
-                        "<- Then Scan your Badge on the gray NFC reader on the Left", "READY")
+                return (
+                    "Please Close the gate (the long rod infront)\n"
+                    "<- Then Scan your Badge on the gray NFC reader on the Left",
+                    "READY",
+                )
             case StateMachineState.REGISTERED:
-                if (self.state_machine.user.name == "Unregistered User"):
-                    return "User not found. \nPlease register yourself online and press the red button", "NOT_READY"
-                return (f"Hey, {self.state_machine.user.name} You're ready to race!\n"
-                        "Your time starts as soon as you open the gate.", "READY")
+                if self.state_machine.user.name == "Unregistered User":
+                    return (
+                        "User not found. \nPlease register yourself online and press the red button",
+                        "NOT_READY",
+                    )
+                return (
+                    f"Hey, {self.state_machine.user.name} You're ready to race!\n"
+                    "Your time starts as soon as you open the gate.",
+                    "READY",
+                )
             case StateMachineState.RUNNING:
-                return (f"{self.state_machine.user.name} is Racing...\n\n"
-                "If you dont see anyone on the slope anymore press the red button", "NOT_READY")
+                if self.state_machine.next_user == None:
+                    return (
+                        f"{self.state_machine.user.name} is Racing...\n\n"
+                        "Please Close the gate (the long rod infront)\n"
+                        "<- Then Scan your Badge on the gray NFC reader on the Left",
+                        "NOT_READY",
+                    )
+                return (
+                    f"{self.state_machine.user.name} is Racing...\n\n"
+                    "If you dont see anyone on the slope anymore press the red button",
+                    "NOT_READY",
+                )
 
     def _update_last_time_label(self):
         # Placeholder value for last_time

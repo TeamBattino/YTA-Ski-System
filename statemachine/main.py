@@ -75,7 +75,11 @@ def panic_button_call():
 
 def update_user():
     user = api.getUser(statemachne.user.rfid)
-    statemachne.user = user
+    if(statemachne.next_user):
+        statemachne.user = statemachne.next_user
+        statemachne.next_user = user
+    else:
+        statemachne.next_user = user
 
 user_update_event = Event()
 ui = AlpenhundeUI(statemachne, user_update_event)
