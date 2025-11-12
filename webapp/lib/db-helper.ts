@@ -95,6 +95,7 @@ export async function getTopRuns() {
         racer.name,
         racer.ldap,
         racer.location,
+        racer.race_id,
         MIN(r.duration) as duration
     FROM
         run r

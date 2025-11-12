@@ -160,6 +160,7 @@ export default function TopRunsTable(race: any) {
 
   const onRowClick = (item: Key) => {
     const personToView = list.items.find((i) => i.name === item);
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     personToView &&
       redirect(`/dashboard/leaderboard/${personToView?.ski_pass}`);
   };
