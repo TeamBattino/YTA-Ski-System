@@ -7,16 +7,17 @@ import { useEffect, useState } from "react"
 
 type PageBuilderProps = {
     ski_pass: string;
+    race_id: string;
 }
 
-function PageBuilder({ ski_pass }: PageBuilderProps) {
+function PageBuilder({ ski_pass, race_id }: PageBuilderProps) {
     const [racer, setRacer] = useState<Racer | null>(null);
     useEffect(() => {
-        getRacer(ski_pass).then((racer) => {
+        getRacer(ski_pass, race_id).then((racer) => {
             setRacer(racer);
         });
     }
-        , [ski_pass]);
+        , [ski_pass, race_id]);
     return (
         <div>
             {(racer) ? (
