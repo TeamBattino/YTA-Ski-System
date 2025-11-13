@@ -1,0 +1,22 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "172.27.136.144",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "database": "postgres",
+            "username": "postgres",
+            "password": "!30pgpw48",
+            "name": "DB-001"
+        },
+        {
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "driver": "PostgreSQL",
+            "name": "YTA-Ski-System",
+            "connectString": "postgresql://postgres:postgres@49.13.22.162:5432/postgres"
+        }
+    ]
+}
