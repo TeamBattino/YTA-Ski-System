@@ -34,9 +34,7 @@ export async function getAllConsistency() {
             FROM
               run r
               JOIN racer ON r.ski_pass = racer.ski_pass AND r.race_id = racer.race_id
-              GROUP BY racer.race_id
             JOIN RunCounts rc ON r.ski_pass = rc.ski_pass AND r.race_id = rc.race_id
-            GROUP BY r.race_id
         ),
         Consistency AS (
             SELECT
@@ -106,7 +104,7 @@ export async function getTopRuns() {
     JOIN
         racer ON r.ski_pass = racer.ski_pass AND r.race_id = racer.race_id
     GROUP BY
-        r.ski_pass, r.race_id, racer.name, racer.ldap, racer.location
+        r.ski_pass, r.race_id, racer.name, racer.ldap, racer.location, racer.race_id
     ORDER BY
         duration ASC
   `;
@@ -123,7 +121,7 @@ export async function getRecentRuns() {
             run r
         JOIN
             racer ON r.ski_pass = racer.ski_pass  AND r.race_id = racer.race_id
-        GROUP BY racer.race_id
+        GROUP BY racer.race_id, r.start_time, r.duration, r.ski_pass, r.run_id, racer.name, racer.ldap, racer.location
         ORDER BY
             r.start_time DESC
 `;
@@ -138,7 +136,6 @@ export async function getRaces() {
             race r
         ORDER BY
             r.name
-        GROUP BY r.race_id
     `;
   return races;
 }
