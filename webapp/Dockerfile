@@ -12,6 +12,8 @@ RUN bun install
 
 RUN bunx prisma db push
 
+RUN bunx auth secret
+
 RUN bun run build
 
 EXPOSE 3000

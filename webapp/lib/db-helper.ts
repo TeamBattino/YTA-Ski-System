@@ -2,7 +2,6 @@
 
 import prisma from "./prisma";
 
-
 export interface Consistency {
   ski_pass: string;
   name: string;
@@ -35,8 +34,9 @@ export async function getAllConsistency() {
             FROM
               run r
               JOIN racer ON r.ski_pass = racer.ski_pass AND r.race_id = racer.race_id
+              GROUP BY racer.race_id
             JOIN RunCounts rc ON r.ski_pass = rc.ski_pass AND r.race_id = rc.race_id
-
+            GROUP BY r.race_id
         ),
         Consistency AS (
             SELECT
@@ -78,8 +78,8 @@ export type Run = {
   ldap: string;
   location: string;
   start_time: Date;
-  race_id : string;
-}
+  race_id: string;
+};
 export type RunWithDupilcates = {
   run_id: string;
   name: string;
@@ -88,8 +88,8 @@ export type RunWithDupilcates = {
   ldap: string;
   location: string;
   start_time: Date;
-  race_id : string;
-}
+  race_id: string;
+};
 
 export async function getTopRuns() {
   const racersWithShortestRun = await prisma.$queryRaw<Run[]>`
@@ -123,6 +123,7 @@ export async function getRecentRuns() {
             run r
         JOIN
             racer ON r.ski_pass = racer.ski_pass  AND r.race_id = racer.race_id
+        GROUP BY racer.race_id
         ORDER BY
             r.start_time DESC
 `;
@@ -130,13 +131,14 @@ export async function getRecentRuns() {
 }
 
 export async function getRaces() {
-    const races = await prisma.$queryRaw<RunWithDupilcates[]>`
+  const races = await prisma.$queryRaw<RunWithDupilcates[]>`
         SELECT
             r.*
         FROM
             race r
         ORDER BY
             r.name
+        GROUP BY r.race_id
     `;
   return races;
 }
@@ -147,7 +149,6 @@ export type Racer = {
   ldap: string;
   location: string;
   consistency?: number;
-}
+};
 
 // Get the singular racer that has this ski pass and calculate his consistency if they have more than 2 runs based on his durration
-
