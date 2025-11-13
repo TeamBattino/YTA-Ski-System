@@ -17,6 +17,7 @@ export async function getAllConsistency() {
         WITH RunCounts AS (
           SELECT
               ski_pass,
+              race_id,
               COUNT(*) as run_count
           FROM
               run
@@ -33,8 +34,8 @@ export async function getAllConsistency() {
                 ROW_NUMBER() OVER (PARTITION BY r.ski_pass ORDER BY r.start_time DESC) as rn
             FROM
               run r
-              JOIN racer ON r.ski_pass = racer.ski_pass
-            JOIN RunCounts rc ON r.ski_pass = rc.ski_pass
+              JOIN racer ON r.ski_pass = racer.ski_pass AND r.race_id = racer.race_id
+            JOIN RunCounts rc ON r.ski_pass = rc.ski_pass AND r.race_id = rc.race_id
 
         ),
         Consistency AS (
@@ -61,7 +62,7 @@ export async function getConsistencyCount() {
   const count = await prisma.$queryRaw<number>`
         SELECT COUNT(DISTINCT ski_pass)
         FROM (
-            SELECT ski_pass
+            SELECT ski_pass, race_id
             FROM run
             GROUP BY ski_pass, race_id
             HAVING COUNT(*) >= 2
@@ -94,6 +95,7 @@ export async function getTopRuns() {
   const racersWithShortestRun = await prisma.$queryRaw<Run[]>`
     SELECT
         r.ski_pass,
+        r.race_id,
         racer.name,
         racer.ldap,
         racer.location,
@@ -104,7 +106,7 @@ export async function getTopRuns() {
     JOIN
         racer ON r.ski_pass = racer.ski_pass AND r.race_id = racer.race_id
     GROUP BY
-        r.ski_pass, race_id, racer.name, racer.ldap, racer.location
+        r.ski_pass, r.race_id, racer.name, racer.ldap, racer.location
     ORDER BY
         duration ASC
   `;
@@ -137,25 +139,6 @@ export async function getRaces() {
             r.name
     `;
   return races;
-}
-
-export async function getRacerRunsBySkicard(ski_pass: string, race_id: string) {
-  const runs = await prisma.$queryRaw<RunWithDupilcates[]>`
-        SELECT
-            r.*,
-            racer.name,
-            racer.ldap,
-            racer.location
-        FROM
-            run r
-        JOIN
-            racer ON r.ski_pass = racer.ski_pass
-        WHERE
-            r.ski_pass = ${ski_pass} AND r.race_id = ${race_id}
-        ORDER BY
-            r.start_time DESC
-    `;
-  return runs;
 }
 
 export type Racer = {
