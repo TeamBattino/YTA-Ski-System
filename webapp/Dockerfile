@@ -10,7 +10,7 @@ RUN cd ..
 
 RUN bun install
 
-RUN npx run prisma generate
+RUN npx prisma migrate deploy
 
 RUN bun run build
 
