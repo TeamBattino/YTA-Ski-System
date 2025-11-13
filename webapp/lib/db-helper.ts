@@ -167,41 +167,4 @@ export type Racer = {
 }
 
 // Get the singular racer that has this ski pass and calculate his consistency if they have more than 2 runs based on his durration
-export async function getRacer(ski_pass: string, race_id: string): Promise<Racer> {
-  const racer = await prisma.$queryRaw<Racer[]>`
-WITH RacerRuns AS (
-        SELECT
-            duration
-        FROM
-            run
-        WHERE
-            ski_pass = ${ski_pass} AND r.race_id = ${race_id}
-        ORDER BY
-            start_time DESC
-        LIMIT 2
-    ),
-    Consistency AS (
-        SELECT
-            ABS(MAX(duration) - MIN(duration)) as consistency
-        FROM
-            RacerRuns
-        HAVING COUNT(*) = 2
-    )
-    SELECT
-        r.ski_pass,
-        r.name,
-        r.ldap,
-        r.location,
-        c.consistency
-    FROM
-        racer r
-    LEFT JOIN
-        Consistency c ON 1=1
-    WHERE
-        r.ski_pass = ${ski_pass} AND r.race_id = ${race_id}   
-        `;
-  if (racer.length === 0) {
-    throw new Error("Racer not found");
-  }
-  return racer[0];
-}
+
