@@ -10,6 +10,8 @@ RUN cd ..
 
 RUN bun install
 
+RUN npx prisma migrate deploy
+
 RUN bun run build
 
 EXPOSE 3000
