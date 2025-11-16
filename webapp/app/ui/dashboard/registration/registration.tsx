@@ -10,13 +10,10 @@ import {
 import { Button } from "@heroui/button";
 import { getRaces } from "@/lib/db-helper";
 
-
 export default function Registration() {
   const [name, setName] = useState<string>("");
   const [ldap, setLdap] = useState<string>("");
   const [selectedLocation, setLocation] = useState<any>();
-  const [race, setRace] = useState(new Set(["Empty"]));
-  const [races, setRaces] = useState<any[]>([]);
   const [ski_pass, setSkiPass] = useState<string>("prrthiusdfhg");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string>(""); // for nfc reader
@@ -53,17 +50,6 @@ export default function Registration() {
     }
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const fetchRaces = async () => {
-    const races = await getRaces();
-    setRaces(races);
-  };
-
-  const selectedRace = React.useMemo(
-    () => Array.from(race).join(", ").replace(/_/g, ""),
-    [race]
-  );
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -72,14 +58,14 @@ export default function Registration() {
       setIsSubmitting(false);
       return;
     }
-    if (!name || !ldap || !ski_pass || !selectedLocation || !race) {
+    if (!name || !ldap || !ski_pass || !selectedLocation) {
       alert("All fields are required.");
       setIsSubmitting(false);
       return;
     }
 
     try {
-      if (name && ldap && ski_pass && selectedLocation && race) {
+      if (name && ldap && ski_pass && selectedLocation) {
         const response = await fetch("/api/racers", {
           method: "POST",
           body: JSON.stringify({
@@ -87,7 +73,7 @@ export default function Registration() {
             ldap: ldap,
             location: selectedLocation,
             ski_pass: ski_pass,
-            race: race,
+            race: "6d3173f4-823b-4e05-a4d7-b2decacc7ade", // set to current race id
           }),
           headers: {
             "Content-Type": "application/json",
@@ -112,10 +98,6 @@ export default function Registration() {
       setIsSubmitting(false);
     }
   };
-
-  useEffect(() => {
-    fetchRaces();
-  }, []);
 
   return (
     <div className="flex h-screen flex-col items-center justify-start bg-gray-50 px-4 pt-8">
@@ -192,40 +174,6 @@ export default function Registration() {
         </div>
       </div>
 
-      {/* Dropdown for Race */}
-      <Dropdown>
-        <DropdownTrigger>
-          <Button className="capitalize" variant="flat">
-            {selectedRace}
-          </Button>
-        </DropdownTrigger>
-        <DropdownMenu
-          disallowEmptySelection
-          aria-label="Single selection example"
-          selectedKeys={race}
-          selectionMode="single"
-          variant="flat"
-          onSelectionChange={(race: any) => setRace(race)}
-        >
-          {races && races.length ? (
-            races.map((r) => {
-              const key = r.race_id ?? "2026";
-              const label = r.race_name ?? "";
-              return (
-                <DropdownItem key={String(key)} value={String(key)}>
-                  {label}
-                </DropdownItem>
-              );
-            })
-          ) : (
-            <DropdownItem key="empty" isDisabled>
-              No races
-            </DropdownItem>
-          )}
-        </DropdownMenu>
-      </Dropdown>
-      <br />
-      <br />
       {/* Register Button */}
       <button
         onClick={handleSubmit}
