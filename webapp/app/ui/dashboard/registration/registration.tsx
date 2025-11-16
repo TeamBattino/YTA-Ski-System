@@ -1,14 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from "@heroui/dropdown";
-import { Button } from "@heroui/button";
-import { getRaces } from "@/lib/db-helper";
+import React, { useState } from "react";
 
 export default function Registration() {
   const [name, setName] = useState<string>("");
