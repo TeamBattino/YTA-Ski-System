@@ -1,14 +1,50 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getRaces } from "@/lib/db-helper";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+type Race = {
+  race_id: string;
+  name: string;
+};
 
 export default function Registration() {
   const [name, setName] = useState<string>("");
   const [ldap, setLdap] = useState<string>("");
   const [selectedLocation, setLocation] = useState<any>();
   const [ski_pass, setSkiPass] = useState<string>("prrthiusdfhg");
+  const [race, setRace] = useState<Race>();
+  const [open, setOpen] = React.useState(false);
+  const [races, setRaces] = useState<Race[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string>(""); // for nfc reader
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const fetchRaces = async () => {
+    const races = await getRaces();
+    setRaces(races);
+  };
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    fetchRaces();
+  }, []);
 
   const handleScan = async () => {
     if ("NDEFReader" in window) {
@@ -50,14 +86,14 @@ export default function Registration() {
       setIsSubmitting(false);
       return;
     }
-    if (!name || !ldap || !ski_pass || !selectedLocation) {
+    if (!name || !ldap || !ski_pass || !selectedLocation || !race) {
       alert("All fields are required.");
       setIsSubmitting(false);
       return;
     }
 
     try {
-      if (name && ldap && ski_pass && selectedLocation) {
+      if (name && ldap && ski_pass && selectedLocation && race) {
         const response = await fetch("/api/racers", {
           method: "POST",
           body: JSON.stringify({
@@ -65,7 +101,7 @@ export default function Registration() {
             ldap: ldap,
             location: selectedLocation,
             ski_pass: ski_pass,
-            race: "6d3173f4-823b-4e05-a4d7-b2decacc7ade", // set to current race id
+            race: race.race_id, 
           }),
           headers: {
             "Content-Type": "application/json",
@@ -165,6 +201,56 @@ export default function Registration() {
           ))}
         </div>
       </div>
+
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-[200px] justify-between"
+          >
+            {race
+              ? races.find((currentRace) => race === currentRace)?.name
+              : "Select race..."}
+            <ChevronsUpDown className="opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0">
+          <Command>
+            <CommandInput placeholder="Search race..." className="h-9" />
+            <CommandList>
+              <CommandEmpty>No race found.</CommandEmpty>
+              <CommandGroup>
+                {races.map((currentRace) => (
+                  <CommandItem
+                    key={currentRace.race_id}
+                    value={currentRace.name}
+                    onSelect={(currentValue) => {
+                      setRace(
+                        races.find(
+                          (raceWithName) => currentValue === raceWithName.name
+                        )
+                      );
+                      setOpen(false);
+                    }}
+                  >
+                    {currentRace.name}
+                    <Check
+                      className={cn(
+                        "ml-auto",
+                        currentRace === race ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+
+      <br /><br />
 
       {/* Register Button */}
       <button

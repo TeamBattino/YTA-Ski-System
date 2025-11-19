@@ -3,7 +3,7 @@
 import Link from "next/link";
 import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
-import { FaUserPlus, FaQuestion, FaFlagCheckered } from 'react-icons/fa';
+import { FaUserPlus, FaQuestion, FaFlagCheckered, FaGoogle } from 'react-icons/fa';
 
 export default function NavLink() {
   const pathname = usePathname();
@@ -12,6 +12,7 @@ export default function NavLink() {
     { name: 'Leaderboard', href: '/dashboard/leaderboard', icon: <FaFlagCheckered /> },
     { name: 'Registration', href: '/dashboard/registration', icon: <FaUserPlus /> },
     { name: 'Faq', href: '/dashboard/faq', icon: <FaQuestion /> },
+    { name: 'Admin', href: '/dashboard/admin', icon: <FaGoogle /> },
   ];
 
   return (

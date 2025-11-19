@@ -109,7 +109,7 @@ export default function Page() {
         <h1 className="py-2 text-2xl font-bold">Leaderboards</h1>
         <p>
           The Aim of the challenge is to have your two most recent runs be
-          closest to eachother in time.
+          closest to each other in time.
         </p>
         <p>
           View recent runs or click an entry to view the persons current
