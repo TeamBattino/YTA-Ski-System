@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
-    const admin = await loginAdmin(data.name, data.password);
+    const admin = await loginAdmin(data.username, data.password);
     return NextResponse.json(admin);
   } catch (error) {
     console.error('Error handling POST request:', error);
