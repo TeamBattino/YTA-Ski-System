@@ -48,10 +48,14 @@ export default function Admin() {
     }
   };
 
+  if(!isAuthenticated){
+    return <></>
+  }
+
   return (
     <div className="flex h-screen flex-col items-center justify-start bg-gray-50 px-4 pt-8">
       <p>
-        This page is only meant for admin users. If you are not an admin, please
+        *This page is only meant for admin users. If you are not an admin, please
         proceed to another page of the Ski-App.
       </p>
       <h1 className="mb-6 text-2xl font-bold text-blue-600">Admin Login</h1>
