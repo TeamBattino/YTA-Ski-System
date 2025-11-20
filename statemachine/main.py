@@ -43,7 +43,7 @@ ENV_API_URL = os.getenv("API_DOMAIN")
 ENV_AUTH_SECRET = os.getenv("AUTH_SECRET")
 
 """ Shared state variables here """
-statemachne = StateMachine(StateMachineState.IDLE, -1, User("", ""), False, False)
+statemachne = StateMachine(StateMachineState.IDLE, -1, User("", ""), False, False, User("",""))
 
 """ Threads created here """
 panic_event = Event()

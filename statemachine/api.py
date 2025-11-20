@@ -13,7 +13,7 @@ class ApiClient:
         response = requests.get(url, params=params)
         if response.status_code == 404:
             print(f"User {ski_pass} not found")
-            return User("Unregistered User","Unregistered User", "Unregistered User")
+            return User("Unregistered User","Unregistered User")
         req_user = response.json()
         print(req_user)
         if response.status_code == 200:
