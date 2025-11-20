@@ -1,111 +1,96 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getRaces } from "@/lib/db-helper";
+import AdminRecentRunsTable from "@/components/AdminRecentRunsTable";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+type Race = {
+  race_id: string;
+  name: string;
+};
 
 export default function Admin() {
-  const [username, setName] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [race, setRace] = useState<Race>();
+  const [open, setOpen] = React.useState(false);
+  const [races, setRaces] = useState<Race[]>([]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    if (!username || !password) {
-      alert("All fields are required.");
-      setIsSubmitting(false);
-      return;
-    }
-
-    try {
-      if (username) {
-        const response = await fetch("/api/admin", {
-          method: "POST",
-          body: JSON.stringify({
-            name: username,
-            password: password,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (response.ok) {
-          alert("Registration successful!");
-          setName("");
-          setAuthenticated(true);
-        } else {
-          alert("Registration failed. Please try again." + response.statusText);
-          setAuthenticated(false);
-          return;
-        }
-      }
-    } catch (error) {
-      console.error("Error registering racer: ", error);
-      alert("An error occurred. Please try again.: " + error);
-    } finally {
-      setIsSubmitting(false);
-    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const fetchRaces = async () => {
+    const races = await getRaces();
+    setRaces(races);
   };
 
-  if(!isAuthenticated){
-    return <></>
-  }
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    fetchRaces();
+  }, []);
 
   return (
-    <div className="flex h-screen flex-col items-center justify-start bg-gray-50 px-4 pt-8">
-      <p>
-        *This page is only meant for admin users. If you are not an admin, please
-        proceed to another page of the Ski-App.
-      </p>
-      <h1 className="mb-6 text-2xl font-bold text-blue-600">Admin Login</h1>
-
-      {/* Name Field */}
-      <div className="mb-6 w-60">
-        <label
-          htmlFor="username"
-          className="block mb-2 text-sm font-medium text-gray-700"
-        >
-          Name
-        </label>
-        <input
-          id="username"
-          name="username"
-          type="text"
-          value={username}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Enter your username"
-          className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
-        />
-      </div>
-
-      {/* Password Field */}
-      <div className="mb-6 w-60">
-        <label
-          htmlFor="password"
-          className="block mb-2 text-sm font-medium text-gray-700"
-        >
-          Password
-        </label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter your password"
-          className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
-        />
-      </div>
-
-      {/* Register Button */}
-      <button
-        onClick={handleSubmit}
-        disabled={isSubmitting}
-        className="w-60 rounded-md bg-blue-400 px-4 py-2 text-white hover:bg-sky-100 hover:text-blue-600"
-      >
-        {isSubmitting ? "Registering..." : "Register"}
-      </button>
-    </div>
+    <>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-[200px] justify-between"
+          >
+            {race
+              ? races.find((currentRace) => race === currentRace)?.name
+              : "Select race..."}
+            <ChevronsUpDown className="opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0">
+          <Command>
+            <CommandInput placeholder="Search race..." className="h-9" />
+            <CommandList>
+              <CommandEmpty>No race found.</CommandEmpty>
+              <CommandGroup>
+                {races.map((currentRace) => (
+                  <CommandItem
+                    key={currentRace.race_id}
+                    value={currentRace.name}
+                    onSelect={(currentValue) => {
+                      setRace(
+                        races.find(
+                          (raceWithName) => currentValue === raceWithName.name
+                        )
+                      );
+                      setOpen(false);
+                    }}
+                  >
+                    {currentRace.name}
+                    <Check
+                      className={cn(
+                        "ml-auto",
+                        currentRace === race ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+      <AdminRecentRunsTable race={race} />
+    </>
   );
 }
