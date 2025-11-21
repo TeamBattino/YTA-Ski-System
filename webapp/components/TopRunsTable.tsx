@@ -19,6 +19,7 @@ import {
 import { SearchIcon } from "./icons/SearchIcon";
 import moment from "moment";
 import { redirect } from "next/navigation";
+import { race as Race } from '@prisma/client';
 
 type FormattedRun = {
   name: string;
@@ -29,7 +30,7 @@ type FormattedRun = {
   race_id: string;
 };
 
-export default function TopRunsTable(race: any) {
+export default function TopRunsTable(race: Race) {
   const columns = [
     { key: "name", label: "Name", allowsSorting: true },
     { key: "duration", label: "Duration", allowsSorting: true },
@@ -45,7 +46,7 @@ export default function TopRunsTable(race: any) {
   const hasSearch = Boolean(searchValue);
   let list = useAsyncList<FormattedRun>({
     async load() {
-      const topRuns = await getTopRuns();
+      const topRuns = await getTopRuns(race.race_id);
       const formattedRuns = topRuns.map((run: Run) => {
         const durationMilliseconds = run.duration / 10;
         const duration = moment.duration(durationMilliseconds);
@@ -158,13 +159,6 @@ export default function TopRunsTable(race: any) {
     });
   }, [list.items, race, searchValue, selectedLocation]);
 
-  const onRowClick = (item: Key) => {
-    const personToView = list.items.find((i) => i.name === item);
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    personToView &&
-      redirect(`/dashboard/leaderboard/${personToView?.ski_pass}`);
-  };
-
   return (
     <div>
       <div className="flex flex-row gap-2 py-2">
@@ -209,7 +203,6 @@ export default function TopRunsTable(race: any) {
             direction: "ascending",
           },
           onSortChange: list.sort,
-          onRowAction: onRowClick,
         }}
       />
     </div>

@@ -13,8 +13,10 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "./icons/SearchIcon";
 import { redirect } from "next/navigation";
+import { race as Race } from '@prisma/client';
 
-export default function ConsistencyTable(race: any) {
+
+export default function ConsistencyTable(race: Race) {
   const columns = [
     { key: "name", label: "Name", allowsSorting: true },
     { key: "consistency", label: "Consistency", allowsSorting: true },
@@ -27,9 +29,11 @@ export default function ConsistencyTable(race: any) {
   const [searchValue, setSearchValue] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("ALL");
   const hasSearch = Boolean(searchValue);
+  console.log("Reload table", race);
   let list = useAsyncList<Consistency>({
     async load() {
-      const consistency = await getAllConsistency();
+      const consistency = await getAllConsistency(race.race_id);
+      
       setIsLoading(false);
       consistency.map((run: Consistency) => {
         run.consistency = run.consistency / 10000;

@@ -23,10 +23,7 @@ import {
 } from "@/components/ui/popover";
 import { get } from "http";
 
-type Race = {
-  race_id: string;
-  name: string;
-};
+import { race as Race } from '@prisma/client';
 
 export default function Page() {
   const showingConsistency = true;
@@ -118,7 +115,7 @@ export default function Page() {
         <h2 className="py-2 text-xl font-bold">Recent Runs</h2>
         <RecentRunsTable />
         <h2 className="py-2 text-xl font-bold">Non-Competitive Top Runs</h2>
-        <TopRunsTable />
+        <TopRunsTable race={race} />
       </div>
     );
   }

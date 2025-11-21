@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { redirect } from "next/navigation";
+import SignIn from '@/components/sign-in';
 
 export default function Login() {
   const [username, setName] = useState<string>("");
@@ -56,52 +57,7 @@ export default function Login() {
       </p>
       <h1 className="mb-6 text-2xl font-bold text-blue-600">Admin Login</h1>
 
-      {/* Name Field */}
-      <div className="mb-6 w-60">
-        <label
-          htmlFor="username"
-          className="block mb-2 text-sm font-medium text-gray-700"
-        >
-          Username
-        </label>
-        <input
-          id="username"
-          name="username"
-          type="text"
-          value={username}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Enter your username"
-          className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
-        />
-      </div>
-
-      {/* Password Field */}
-      <div className="mb-6 w-60">
-        <label
-          htmlFor="password"
-          className="block mb-2 text-sm font-medium text-gray-700"
-        >
-          Password
-        </label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter your password"
-          className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
-        />
-      </div>
-
-      {/* Register Button */}
-      <button
-        onClick={handleSubmit}
-        disabled={isSubmitting}
-        className="w-60 rounded-md bg-blue-400 px-4 py-2 text-white hover:bg-sky-100 hover:text-blue-600"
-      >
-        {isSubmitting ? "Registering..." : "Register"}
-      </button>
+     <SignIn />
     </div>
   );
 }
