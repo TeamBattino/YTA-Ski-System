@@ -4,7 +4,7 @@ export const authConfig = {
   pages: {
     signIn: '/dashboard/login',
   },
-callbacks: {
+  callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       if (isLoggedIn) {

@@ -34,7 +34,7 @@ export default function Login() {
           alert("Login successful!");
           setName("");
           setPassword("");
-          redirect('dashboard/admin');
+          redirect('/dashboard/admin');
         } else {
           alert("Login failed. Please try again." + response.statusText);
           return;

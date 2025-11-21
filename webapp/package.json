@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.11.1",
     "@heroui/dropdown": "^2.3.27",
     "@heroui/system": "^2.4.23",
     "@heroui/theme": "^2.4.23",

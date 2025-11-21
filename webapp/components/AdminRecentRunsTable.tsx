@@ -4,7 +4,7 @@ import AdminTableComponent from "./AdminTable";
 import {
   Consistency,
   getAllConsistency,
-  getTopRuns,
+  getRecentRuns,
   Run,
 } from "@/lib/db-helper";
 import { Key, useCallback, useMemo, useState } from "react";
@@ -45,7 +45,7 @@ export default function AdminRecentRunsTable(race: any) {
   const hasSearch = Boolean(searchValue);
   let list = useAsyncList<FormattedRun>({
     async load() {
-      const topRuns = await getTopRuns();
+      const topRuns = await getRecentRuns();
       const formattedRuns = topRuns.map((run: Run) => {
         const durationMilliseconds = run.duration / 10;
         const duration = moment.duration(durationMilliseconds);
@@ -156,7 +156,7 @@ export default function AdminRecentRunsTable(race: any) {
         }
       }
     });
-  }, [list.items, searchValue, selectedLocation]);
+  }, [list.items, race, searchValue, selectedLocation]);
 
   const onRowClick = (item: Key) => {
     const personToView = list.items.find((i) => i.name === item);
