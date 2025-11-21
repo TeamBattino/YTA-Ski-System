@@ -101,7 +101,7 @@ export default function Registration() {
             ldap: ldap,
             location: selectedLocation,
             ski_pass: ski_pass,
-            race: race.race_id, 
+            race_id: race.race_id, 
           }),
           headers: {
             "Content-Type": "application/json",

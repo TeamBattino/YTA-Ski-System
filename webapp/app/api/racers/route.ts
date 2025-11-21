@@ -29,11 +29,11 @@ export async function POST(req: Request) {
   try {
     const data: racer = await req.json();
     
-    if (!data.name || !data.ldap || !data.location || !data.ski_pass) {
+    if (!data.name || !data.ldap || !data.location || !data.ski_pass || !data.race_id) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
-    const newRacer = await createRacer(data.name, data.ldap, data.ski_pass, data.location);
+    const newRacer = await createRacer(data.name, data.ldap, data.ski_pass, data.location, data.race_id);
     return NextResponse.json(newRacer);
   } catch (error) {
     console.error('Error handling POST request:', error);

@@ -84,13 +84,8 @@ export default function ConsistencyTable(race: any) {
         }
       }
     });
-  }, [list.items, searchValue, selectedLocation]);
+  }, [list.items, race, searchValue, selectedLocation]);
 
-  const onRowClick = (item: Key) => {
-    const personToView = list.items.find((i) => i.name === item);
-    personToView &&
-      redirect(`/dashboard/leaderboard/${personToView?.ski_pass}`);
-  };
   return (
     <div>
       <div className="flex flex-row gap-2 py-2">
@@ -135,7 +130,6 @@ export default function ConsistencyTable(race: any) {
             direction: "ascending",
           },
           onSortChange: list.sort,
-          onRowAction: onRowClick,
         }}
       />
       <span className="px-6 text-xs">

@@ -24,7 +24,8 @@ export async function createRacer(
   name: string,
   ldap: string,
   ski_pass: string,
-  location: string
+  location: string,
+  race_id: string
 ) {
   const newRacer = await prisma.racer.create({
     data: {
@@ -32,6 +33,7 @@ export async function createRacer(
       ldap: ldap,
       ski_pass: ski_pass,
       location: location,
+      race_id: race_id,
     },
   });
   return newRacer;

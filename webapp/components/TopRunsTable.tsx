@@ -156,7 +156,7 @@ export default function TopRunsTable(race: any) {
         }
       }
     });
-  }, [list.items, searchValue, selectedLocation]);
+  }, [list.items, race, searchValue, selectedLocation]);
 
   const onRowClick = (item: Key) => {
     const personToView = list.items.find((i) => i.name === item);
