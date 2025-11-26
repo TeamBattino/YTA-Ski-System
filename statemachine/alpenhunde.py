@@ -82,5 +82,6 @@ class Alpenhunde():
     def clear(self):
         if self.is_race_running():
             currently_running = self.get_running_races()
-            for curr in currently_running:
-                self.stop_race(curr["index"])
+            if currently_running:
+                for curr in currently_running:
+                    self.stop_race(curr["index"])
