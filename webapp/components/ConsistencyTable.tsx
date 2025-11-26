@@ -30,6 +30,7 @@ export default function ConsistencyTable(race: Race) {
   const [selectedLocation, setSelectedLocation] = useState("ALL");
   const hasSearch = Boolean(searchValue);
   console.log("Reload table", race);
+  console.log("Race ID", race.race_id);
   let list = useAsyncList<Consistency>({
     async load() {
       const consistency = await getAllConsistency(race.race_id);

@@ -14,7 +14,7 @@ import {
 } from "@nextui-org/react";
 import Link from "next/link";
 
-import { DeleteIcon } from "@/components/ui/icons/lucide-delete";
+import { DeleteIcon } from "@/components/common/icons/lucide-delete";
 
 
 type Column = {

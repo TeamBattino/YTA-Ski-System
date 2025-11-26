@@ -1,19 +1,2 @@
-SET search_path TO public;
-SELECT r.ski_pass,
-    r.race_id,
-    racer.name,
-    racer.ldap,
-    racer.location,
-    racer.race_id,
-    MIN(r.duration) as duration
-FROM run r
-    JOIN racer ON r.ski_pass = racer.ski_pass
-    AND r.race_id = racer.race_id
-WHERE r.race_id = '6d3173f4-823b-4e05-a4d7-b2decacc7ade'
-GROUP BY r.ski_pass,
-    r.race_id,
-    racer.name,
-    racer.ldap,
-    racer.location,
-    racer.race_id
-ORDER BY duration ASC;
+UPDATE racer SET ski_pass = 'e8df800d663c16e0' WHERE ldap = 'janludwig';
+SELECT * FROM racer;

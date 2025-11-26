@@ -11,6 +11,37 @@ export interface Consistency {
   race_id: string;
 }
 
+export type Run = {
+  name: string;
+  ski_pass: string;
+  duration: number;
+  ldap: string;
+  location: string;
+  start_time: Date;
+  race_id: string;
+};
+
+export type Admin = {
+  admin_id: string;
+  email: string;
+};
+
+export type Race = {
+  race_id: string;
+  name: string;
+};
+
+export type RunWithDupilcates = {
+  run_id: string;
+  name: string;
+  ski_pass: string;
+  duration: number;
+  ldap: string;
+  location: string;
+  start_time: Date;
+  race_id: string;
+};
+
 export async function getAllConsistency(race_id: string) {
   const consistency = await prisma.$queryRaw<Consistency[]>`
         WITH RunCounts AS (
@@ -70,25 +101,6 @@ export async function getConsistencyCount() {
   return count;
 }
 
-export type Run = {
-  name: string;
-  ski_pass: string;
-  duration: number;
-  ldap: string;
-  location: string;
-  start_time: Date;
-  race_id: string;
-};
-export type RunWithDupilcates = {
-  run_id: string;
-  name: string;
-  ski_pass: string;
-  duration: number;
-  ldap: string;
-  location: string;
-  start_time: Date;
-  race_id: string;
-};
 
 export async function getTopRuns(race_id: string) {
   const racersWithShortestRun = await prisma.$queryRaw<Run[]>`
@@ -132,7 +144,7 @@ export async function getRecentRuns() {
 }
 
 export async function getRaces() {
-  const races = await prisma.$queryRaw<RunWithDupilcates[]>`
+  const races = await prisma.$queryRaw<Race[]>`
         SELECT
             r.*
         FROM
@@ -141,6 +153,18 @@ export async function getRaces() {
             r.name
     `;
   return races;
+}
+
+export async function getAdminByEmail(email : string) {
+  const admins = await prisma.$queryRaw<Admin[]>`
+        SELECT
+            *
+        FROM
+            admin
+        WHERE
+          email = ${email}
+    `;
+  return admins;
 }
 
 export type Racer = {

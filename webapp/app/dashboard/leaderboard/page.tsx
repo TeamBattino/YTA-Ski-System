@@ -7,7 +7,7 @@ import React, { useState, useEffect } from "react";
 import { getRaces } from "@/lib/db-helper";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/button";
 import {
   Command,
   CommandEmpty,
@@ -15,12 +15,13 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
+} from "@/components/common/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@/components/common/popover";
+import { useSession } from "next-auth/react"
 import { get } from "http";
 
 import { race as Race } from '@prisma/client';
@@ -37,10 +38,14 @@ export default function Page() {
     setRaces(races);
   };
 
+  const {data:session } = useSession()
+
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     fetchRaces();
-  }, []);
+    console.log(session)
+  }, [session]);
+
 
   if (showingConsistency) {
     return (

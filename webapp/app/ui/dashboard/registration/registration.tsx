@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { getRaces } from "@/lib/db-helper";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/button";
 import {
   Command,
   CommandEmpty,
@@ -12,12 +12,12 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
+} from "@/components/common/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@/components/common/popover";
 
 type Race = {
   race_id: string;
@@ -28,21 +28,18 @@ export default function Registration() {
   const [name, setName] = useState<string>("");
   const [ldap, setLdap] = useState<string>("");
   const [selectedLocation, setLocation] = useState<any>();
-  const [ski_pass, setSkiPass] = useState<string>("prrthiusdfhg");
+  const [ski_pass, setSkiPass] = useState<string>();
   const [race, setRace] = useState<Race>();
   const [open, setOpen] = React.useState(false);
   const [races, setRaces] = useState<Race[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string>(""); // for nfc reader
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const fetchRaces = async () => {
-    const races = await getRaces();
-    setRaces(races);
-  };
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
+    const fetchRaces = async () => {
+      const races = await getRaces();
+      setRaces(races);
+    };
     fetchRaces();
   }, []);
 
@@ -101,7 +98,7 @@ export default function Registration() {
             ldap: ldap,
             location: selectedLocation,
             ski_pass: ski_pass,
-            race_id: race.race_id, 
+            race_id: race.race_id,
           }),
           headers: {
             "Content-Type": "application/json",
@@ -250,7 +247,8 @@ export default function Registration() {
         </PopoverContent>
       </Popover>
 
-      <br /><br />
+      <br />
+      <br />
 
       {/* Register Button */}
       <button
