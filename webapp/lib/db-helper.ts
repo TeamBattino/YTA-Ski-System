@@ -106,7 +106,7 @@ export async function getTopRuns(race_id: string) {
   const racersWithShortestRun = await prisma.$queryRaw<Run[]>`
     SELECT r.ski_pass,
     r.race_id,
-    r.racer_id,
+    r.run_id,
     racer.name,
     racer.ldap,
     racer.location,
@@ -117,6 +117,7 @@ FROM run r
     AND r.race_id = racer.race_id
 WHERE r.race_id = ${race_id}
 GROUP BY r.ski_pass,
+    r.run_id,
     r.race_id,
     racer.name,
     racer.ldap,

@@ -2,24 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { getRaces, createRacer } from "@/lib/db-helper";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/common/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/common/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/common/popover";
+import RaceSelect from "@/components/RaceSelect";
 
-import {race as Race, racer as Racer} from "@prisma/client"
+import { race as Race } from "@prisma/client";
 
 export default function Registration() {
   const [name, setName] = useState<string>("");
@@ -27,7 +12,6 @@ export default function Registration() {
   const [selectedLocation, setLocation] = useState<any>();
   const [ski_pass, setSkiPass] = useState<string>();
   const [race, setRace] = useState<Race>();
-  const [open, setOpen] = React.useState(false);
   const [races, setRaces] = useState<Race[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string>(""); // for nfc reader
@@ -88,7 +72,13 @@ export default function Registration() {
 
     try {
       if (name && ldap && ski_pass && selectedLocation && race) {
-        const responseRacer = await createRacer(name, ldap, ski_pass, selectedLocation, race.race_id);
+        const responseRacer = await createRacer(
+          name,
+          ldap,
+          ski_pass,
+          selectedLocation,
+          race.race_id
+        );
 
         if (responseRacer.racer_id) {
           alert("Registration successful!");
@@ -184,53 +174,7 @@ export default function Registration() {
         </div>
       </div>
 
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-[200px] justify-between"
-          >
-            {race
-              ? races.find((currentRace) => race === currentRace)?.name
-              : "Select race..."}
-            <ChevronsUpDown className="opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0">
-          <Command>
-            <CommandInput placeholder="Search race..." className="h-9" />
-            <CommandList>
-              <CommandEmpty>No race found.</CommandEmpty>
-              <CommandGroup>
-                {races.map((currentRace) => (
-                  <CommandItem
-                    key={currentRace.race_id}
-                    value={currentRace.name}
-                    onSelect={(currentValue) => {
-                      setRace(
-                        races.find(
-                          (raceWithName) => currentValue === raceWithName.name
-                        )
-                      );
-                      setOpen(false);
-                    }}
-                  >
-                    {currentRace.name}
-                    <Check
-                      className={cn(
-                        "ml-auto",
-                        currentRace === race ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+      <RaceSelect races={races} setRace={setRace} />
 
       <br />
       <br />

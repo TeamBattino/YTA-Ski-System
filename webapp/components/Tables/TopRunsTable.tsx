@@ -2,12 +2,10 @@
 import { useAsyncList } from "react-stately";
 import TableComponent from "./Table";
 import {
-  Consistency,
-  getAllConsistency,
   getTopRuns,
   Run,
 } from "@/lib/db-helper";
-import { Key, useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   Button,
   Dropdown,
@@ -16,9 +14,8 @@ import {
   DropdownTrigger,
   Input,
 } from "@nextui-org/react";
-import { SearchIcon } from "./icons/SearchIcon";
+import { SearchIcon } from "../icons/SearchIcon";
 import moment from "moment";
-import { redirect } from "next/navigation";
 import { race as Race } from '@prisma/client';
 
 type FormattedRun = {
@@ -43,7 +40,6 @@ export default function TopRunsTable(race: Race) {
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("ALL");
-  const hasSearch = Boolean(searchValue);
   let list = useAsyncList<FormattedRun>({
     async load() {
       const topRuns = await getTopRuns(race.race_id);

@@ -1,9 +1,22 @@
-import Login from "@/components/login/login";
-
+import { signIn } from "../../../auth"
 export default function Page() {
   return (
     <>
-      <Login />
+      <div className="flex h-screen flex-col items-center justify-start bg-gray-50 px-4 pt-8">
+        <p>
+          *This page is only meant for admin users. If you are not an admin,
+          please proceed to another page of the Ski-App.
+        </p>
+        <h1 className="mb-6 text-2xl font-bold text-blue-600">Admin Login</h1>
+        <form
+          action={async () => {
+            "use server";
+            await signIn("google", { redirectTo: "/dashboard/admin" });
+          }}
+        >
+          <button type="submit">Sign in with Google</button>
+        </form>
+      </div>
     </>
   );
 }

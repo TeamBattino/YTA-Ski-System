@@ -14,7 +14,7 @@ import {
   DropdownTrigger,
   Input,
 } from "@nextui-org/react";
-import { SearchIcon } from "./icons/SearchIcon";
+import { SearchIcon } from "../icons/SearchIcon";
 import moment from "moment";
 import { redirect } from "next/navigation";
 
