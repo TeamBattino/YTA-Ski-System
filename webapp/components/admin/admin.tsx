@@ -8,17 +8,14 @@ import {Session} from "next-auth"
 import { race as Race } from "@prisma/client";
 import RaceSelect from "@/components/RaceSelect";
 
-export default function Admin(session: Session ) {
-  const [race, setRace] = useState<Race>();
-  const [races, setRaces] = useState<Race[]>([]);
+type AdminProp = {
+  session : Session;
+  races: Race[];
+}
 
-  useEffect(() => {
-    const fetchRaces = async () => {
-      const races = await getRaces();
-      setRaces(races);
-    };
-    fetchRaces();
-  }, [session]);
+export default function Admin({session, races}: AdminProp ) {
+  const [race, setRace] = useState<Race>();
+
   return (
     <>
       <RaceSelect races={races} setRace={setRace} />

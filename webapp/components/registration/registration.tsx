@@ -1,28 +1,23 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { getRaces, createRacer } from "@/lib/db-helper";
+import React, { useState } from "react";
+import { createRacer } from "@/lib/db-helper";
 import RaceSelect from "@/components/RaceSelect";
 
 import { race as Race } from "@prisma/client";
 
-export default function Registration() {
+type RegistrationProp = {
+  races: Race[];
+}
+
+export default function Registration({races}: RegistrationProp[]) {
   const [name, setName] = useState<string>("");
   const [ldap, setLdap] = useState<string>("");
   const [selectedLocation, setLocation] = useState<any>();
   const [ski_pass, setSkiPass] = useState<string>();
   const [race, setRace] = useState<Race>();
-  const [races, setRaces] = useState<Race[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string>(""); // for nfc reader
-
-  useEffect(() => {
-    const fetchRaces = async () => {
-      const races = await getRaces();
-      setRaces(races);
-    };
-    fetchRaces();
-  }, []);
 
   const handleScan = async () => {
     if ("NDEFReader" in window) {

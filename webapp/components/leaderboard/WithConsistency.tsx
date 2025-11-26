@@ -1,26 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { race as Race } from "@prisma/client";
-import { getRaces } from "@/lib/db-helper";
 import RaceSelect from "@/components/RaceSelect";
 import ConsistencyTable from "@/components/Tables/ConsistencyTable";
 import TopRunsTable from "@/components/Tables/TopRunsTable";
 
-export default function WithConsistency() {
+type LeaderboardProp = {
+  races: Race[];
+}
+
+export default function WithConsistency({races}:LeaderboardProp) {
   const [race, setRace] = useState<Race>();
-  const [races, setRaces] = useState<Race[]>([]);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const fetchRaces = async () => {
-    const races = await getRaces();
-    setRaces(races);
-  };
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
-    fetchRaces();
-  }, []);
 
   return (
     <>
