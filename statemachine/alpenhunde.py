@@ -14,7 +14,7 @@ class Alpenhunde():
 
     def get_running_races(self):
         try:
-            response = requests.get("http://192.168.4.1/timing/?action=get_name_queue_and_running_times")
+            response = requests.get("http://192.168.4.1/timing/?action=get_name_queue_and_running_times", timeout=5)
             response.raise_for_status()
             return response.json()["times"]
         except requests.RequestException as e:
@@ -23,7 +23,7 @@ class Alpenhunde():
 
     def get_race_results(self):
         try:
-            response = requests.get("http://192.168.4.1/timing/results/")
+            response = requests.get("http://192.168.4.1/timing/results/", timeout=5)
             response.raise_for_status()
             return response.json()["times"]
         except requests.RequestException as e:
@@ -40,7 +40,7 @@ class Alpenhunde():
 
     def stop_race(self,index):
         try:
-            response = requests.post("http://192.168.4.1/timing/?action=cancel&index=" + index)
+            response = requests.post("http://192.168.4.1/timing/?action=cancel&index=" + index, timeout=5)
         except requests.RequestException as e:
             print(f"Error sending POST request: {e}")
 

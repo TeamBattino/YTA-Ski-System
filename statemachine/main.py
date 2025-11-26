@@ -13,7 +13,7 @@ import socket
 import requests
 
 """ INITIALIZATION """
-def is_web_reachable(url, timeout=1.5):
+def is_web_reachable(url, timeout=3):
     """Checks if a web address is reachable by making an HTTP GET request."""
     try:
         response = requests.get(url, timeout=timeout)
@@ -26,8 +26,8 @@ target_url = "http://192.168.4.1"
 while not is_web_reachable(target_url):
     print(f"Waiting for URL {target_url} to be reachable...")
     os.system('espeak -a 400 "Waiting for internet connection"')
-    time.sleep(1.5)
-os.system('espeak -a 400 "Internet connection established. Resetting..."')
+    time.sleep(2)
+os.system('espeak -a 400 "Internet connection established."')
 print("URL is reachable!")
 requests.post(f"{target_url}/system/?action=full_reset")
 while not is_web_reachable(target_url):

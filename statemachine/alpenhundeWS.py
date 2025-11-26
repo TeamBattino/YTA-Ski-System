@@ -24,7 +24,7 @@ class AlpenhundeWS:
 
     def connect_websocket(self):
         websocket.enableTrace(True)
-        websocket.setdefaulttimeout(2)
+        websocket.setdefaulttimeout(5)
         ws = websocket.WebSocketApp(
             "ws://192.168.4.1/ws/events",
             on_message=self.on_message,
@@ -32,4 +32,4 @@ class AlpenhundeWS:
             on_close=self.on_close,
             on_open=self.on_open,
         ) 
-        ws.run_forever(ping_interval=1.5, ping_timeout=1, reconnect=2)
+        ws.run_forever(ping_interval=2, ping_timeout=3, reconnect=5)
