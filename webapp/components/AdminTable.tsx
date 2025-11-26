@@ -13,6 +13,9 @@ import {
   ScrollShadow,
 } from "@nextui-org/react";
 import Link from "next/link";
+import {
+  deleteRunById,
+} from "@/lib/db-helper";
 
 import { DeleteIcon } from "@/components/common/icons/lucide-delete";
 
@@ -40,22 +43,7 @@ export default function AdminTableComponent({
     run_id: any
   ): Promise<React.MouseEventHandler<HTMLButtonElement> | undefined> {
     try {
-      const response = await fetch("/api/runs", {
-        method: "DELETE",
-        body: JSON.stringify({
-          run_id: run_id,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        alert("Run deleted successfully!");
-      } else {
-        alert("Registration failed. Please try again." + response.statusText);
-        return;
-      }
+      await deleteRunById(run_id);
     } catch (error) {
       console.error("Error registering racer: ", error);
       alert("An error occurred. Please try again.: " + error);

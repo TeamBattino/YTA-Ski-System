@@ -2,6 +2,7 @@
 
 import prisma from "./prisma";
 
+/** Types */
 export interface Consistency {
   ski_pass: string;
   name: string;
@@ -19,6 +20,7 @@ export type Run = {
   location: string;
   start_time: Date;
   race_id: string;
+  run_id: string;
 };
 
 export type Admin = {
@@ -26,22 +28,19 @@ export type Admin = {
   email: string;
 };
 
+export type Racer = {
+  ski_pass: string;
+  name: string;
+  ldap: string;
+  location: string;
+  consistency?: number;
+};
+
 export type Race = {
   race_id: string;
   name: string;
 };
-
-export type RunWithDupilcates = {
-  run_id: string;
-  name: string;
-  ski_pass: string;
-  duration: number;
-  ldap: string;
-  location: string;
-  start_time: Date;
-  race_id: string;
-};
-
+/** Consistency */
 export async function getAllConsistency(race_id: string) {
   const consistency = await prisma.$queryRaw<Consistency[]>`
         WITH RunCounts AS (
@@ -51,7 +50,7 @@ export async function getAllConsistency(race_id: string) {
               COUNT(*) as run_count
           FROM
               run
-           WHERE race_id = ${race_id}
+          WHERE race_id = ${race_id}
           GROUP BY
               ski_pass, race_id
           HAVING COUNT(*) >= 2
@@ -101,11 +100,13 @@ export async function getConsistencyCount() {
   return count;
 }
 
+/** Top Runs */
 
 export async function getTopRuns(race_id: string) {
   const racersWithShortestRun = await prisma.$queryRaw<Run[]>`
     SELECT r.ski_pass,
     r.race_id,
+    r.racer_id,
     racer.name,
     racer.ldap,
     racer.location,
@@ -125,8 +126,10 @@ ORDER BY duration ASC
   `;
   return racersWithShortestRun;
 }
+
+/** Recent Runs */
 export async function getRecentRuns() {
-  const recentRuns = await prisma.$queryRaw<RunWithDupilcates[]>`
+  const recentRuns = await prisma.$queryRaw<Run[]>`
         SELECT
             r.*,
             racer.name,
@@ -142,7 +145,59 @@ export async function getRecentRuns() {
 `;
   return recentRuns;
 }
+/*** CRUD for Entities */
 
+/** Create */
+
+export async function createRacer(
+  name: string,
+  ldap: string,
+  ski_pass: string,
+  location: string,
+  race_id: string
+) {
+  const newRacer = await prisma.racer.create({
+    data: {
+      name: name,
+      ldap: ldap,
+      ski_pass: ski_pass,
+      location: location,
+      race_id: race_id,
+    },
+  });
+  return newRacer;
+}
+
+export async function createRun(run: Omit<Run, "run_id">) {
+  // Check if the ski_pass exists in the racer table
+  const racerExists = await prisma.racer.findUnique({
+    where: {
+      racer_identifier: {
+        ski_pass: run.ski_pass,
+        race_id: run.race_id,
+      },
+    },
+  });
+
+  if (!racerExists) {
+    throw new Error(
+      `Racer with ski_pass ${run.ski_pass} and race_id ${run.race_id} does not exist.`
+    );
+  }
+
+  // If racer exists, create the run
+  const newRun = await prisma.run.create({
+    data: {
+      start_time: run.start_time,
+      duration: run.duration,
+      ski_pass: run.ski_pass,
+      race_id: run.race_id,
+    },
+  });
+  return newRun;
+}
+
+/** Read */
 export async function getRaces() {
   const races = await prisma.$queryRaw<Race[]>`
         SELECT
@@ -155,7 +210,7 @@ export async function getRaces() {
   return races;
 }
 
-export async function getAdminByEmail(email : string) {
+export async function getAdminByEmail(email: string) {
   const admins = await prisma.$queryRaw<Admin[]>`
         SELECT
             *
@@ -167,12 +222,46 @@ export async function getAdminByEmail(email : string) {
   return admins;
 }
 
-export type Racer = {
-  ski_pass: string;
-  name: string;
-  ldap: string;
-  location: string;
-  consistency?: number;
-};
+export async function fetchRacerBySkiPass(ski_pass: string, race_id: string) {
+  const racer = await prisma.racer.findUnique({
+    where: {
+      racer_identifier: {
+        ski_pass: ski_pass,
+        race_id: race_id,
+      },
+    },
+  });
+  return racer;
+}
 
-// Get the singular racer that has this ski pass and calculate his consistency if they have more than 2 runs based on his durration
+export async function fetchRacers() {
+  const racers = await prisma.racer.findMany();
+  return racers;
+}
+
+/** Update */
+export async function updateRun(run: Run) {
+  const updatedRun = await prisma.run.update({
+    where: {
+      run_id: run.run_id,
+    },
+    data: {
+      start_time: run.start_time,
+      duration: run.duration,
+      ski_pass: run.ski_pass,
+      race_id: run.race_id,
+    },
+  });
+  return updatedRun;
+}
+
+/** Delete */
+export async function deleteRun(run_id: string) {
+  await prisma.run
+    .delete({
+      where: {
+        run_id: run_id,
+      },
+    })
+    .then((res) => console.log(res));
+}

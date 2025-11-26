@@ -1,5 +1,5 @@
-import { fetchRacers, fetchRacerBySkiPass, createRacer, updateRacer, deleteRacer } from '@/app/lib/actions/racers/data';
-import { racer } from '@prisma/client';
+import { fetchRacers, fetchRacerBySkiPass } from '@/lib/db-helper';
+import { racer as Racer } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {

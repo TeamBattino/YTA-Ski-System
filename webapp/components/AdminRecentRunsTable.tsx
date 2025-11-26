@@ -2,8 +2,6 @@
 import { useAsyncList } from "react-stately";
 import AdminTableComponent from "./AdminTable";
 import {
-  Consistency,
-  getAllConsistency,
   getRecentRuns,
   Run,
 } from "@/lib/db-helper";

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { getRaces } from "@/lib/db-helper";
+import { getRaces, createRacer } from "@/lib/db-helper";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/common/button";
@@ -19,10 +19,7 @@ import {
   PopoverTrigger,
 } from "@/components/common/popover";
 
-type Race = {
-  race_id: string;
-  name: string;
-};
+import {race as Race, racer as Racer} from "@prisma/client"
 
 export default function Registration() {
   const [name, setName] = useState<string>("");
@@ -91,28 +88,16 @@ export default function Registration() {
 
     try {
       if (name && ldap && ski_pass && selectedLocation && race) {
-        const response = await fetch("/api/racers", {
-          method: "POST",
-          body: JSON.stringify({
-            name: name,
-            ldap: ldap,
-            location: selectedLocation,
-            ski_pass: ski_pass,
-            race_id: race.race_id,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const responseRacer = await createRacer(name, ldap, ski_pass, selectedLocation, race.race_id);
 
-        if (response.ok) {
+        if (responseRacer.racer_id) {
           alert("Registration successful!");
           setName("");
           setLdap("");
           setLocation("");
           setSkiPass("");
         } else {
-          alert("Registration failed. Please try again." + response.statusText);
+          alert("Registration failed. Please try again.");
           return;
         }
       }
