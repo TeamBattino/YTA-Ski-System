@@ -32,4 +32,4 @@ class AlpenhundeWS:
             on_close=self.on_close,
             on_open=self.on_open,
         ) 
-        ws.run_forever(ping_interval=2, ping_timeout=3, reconnect=5)
+        ws.run_forever(ping_interval=5, ping_timeout=3, reconnect=5)

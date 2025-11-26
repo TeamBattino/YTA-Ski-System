@@ -45,19 +45,28 @@ class AlpenhundeUI:
         self.root.bind("<Key>", self.onKeyPress)
 
     def onKeyPress(self, event: tk.Event):
+        print(f"[DEBUG] Key pressed: '{event.char}' (keycode: {event.keycode})")
+        print(f"[DEBUG] Current state: {self.state_machine.current_state}")
         if self.state_machine.current_state == StateMachineState.IDLE:
             self.rfid += event.char
+            print(f"[DEBUG] RFID buffer: '{self.rfid}'")
             if event.char == "\r":
 
                 os.system("espeak -a 400 'detected skee paass' &")
                 clean_rfid = self.rfid.strip().lower()
+                print(f"[DEBUG] Scanned RFID (raw): '{self.rfid}'")
+                print(f"[DEBUG] Cleaned RFID: '{clean_rfid}'")
                 self.state_machine.user.rfid = clean_rfid
                 self.rfid = ""
                 self.user_update_event.set()
+        else:
+            print(f"[DEBUG] Ignoring key press - state is not IDLE")
 
     def update_state(self):
         self._update_last_time_label()
         self._update_state_text()
+        # Focus the window to ensure it receives keyboard events
+        self.root.focus_force()
         self.root.update()
 
     def _update_state_text(self):

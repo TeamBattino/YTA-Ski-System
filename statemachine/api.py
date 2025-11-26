@@ -10,12 +10,16 @@ class ApiClient:
     def getUser(self, ski_pass) -> User:
         url = f"https://{self.base_url}/api/racers"
         params = {'ski_pass': ski_pass, 'race_id': self.race_id}
+        print(f"[DEBUG] API Request URL: {url}")
+        print(f"[DEBUG] API Request Params: {params}")
         response = requests.get(url, params=params, timeout=10)
+        print(f"[DEBUG] API Response Status: {response.status_code}")
         if response.status_code == 404:
+            print(f"[DEBUG] API Response Body: {response.text}")
             print(f"User {ski_pass} not found")
             return User("Unregistered User","Unregistered User")
         req_user = response.json()
-        print(req_user)
+        print(f"[DEBUG] API Response: {req_user}")
         if response.status_code == 200:
             return User(req_user['ski_pass'], req_user['name'])
 

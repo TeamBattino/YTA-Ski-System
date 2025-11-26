@@ -45,6 +45,7 @@ ENV_AUTH_SECRET = os.getenv("AUTH_SECRET")
 
 """ Shared state variables here """
 statemachne = StateMachine(StateMachineState.IDLE, -1, User("", ""), False, False, User("",""))
+print(f"[DEBUG] Initial state: {statemachne.current_state}")
 
 """ Threads created here """
 panic_event = Event()
@@ -97,6 +98,7 @@ while True:
         user_update_event.clear()
     if not message_queue.empty():
         message = message_queue.get()
+        print(f"[DEBUG] Received message from queue: {message}")
         match message:
             case "UpdateAlpenhunde":
                 print("Update Alpenhunde")
@@ -106,13 +108,14 @@ while True:
                 print("WebSocket connected")
                 statemachne.connection_issues = False
             case "WSError":
-                print("WebSocket error")
-                statemachne.connection_issues = True
-                os.system('espeak -a 400 "Websocket disconnect detected. Reconnecting"')
+                print("WebSocket error - NOT changing state, continuing normal operation")
+                # Don't set connection_issues to True - let the system continue
+                # statemachne.connection_issues = True
+                # os.system('espeak -a 400 "Websocket disconnect detected. Reconnecting"')
             case "WSClosed":
-                print("WebSocket closed")
+                print("WebSocket closed - will reconnect automatically")
             case _:
-                print("Unknown message")
+                print(f"Unknown message: {message}")
         message_queue.task_done()
     if race_finished_event.is_set():
         statemachne.loading = True
