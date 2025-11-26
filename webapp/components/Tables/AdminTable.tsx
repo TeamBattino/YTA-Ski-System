@@ -10,11 +10,9 @@ import {
   getKeyValue,
   Spinner,
   Button,
-  ScrollShadow,
 } from "@nextui-org/react";
-import Link from "next/link";
 import {
-  deleteRunById,
+  deleteRun,
 } from "@/lib/db-helper";
 
 import { DeleteIcon } from "@/components/common/icons/lucide-delete";
@@ -43,7 +41,8 @@ export default function AdminTableComponent({
     run_id: any
   ): Promise<React.MouseEventHandler<HTMLButtonElement> | undefined> {
     try {
-      await deleteRunById(run_id);
+      await deleteRun(run_id);
+      return;
     } catch (error) {
       console.error("Error registering racer: ", error);
       alert("An error occurred. Please try again.: " + error);

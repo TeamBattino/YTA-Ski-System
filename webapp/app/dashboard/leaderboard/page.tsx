@@ -1,8 +1,8 @@
 "use client";
 
-import ConsistencyTable from "@/components/ConsistencyTable";
-import RecentRunsTable from "@/components/RecentRunsTable";
-import TopRunsTable from "@/components/TopRunsTable";
+import ConsistencyTable from "@/components/Tables/ConsistencyTable";
+import RecentRunsTable from "@/components/Tables/RecentRunsTable";
+import TopRunsTable from "@/components/Tables/TopRunsTable";
 import React, { useState, useEffect } from "react";
 import { getRaces } from "@/lib/db-helper";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -21,7 +21,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/common/popover";
-import { useSession } from "next-auth/react"
 import { get } from "http";
 
 import { race as Race } from '@prisma/client';
@@ -38,13 +37,11 @@ export default function Page() {
     setRaces(races);
   };
 
-  const {data:session } = useSession()
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     fetchRaces();
-    console.log(session)
-  }, [session]);
+  }, []);
 
 
   if (showingConsistency) {

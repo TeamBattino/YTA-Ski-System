@@ -11,8 +11,7 @@ import {
   DropdownTrigger,
   Input,
 } from "@nextui-org/react";
-import { SearchIcon } from "./icons/SearchIcon";
-import { redirect } from "next/navigation";
+import { SearchIcon } from "../icons/SearchIcon";
 import { race as Race } from '@prisma/client';
 
 
@@ -29,8 +28,6 @@ export default function ConsistencyTable(race: Race) {
   const [searchValue, setSearchValue] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("ALL");
   const hasSearch = Boolean(searchValue);
-  console.log("Reload table", race);
-  console.log("Race ID", race.race_id);
   let list = useAsyncList<Consistency>({
     async load() {
       const consistency = await getAllConsistency(race.race_id);

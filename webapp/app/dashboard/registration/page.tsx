@@ -1,4 +1,4 @@
-import Registration from "@/app/ui/dashboard/registration/registration";
+import Registration from "@/components/registration/registration";
 
 export default function Page() {
   return <Registration />

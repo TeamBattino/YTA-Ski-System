@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import NavLink from './navlink';
-import Logo from '../../../components/icons/YoutubeAdsLogo';
+import Logo from './icons/YoutubeAdsLogo';
 
 export default function SideNav() {
   return (

@@ -20,7 +20,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/common/popover";
-import SignOut from "@/components/sign-out";
+import { signOut } from "next-auth/react";
 import { getAdminByEmail } from "@/lib/db-helper";
 
 type Race = {
@@ -92,7 +92,11 @@ export default function Admin(session: any) {
           </PopoverContent>
         </Popover>
         <br />
-        <SignOut />
+        <button
+          onClick={() => signOut({ redirectTo: "/dashboard/leaderboard" })}
+        >
+          Sign Out
+        </button>
         <AdminRecentRunsTable race={race} />
       </>
     );

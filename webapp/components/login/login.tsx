@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import SignIn from "@/components/sign-in";
+import { signIn } from "next-auth/react";
 
 export default function Login() {
   return (
@@ -12,7 +12,11 @@ export default function Login() {
       </p>
       <h1 className="mb-6 text-2xl font-bold text-blue-600">Admin Login</h1>
 
-      <SignIn />
+      <button
+        onClick={() => signIn("google", { redirectTo: "/dashboard/admin" })}
+      >
+        Sign in With Google
+      </button>
     </div>
   );
 }
