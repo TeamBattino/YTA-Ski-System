@@ -25,7 +25,13 @@ class Alpenhunde():
         try:
             response = requests.get("http://192.168.4.1/timing/results/", timeout=5)
             response.raise_for_status()
-            return response.json()["times"]
+            data = response.json()
+            print(f"[DEBUG RESULTS] Full response: {data}")
+            results = data["times"]
+            print(f"[DEBUG RESULTS] Total results: {len(results)}")
+            if len(results) > 0:
+                print(f"[DEBUG RESULTS] Last result: {results[-1]}")
+            return results
         except requests.RequestException as e:
             print(f"Error fetching race results: {e}")
             return None
@@ -63,14 +69,16 @@ class Alpenhunde():
 
     def update(self):
         running = self.is_race_running()
+        print(f"[DEBUG UPDATE] Race running: {running}, prev_result_len: {self.prev_result_len}")
         result_timings = self.get_race_results()
         
         # Check for new results (only if we got valid data)
         if result_timings and len(result_timings) > self.prev_result_len:
-            print(f"[RACE FINISHED] New result! Total results: {len(result_timings)}")
+            print(f"[RACE FINISHED] New result! Previous: {self.prev_result_len}, Now: {len(result_timings)}")
+            print(f"[RACE FINISHED] Full last result object: {result_timings[-1]}")
             self.prev_result_len = len(result_timings)
-            new_time = result_timings[-1]["t"]  # Last result
-            print(f"[RACE FINISHED] Time: {new_time}")
+            new_time = result_timings[-1]["t"]
+            print(f"[RACE FINISHED] Extracted time 't': {new_time} (type: {type(new_time)})")
             self.global_state.last_race_time = new_time
             self.race_finished_event.set()
             self.clear()
