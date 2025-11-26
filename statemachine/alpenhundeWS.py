@@ -5,6 +5,8 @@ from queue import Queue
 class AlpenhundeWS:
     def __init__(self, message_queue: Queue):
         self.message_queue = message_queue
+        self.last_update_time = 0
+        self.update_cooldown = 0.5  # Check every 0.5 seconds to catch race finish
 
     def on_error(self, ws, error):
         print(error)
@@ -17,13 +19,18 @@ class AlpenhundeWS:
         print("WebSocket connection opened")
 
     def on_message(self, ws, message):
-        self.message_queue.put("UpdateAlpenhunde")
+        # Rate-limit updates to prevent spam
+        current_time = time.time()
+        if current_time - self.last_update_time >= self.update_cooldown:
+            self.last_update_time = current_time
+            self.message_queue.put("UpdateAlpenhunde")
+        # else: ignore message, too soon since last update
     
     
 
 
     def connect_websocket(self):
-        websocket.enableTrace(True)
+        websocket.enableTrace(False)  # Disable verbose logging
         websocket.setdefaulttimeout(5)
         ws = websocket.WebSocketApp(
             "ws://192.168.4.1/ws/events",

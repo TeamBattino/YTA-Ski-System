@@ -64,14 +64,16 @@ class Alpenhunde():
     def update(self):
         running = self.is_race_running()
         result_timings = self.get_race_results()
-        if len(result_timings) != self.prev_result_len:
+        
+        # Check for new results (only if we got valid data)
+        if result_timings and len(result_timings) > self.prev_result_len:
+            print(f"[RACE FINISHED] New result! Total results: {len(result_timings)}")
             self.prev_result_len = len(result_timings)
-            new_time = result_timings[len(result_timings)-1]["t"]
-            if int(new_time) > 0:
-                print(f"New time: {new_time}")
-                self.global_state.last_race_time = new_time
-                self.race_finished_event.set()
-                self.clear()
+            new_time = result_timings[-1]["t"]  # Last result
+            print(f"[RACE FINISHED] Time: {new_time}")
+            self.global_state.last_race_time = new_time
+            self.race_finished_event.set()
+            self.clear()
                 
         if (running):
             self.global_state.current_state = StateMachineState.RUNNING
