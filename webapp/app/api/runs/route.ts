@@ -1,5 +1,4 @@
-import {  updateRun, createRun } from '@/lib/db-helper';
-import { run as Run } from '@prisma/client';
+import {  updateRun, createRun, Run } from '@/lib/db-helper';
 import { NextResponse } from 'next/server';
 
 type PostRunProps = {
@@ -24,7 +23,7 @@ export async function POST(req: Request) {
     }
 
     // Try to create the run
-    const run = {
+    const run: Run = {
       duration: data.duration,
       ski_pass: data.ski_pass,
       start_time: new Date(),
