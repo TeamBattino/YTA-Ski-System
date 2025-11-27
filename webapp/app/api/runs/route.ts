@@ -1,5 +1,5 @@
 import {  updateRun, createRun } from '@/lib/db-helper';
-import { run } from '@prisma/client';
+import { run as Run } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
 type PostRunProps = {
@@ -29,6 +29,7 @@ export async function POST(req: Request) {
       ski_pass: data.ski_pass,
       start_time: new Date(),
       race_id: data.race_id,
+      run_id: "",
     }
     const newRun = await createRun(run);
     return NextResponse.json(newRun);
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   if (!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 });
   try {
-    const data: run = await req.json();
+    const data: Run = await req.json();
 
     if (!data.run_id || !data.duration || !data.ski_pass || !data.start_time || !data.race_id) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
