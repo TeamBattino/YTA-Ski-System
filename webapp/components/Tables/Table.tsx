@@ -9,10 +9,7 @@ import {
   TableCell,
   getKeyValue,
   Spinner,
-  Button,
-  ScrollShadow,
 } from "@nextui-org/react";
-import Link from "next/link";
 
 type Column = {
   key: string,

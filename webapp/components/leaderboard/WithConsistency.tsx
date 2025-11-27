@@ -19,9 +19,22 @@ export default function WithConsistency({races}:LeaderboardProp) {
       <RaceSelect races={races} setRace={setRace} />
 
       <h2 className="py-2 text-xl font-bold">⭐ Competitive Consistency</h2>
-      <ConsistencyTable race={race} />
+      {race ? (
+        <>
+          <ConsistencyTable race={race} />
+        </>
+      ) : (
+        <>Please select a race</>
+      )}
       <h2 className="py-2 text-xl font-bold">Non-Competitive Top Runs</h2>
-      <TopRunsTable race={race} />
+
+      {race ? (
+        <>
+          <TopRunsTable race={race} />
+        </>
+      ) : (
+        <>Please select a race</>
+      )}
     </>
   );
 }

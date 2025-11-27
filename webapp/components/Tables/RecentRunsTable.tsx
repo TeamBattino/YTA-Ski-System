@@ -2,8 +2,8 @@
 import { useAsyncList } from "react-stately";
 import TableComponent from "./Table";
 import { getRecentRuns } from "@/lib/db-helper";
-import { run as Run } from "@prisma/client";
-import { Key, useCallback, useMemo, useState } from "react";
+import { run as Run, race as Race } from "@prisma/client";
+import { useCallback, useMemo, useState } from "react";
 import {
   Button,
   Dropdown,
@@ -14,7 +14,7 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../icons/SearchIcon";
 import moment from "moment";
-import { redirect } from "next/navigation";
+// import { redirect } from "next/navigation";
 
 type FormattedRun = {
   run_id: string;
@@ -25,7 +25,7 @@ type FormattedRun = {
   ski_pass: string;
 };
 
-export default function RecentRunsTable() {
+export default function RecentRunsTable(race: Race) {
   const columns = [
     { key: "name", label: "Name", allowsSorting: true },
     { key: "duration", label: "Duration", allowsSorting: true },
@@ -38,10 +38,9 @@ export default function RecentRunsTable() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("ALL");
-  const hasSearch = Boolean(searchValue);
-  let list = useAsyncList<FormattedRun>({
+  const list = useAsyncList<FormattedRun>({
     async load() {
-      const recentRuns = await getRecentRuns();
+      const recentRuns = await getRecentRuns(race.race_id);
       const formattedRuns = recentRuns.map((run: Run) => {
         if (run.duration) {
           const durationMilliseconds = run.duration / 10;
@@ -65,11 +64,11 @@ export default function RecentRunsTable() {
       return {
         items: items.sort((a: FormattedRun, b: FormattedRun) => {
           if (sortDescriptor.column === "start_time") {
-            let first = moment(
+            const first = moment(
               a[sortDescriptor.column as keyof FormattedRun],
               "HH:mm D/M/YY"
             );
-            let second = moment(
+            const second = moment(
               b[sortDescriptor.column as keyof FormattedRun],
               "HH:mm D/M/YY"
             );
@@ -110,8 +109,8 @@ export default function RecentRunsTable() {
             }
             return cmp;
           } else {
-            let first = a[sortDescriptor.column as keyof FormattedRun];
-            let second = b[sortDescriptor.column as keyof FormattedRun];
+            const first = a[sortDescriptor.column as keyof FormattedRun];
+            const second = b[sortDescriptor.column as keyof FormattedRun];
             let cmp =
               (parseInt(first as string) || first) <
               (parseInt(second as string) || second)
@@ -154,11 +153,11 @@ export default function RecentRunsTable() {
     });
   }, [list.items, searchValue, selectedLocation]);
 
-  const onRowClick = (item: Key) => {
+  /*const onRowClick = (item: Key) => {
     const personToView = list.items.find((i) => i.run_id === item);
     personToView &&
       redirect(`/dashboard/leaderboard/${personToView?.ski_pass}`);
-  };
+  };*/
 
   return (
     <div>
@@ -204,7 +203,7 @@ export default function RecentRunsTable() {
             direction: "descending",
           },
           onSortChange: list.sort,
-          onRowAction: onRowClick,
+          // onRowAction: onRowClick,
         }}
       />
     </div>

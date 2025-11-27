@@ -129,7 +129,7 @@ ORDER BY duration ASC
 }
 
 /** Recent Runs */
-export async function getRecentRuns() {
+export async function getRecentRuns(race_id: string) {
   const recentRuns = await prisma.$queryRaw<Run[]>`
         SELECT
             r.*,
@@ -140,7 +140,8 @@ export async function getRecentRuns() {
             run r
         JOIN
             racer ON r.ski_pass = racer.ski_pass  AND r.race_id = racer.race_id
-        GROUP BY racer.race_id, r.start_time, r.duration, r.ski_pass, r.run_id, racer.name, racer.ldap, racer.location
+        WHERE r.race_id = ${race_id} AND racer.race_id = ${race_id} 
+        GROUP BY racer.race_id, r.start_time, r.duration, r.ski_pass, r.run_id, racer.name, racer.ldap, racer.location, r.race_id
         ORDER BY
             r.start_time DESC
 `;

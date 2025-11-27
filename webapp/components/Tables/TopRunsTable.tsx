@@ -40,7 +40,7 @@ export default function TopRunsTable(race: Race) {
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("ALL");
-  let list = useAsyncList<FormattedRun>({
+  const list = useAsyncList<FormattedRun>({
     async load() {
       const topRuns = await getTopRuns(race.race_id);
       const formattedRuns = topRuns.map((run: Run) => {
@@ -64,11 +64,11 @@ export default function TopRunsTable(race: Race) {
       return {
         items: items.sort((a: FormattedRun, b: FormattedRun) => {
           if (sortDescriptor.column === "start_time") {
-            let first = moment(
+            const first = moment(
               a[sortDescriptor.column as keyof FormattedRun],
               "HH:mm D/M/YY"
             );
-            let second = moment(
+            const second = moment(
               b[sortDescriptor.column as keyof FormattedRun],
               "HH:mm D/M/YY"
             );
@@ -109,8 +109,8 @@ export default function TopRunsTable(race: Race) {
             }
             return cmp;
           } else {
-            let first = a[sortDescriptor.column as keyof FormattedRun];
-            let second = b[sortDescriptor.column as keyof FormattedRun];
+            const first = a[sortDescriptor.column as keyof FormattedRun];
+            const second = b[sortDescriptor.column as keyof FormattedRun];
             let cmp =
               (parseInt(first as string) || first) <
               (parseInt(second as string) || second)

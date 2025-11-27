@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { getRaces } from "@/lib/db-helper";
+import React, { useState } from "react";
 import AdminRecentRunsTable from "@/components/Tables/AdminRecentRunsTable";
 import { signOut } from "next-auth/react";
 import {Session} from "next-auth"

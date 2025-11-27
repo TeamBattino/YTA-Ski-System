@@ -2,7 +2,7 @@
 import { useAsyncList } from "react-stately";
 import TableComponent from "./Table";
 import { Consistency, getAllConsistency } from "@/lib/db-helper";
-import { Key, useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   Button,
   Dropdown,
@@ -27,8 +27,7 @@ export default function ConsistencyTable(race: Race) {
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("ALL");
-  const hasSearch = Boolean(searchValue);
-  let list = useAsyncList<Consistency>({
+  const list = useAsyncList<Consistency>({
     async load() {
       const consistency = await getAllConsistency(race.race_id);
       
@@ -43,8 +42,8 @@ export default function ConsistencyTable(race: Race) {
     async sort({ items, sortDescriptor }) {
       return {
         items: items.sort((a: Consistency, b: Consistency) => {
-          let first = a[sortDescriptor.column as keyof Consistency];
-          let second = b[sortDescriptor.column as keyof Consistency];
+          const first = a[sortDescriptor.column as keyof Consistency];
+          const second = b[sortDescriptor.column as keyof Consistency];
           let cmp =
             (parseInt(first as string) || first) <
             (parseInt(second as string) || second)

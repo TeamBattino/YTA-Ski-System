@@ -1,10 +1,7 @@
 "use client";
 import { useAsyncList } from "react-stately";
 import AdminTableComponent from "./AdminTable";
-import {
-  getRecentRuns,
-  Run,
-} from "@/lib/db-helper";
+import { getRecentRuns } from "@/lib/db-helper";
 import { Key, useCallback, useMemo, useState } from "react";
 import {
   Button,
@@ -17,6 +14,7 @@ import {
 import { SearchIcon } from "../icons/SearchIcon";
 import moment from "moment";
 import { redirect } from "next/navigation";
+import { run as Run, race as Race } from "@prisma/client";
 
 type FormattedRun = {
   name: string;
@@ -27,7 +25,7 @@ type FormattedRun = {
   race_id: string;
 };
 
-export default function AdminRecentRunsTable(race: any) {
+export default function AdminRecentRunsTable(race: Race) {
   const columns = [
     { key: "name", label: "Name", allowsSorting: true },
     { key: "duration", label: "Duration", allowsSorting: true },
@@ -40,21 +38,22 @@ export default function AdminRecentRunsTable(race: any) {
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("ALL");
-  const hasSearch = Boolean(searchValue);
-  let list = useAsyncList<FormattedRun>({
+  const list = useAsyncList<FormattedRun>({
     async load() {
-      const topRuns = await getRecentRuns();
+      const topRuns = await getRecentRuns(race.race_id);
       const formattedRuns = topRuns.map((run: Run) => {
-        const durationMilliseconds = run.duration / 10;
-        const duration = moment.duration(durationMilliseconds);
-        const formattedDuration = moment
-          .utc(duration.asMilliseconds())
-          .format("mm:ss.SSSS");
-        return {
-          ...run,
-          duration: formattedDuration,
-          start_time: moment(run.start_time).format("HH:mm D/M/YY"),
-        };
+        if (run.duration) {
+          const durationMilliseconds = run.duration / 10;
+          const duration = moment.duration(durationMilliseconds);
+          const formattedDuration = moment
+            .utc(duration.asMilliseconds())
+            .format("mm:ss.SSSS");
+          return {
+            ...run,
+            duration: formattedDuration,
+            start_time: moment(run.start_time).format("HH:mm D/M/YY"),
+          };
+        }
       });
       setIsLoading(false);
       return {
@@ -65,11 +64,11 @@ export default function AdminRecentRunsTable(race: any) {
       return {
         items: items.sort((a: FormattedRun, b: FormattedRun) => {
           if (sortDescriptor.column === "start_time") {
-            let first = moment(
+            const first = moment(
               a[sortDescriptor.column as keyof FormattedRun],
               "HH:mm D/M/YY"
             );
-            let second = moment(
+            const second = moment(
               b[sortDescriptor.column as keyof FormattedRun],
               "HH:mm D/M/YY"
             );
@@ -110,8 +109,8 @@ export default function AdminRecentRunsTable(race: any) {
             }
             return cmp;
           } else {
-            let first = a[sortDescriptor.column as keyof FormattedRun];
-            let second = b[sortDescriptor.column as keyof FormattedRun];
+            const first = a[sortDescriptor.column as keyof FormattedRun];
+            const second = b[sortDescriptor.column as keyof FormattedRun];
             let cmp =
               (parseInt(first as string) || first) <
               (parseInt(second as string) || second)

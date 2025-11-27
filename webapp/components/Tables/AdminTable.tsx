@@ -38,7 +38,7 @@ export default function AdminTableComponent({
   tableProps,
 }: TableComponentProps) {
   async function deleteRunById(
-    run_id: any
+    run_id: string
   ): Promise<React.MouseEventHandler<HTMLButtonElement> | undefined> {
     try {
       await deleteRun(run_id);
