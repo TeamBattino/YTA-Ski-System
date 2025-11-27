@@ -12,12 +12,20 @@ export interface Consistency {
   race_id: string;
 }
 
-export type Run = {
+export type FormattedRun = {
   name: string;
   ski_pass: string;
   duration: number;
   ldap: string;
   location: string;
+  start_time: Date;
+  race_id: string;
+  run_id: string;
+};
+
+export type Run = {
+  ski_pass: string;
+  duration: number;
   start_time: Date;
   race_id: string;
   run_id: string;
@@ -103,7 +111,7 @@ export async function getConsistencyCount() {
 /** Top Runs */
 
 export async function getTopRuns(race_id: string) {
-  const racersWithShortestRun = await prisma.$queryRaw<Run[]>`
+  const racersWithShortestRun = await prisma.$queryRaw<FormattedRun[]>`
     SELECT r.ski_pass,
     r.race_id,
     r.run_id,
@@ -130,7 +138,7 @@ ORDER BY duration ASC
 
 /** Recent Runs */
 export async function getRecentRuns(race_id: string) {
-  const recentRuns = await prisma.$queryRaw<Run[]>`
+  const recentRuns = await prisma.$queryRaw<FormattedRun[]>`
         SELECT
             r.*,
             racer.name,
@@ -170,7 +178,7 @@ export async function createRacer(
   return newRacer;
 }
 
-export async function createRun(run: Omit<Run, "run_id">) {
+export async function createRun(run: Run) {
   // Check if the ski_pass exists in the racer table
   const racerExists = await prisma.racer.findUnique({
     where: {

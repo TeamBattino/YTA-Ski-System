@@ -12,7 +12,7 @@ import {
   Input,
 } from "@nextui-org/react";
 import { SearchIcon } from "../icons/SearchIcon";
-import { race as Race } from '@prisma/client';
+import { race as Race } from '@/src/generated/prisma/client';
 
 
 export default function ConsistencyTable(race: Race) {

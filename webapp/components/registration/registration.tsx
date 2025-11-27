@@ -4,13 +4,13 @@ import React, { useState } from "react";
 import { createRacer } from "@/lib/db-helper";
 import RaceSelect from "@/components/RaceSelect";
 
-import { race as Race } from "@prisma/client";
+import { race as Race } from "@/src/generated/prisma/client";
 
 type RegistrationProp = {
   races: Race[];
 }
 
-export default function Registration({races}: RegistrationProp[]) {
+export default function Registration({races}: RegistrationProp) {
   const [name, setName] = useState<string>("");
   const [ldap, setLdap] = useState<string>("");
   const [selectedLocation, setLocation] = useState<any>();

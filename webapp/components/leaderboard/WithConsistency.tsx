@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { race as Race } from "@prisma/client";
+import { race as Race } from "@/src/generated/prisma/client";
 import RaceSelect from "@/components/RaceSelect";
 import ConsistencyTable from "@/components/Tables/ConsistencyTable";
 import TopRunsTable from "@/components/Tables/TopRunsTable";

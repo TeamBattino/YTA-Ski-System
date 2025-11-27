@@ -16,7 +16,7 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../icons/SearchIcon";
 import moment from "moment";
-import { race as Race } from '@prisma/client';
+import { race as Race } from '@/src/generated/prisma/client';
 
 type FormattedRun = {
   name: string;

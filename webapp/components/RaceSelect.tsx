@@ -16,7 +16,7 @@ import {
   CommandList,
 } from "@/components/common/command";
 
-import { race as Race } from "@prisma/client";
+import { race as Race } from "@/src/generated/prisma/client";
 
 type SetRaceInterface = Dispatch<SetStateAction<Race | undefined>>
 

@@ -14,7 +14,7 @@ import {
 import { SearchIcon } from "../icons/SearchIcon";
 import moment from "moment";
 import { redirect } from "next/navigation";
-import { run as Run, race as Race } from "@prisma/client";
+import { run as Run, race as Race } from "@/src/generated/prisma/client";
 
 type FormattedRun = {
   name: string;
