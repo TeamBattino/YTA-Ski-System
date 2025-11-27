@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import AdminRecentRunsTable from "@/components/Tables/AdminRecentRunsTable";
 import { signOut } from "next-auth/react";
 import {Session} from "next-auth"
-import { race as Race } from "@prisma/client";
+import { race as Race } from "@/src/generated/client";
 import RaceSelect from "@/components/RaceSelect";
 
 type AdminProp = {

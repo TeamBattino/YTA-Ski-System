@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { race as Race } from "@prisma/client";
+import { race as Race } from "@/src/generated/client";
 import { getRaces } from "@/lib/db-helper";
 import RaceSelect from "@/components/RaceSelect";
 import RecentRunsTable from "@/components/Tables/RecentRunsTable";

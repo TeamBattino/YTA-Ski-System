@@ -2,7 +2,7 @@
 import { useAsyncList } from "react-stately";
 import TableComponent from "./Table";
 import { getRecentRuns } from "@/lib/db-helper";
-import { run as Run, race as Race } from "@prisma/client";
+import { run as Run, race as Race } from "@/src/generated/client";
 import { useCallback, useMemo, useState } from "react";
 import {
   Button,

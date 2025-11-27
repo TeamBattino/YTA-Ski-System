@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { createRacer } from "@/lib/db-helper";
 import RaceSelect from "@/components/RaceSelect";
 
-import { race as Race } from "@prisma/client";
+import { race as Race } from "@/src/generated/client";
 
 type RegistrationProp = {
   races: Race[];

@@ -3,7 +3,7 @@ import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import prisma from "./lib/prisma";
 import { getAdminByEmail } from "@/lib/db-helper";
-import { admin as Admin } from "@prisma/client";
+import { admin as Admin } from "@/src/generated/client";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [Google],
