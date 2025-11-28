@@ -12,8 +12,6 @@ RUN bun install
 
 RUN bunx prisma db push
 
-RUN bunx auth secret
-
 RUN bunx prisma generate
 
 RUN bun run build
