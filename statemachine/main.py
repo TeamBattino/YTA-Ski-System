@@ -30,12 +30,12 @@ while not is_web_reachable(target_url):
 os.system('espeak -a 400 "Internet connection established."')
 print("URL is reachable!")
 # Full reset disabled - not needed as clear() function handles race cleanup
-# requests.post(f"{target_url}/system/?action=full_reset")
-# while not is_web_reachable(target_url):
-#     print(f"Resetting, so {target_url} to is unreachable...")
-#     os.system('espeak -a 400 "resetting"')
-#     time.sleep(1.5)
-# os.system('espeak -a 400 "Reset was successful"')
+requests.post(f"{target_url}/system/?action=full_reset")
+while not is_web_reachable(target_url):
+    print(f"Resetting, so {target_url} to is unreachable...")
+    os.system('espeak -a 400 "resetting"')
+    time.sleep(1.5)
+os.system('espeak -a 400 "Reset was successful"')
 
 """ Environment variables here """
 load_dotenv()
