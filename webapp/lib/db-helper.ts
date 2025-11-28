@@ -173,7 +173,6 @@ export async function createRacer(
       ski_pass: ski_pass,
       location: location,
       race_id: race_id,
-      racer_id: '',
     },
   });
   return newRacer;
