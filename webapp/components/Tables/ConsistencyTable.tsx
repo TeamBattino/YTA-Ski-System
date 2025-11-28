@@ -14,8 +14,11 @@ import {
 import { SearchIcon } from "../icons/SearchIcon";
 import { race as Race } from '@/src/generated/client';
 
+type RunsTableProp = {
+  race : Race;
+}
 
-export default function ConsistencyTable(race: Race) {
+export default function ConsistencyTable({race}: RunsTableProp) {
   const columns = [
     { key: "name", label: "Name", allowsSorting: true },
     { key: "consistency", label: "Consistency", allowsSorting: true },

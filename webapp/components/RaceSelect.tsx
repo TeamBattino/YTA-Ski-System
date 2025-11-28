@@ -18,14 +18,14 @@ import {
 
 import { race as Race } from "@/src/generated/client";
 
-type SetRaceInterface = Dispatch<SetStateAction<Race | undefined>>
+type SetRaceInterface = Dispatch<SetStateAction<Race | undefined>>;
 
 type RaceSelectProps = {
-races: Race[];  
-setRace: SetRaceInterface
-}
+  races: Race[];
+  setRace: SetRaceInterface;
+};
 
-export default function RaceSelect({ races, setRace}:RaceSelectProps) {
+export default function RaceSelect({ races, setRace }: RaceSelectProps) {
   const [open, setOpen] = useState(false);
   const [race, setRaceLocal] = useState<Race>();
 
@@ -50,28 +50,32 @@ export default function RaceSelect({ races, setRace}:RaceSelectProps) {
           <CommandList>
             <CommandEmpty>No race found.</CommandEmpty>
             <CommandGroup>
-              {races.map((currentRace) => (
-                <CommandItem
-                  key={currentRace.race_id}
-                  value={currentRace.name}
-                  onSelect={(currentValue) => {
-                    const newRaceValue = races.find(
-                      (raceWithName) => currentValue === raceWithName.name
-                    );
-                    setRace(newRaceValue);
-                    setRaceLocal(newRaceValue);
-                    setOpen(false);
-                  }}
-                >
-                  {currentRace.name}
-                  <Check
-                    className={cn(
-                      "ml-auto",
-                      currentRace === race ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                </CommandItem>
-              ))}
+              {races.map((currentRace) =>
+                currentRace.name && currentRace.race_id ? (
+                  <CommandItem
+                    key={currentRace.race_id}
+                    value={currentRace.name}
+                    onSelect={(currentValue) => {
+                      const newRaceValue = races.find(
+                        (raceWithName) => currentValue === raceWithName.name
+                      );
+                      setRace(newRaceValue);
+                      setRaceLocal(newRaceValue);
+                      setOpen(false);
+                    }}
+                  >
+                    {currentRace.name}
+                    <Check
+                      className={cn(
+                        "ml-auto",
+                        currentRace === race ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                  </CommandItem>
+                ) : (
+                  <></>
+                )
+              )}
             </CommandGroup>
           </CommandList>
         </Command>

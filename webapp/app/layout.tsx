@@ -1,12 +1,11 @@
 import "./globals.css";
 import { Providers } from "./providers";
-import { poppins } from "./fonts";
 import "./styles.css";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="light">
-      <body className={`${poppins.className} antialiased`}>
+      <body className={`antialiased`}>
         <Providers>
           {/* Schneeflocken-Container */}
           <div className="snowflakes" aria-hidden="true">

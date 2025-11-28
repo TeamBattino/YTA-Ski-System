@@ -79,7 +79,7 @@ export default function AdminTableComponent({
                 <TableCell>{getKeyValue(item, columnKey)}</TableCell>
               )}
             </TableRow>
-            <Button onClick={deleteRunById(item.run_id)}>
+            <Button onPress={e => deleteRunById(item.run_id)}>
               <DeleteIcon />
             </Button>
           </>

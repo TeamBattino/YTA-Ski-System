@@ -27,7 +27,11 @@ type FormattedRun = {
   race_id: string;
 };
 
-export default function TopRunsTable(race: Race) {
+type RunsTableProp = {
+  race : Race;
+}
+
+export default function TopRunsTable({race}: RunsTableProp) {
   const columns = [
     { key: "name", label: "Name", allowsSorting: true },
     { key: "duration", label: "Duration", allowsSorting: true },
@@ -53,11 +57,15 @@ export default function TopRunsTable(race: Race) {
           ...run,
           duration: formattedDuration,
           start_time: moment(run.start_time).format("HH:mm D/M/YY"),
-        };
+        } as unknown as FormattedRun;
       });
+      const nonNullFormattedRuns = formattedRuns.filter(
+        (run): run is FormattedRun => run !== undefined
+      );
+
       setIsLoading(false);
       return {
-        items: formattedRuns,
+        items: nonNullFormattedRuns,
       };
     },
     async sort({ items, sortDescriptor }) {

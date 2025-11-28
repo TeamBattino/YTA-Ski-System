@@ -25,7 +25,11 @@ type FormattedRun = {
   ski_pass: string;
 };
 
-export default function RecentRunsTable(race: Race) {
+type RunsTableProp = {
+  race : Race;
+}
+
+export default function RecentRunsTable({race}: RunsTableProp) {
   const columns = [
     { key: "name", label: "Name", allowsSorting: true },
     { key: "duration", label: "Duration", allowsSorting: true },
@@ -52,12 +56,16 @@ export default function RecentRunsTable(race: Race) {
             ...run,
             duration: formattedDuration,
             start_time: moment(run.start_time).format("HH:mm D/M/YY"),
-          };
+          } as unknown as FormattedRun;
         }
       });
+      const nonNullFormattedRuns = formattedRuns.filter(
+        (run): run is FormattedRun => run !== undefined
+      );
+
       setIsLoading(false);
       return {
-        items: formattedRuns,
+        items: nonNullFormattedRuns,
       };
     },
     async sort({ items, sortDescriptor }) {

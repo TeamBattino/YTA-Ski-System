@@ -1,1 +1,1 @@
-SELECT * FROM run;
+INSERT INTO admin(email) VALUES ('michel.mahadeva@gmail.com');

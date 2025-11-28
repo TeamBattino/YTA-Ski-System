@@ -10,7 +10,7 @@ type RegistrationProp = {
   races: Race[];
 }
 
-export default function Registration({races}: RegistrationProp[]) {
+export default function Registration({races}: RegistrationProp) {
   const [name, setName] = useState<string>("");
   const [ldap, setLdap] = useState<string>("");
   const [selectedLocation, setLocation] = useState<any>();

@@ -17,7 +17,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (admin.length) {
         return true;
       }
-      return Response.redirect(new URL('/dashboard/leaderboard'));;
+      return '/dashboard/leaderboard';
     },
     async redirect({ url }) {
       return url;
