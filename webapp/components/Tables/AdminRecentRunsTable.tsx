@@ -35,7 +35,7 @@ export default function AdminRecentRunsTable({ race }: RunsTableProp) {
     { key: "duration", label: "Duration", allowsSorting: true },
     { key: "location", label: "Location", allowsSorting: true },
     { key: "start_time", label: "Date", allowsSorting: true },
-    { key: "delete", label: "Delete", allowSorting: false },
+    { key: "delete", label: "Delete", allowsSorting: false },
   ];
 
   const locations = ["ALL", "ZRH", "WAW", "US", "DE"];
