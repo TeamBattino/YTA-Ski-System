@@ -1,5 +1,5 @@
 "use client";
-import { useAsyncList } from "react-stately";
+import {useAsyncList} from "@react-stately/data";
 import AdminTableComponent from "./AdminTable";
 import { getRecentRuns } from "@/lib/db-helper";
 import { Key, useCallback, useMemo, useState } from "react";
@@ -26,15 +26,16 @@ type FormattedRun = {
 };
 
 type RunsTableProp = {
-  race : Race;
-}
+  race: Race;
+};
 
-export default function AdminRecentRunsTable({race}: RunsTableProp) {
+export default function AdminRecentRunsTable({ race }: RunsTableProp) {
   const columns = [
     { key: "name", label: "Name", allowsSorting: true },
     { key: "duration", label: "Duration", allowsSorting: true },
     { key: "location", label: "Location", allowsSorting: true },
     { key: "start_time", label: "Date", allowsSorting: true },
+    { key: "delete", label: "Delete", allowSorting: false },
   ];
 
   const locations = ["ALL", "ZRH", "WAW", "US", "DE"];
