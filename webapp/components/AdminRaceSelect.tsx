@@ -1,4 +1,4 @@
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState, } from "react";
 import {
   Popover,
   PopoverContent,
@@ -18,15 +18,22 @@ import {
 
 import { race as Race } from "@/src/generated/client";
 
-type SetRaceInterface = Dispatch<SetStateAction<Race | undefined>>;
+type SetRaceInterface = (race: {
+  name: string | null;
+  race_id: string;
+}) => Promise<void>;
 
-type RaceSelectProps = {
+type AdminRaceSelectProps = {
   races: Race[];
   setRace: SetRaceInterface;
   currentRace: Race;
 };
 
-export default function RaceSelect({ races, setRace, currentRace }: RaceSelectProps) {
+export default function AdminRaceSelect({
+  races,
+  setRace,
+  currentRace,
+}: AdminRaceSelectProps) {
   const [open, setOpen] = useState(false);
   const [race, setRaceLocal] = useState<Race>(currentRace);
 
@@ -59,7 +66,7 @@ export default function RaceSelect({ races, setRace, currentRace }: RaceSelectPr
                     onSelect={(currentValue) => {
                       const newRaceValue = races.find(
                         (raceWithName) => currentValue === raceWithName.name
-                      );
+                      ) as Race;
                       setRace(newRaceValue);
                       setRaceLocal(newRaceValue);
                       setOpen(false);

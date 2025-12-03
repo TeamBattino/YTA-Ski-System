@@ -1,4 +1,4 @@
-import {  updateRun, createRun, Run } from '@/lib/db-helper';
+import {  updateRun, createRun, Run, getCurrentRace } from '@/lib/db-helper';
 import { NextResponse } from 'next/server';
 
 type PostRunProps = {
@@ -22,12 +22,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
+    const currentRace = await getCurrentRace();
+
     // Try to create the run
     const run: Run = {
       duration: data.duration,
       ski_pass: data.ski_pass,
       start_time: new Date(),
-      race_id: data.race_id,
+      race_id: currentRace.race_id,
       run_id: "",
     }
     const newRun = await createRun(run);

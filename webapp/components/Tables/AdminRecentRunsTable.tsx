@@ -15,8 +15,9 @@ import { SearchIcon } from "../icons/SearchIcon";
 import moment from "moment";
 import { redirect } from "next/navigation";
 import { run as Run, race as Race } from "@/src/generated/client";
+import {FormattedRun} from '@/lib/db-helper';
 
-type FormattedRun = {
+type StringFormattedRun = {
   name: string;
   duration: string;
   location: string;
@@ -43,7 +44,7 @@ export default function AdminRecentRunsTable({ race }: RunsTableProp) {
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("ALL");
-  const list = useAsyncList<FormattedRun>({
+  const list = useAsyncList<StringFormattedRun>({
     async load() {
       const topRuns = await getRecentRuns(race.race_id);
       const formattedRuns = topRuns.map((run: Run) => {
@@ -57,11 +58,11 @@ export default function AdminRecentRunsTable({ race }: RunsTableProp) {
             ...run,
             duration: formattedDuration,
             start_time: moment(run.start_time).format("HH:mm D/M/YY"),
-          } as unknown as FormattedRun;
+          } as unknown as StringFormattedRun;
         }
       });
       const nonNullFormattedRuns = formattedRuns.filter(
-        (run): run is FormattedRun => run !== undefined
+        (run): run is StringFormattedRun => run !== undefined
       );
 
       setIsLoading(false);
@@ -71,14 +72,14 @@ export default function AdminRecentRunsTable({ race }: RunsTableProp) {
     },
     async sort({ items, sortDescriptor }) {
       return {
-        items: items.sort((a: FormattedRun, b: FormattedRun) => {
+        items: items.sort((a: StringFormattedRun, b: StringFormattedRun) => {
           if (sortDescriptor.column === "start_time") {
             const first = moment(
-              a[sortDescriptor.column as keyof FormattedRun],
+              a[sortDescriptor.column as keyof StringFormattedRun],
               "HH:mm D/M/YY"
             );
             const second = moment(
-              b[sortDescriptor.column as keyof FormattedRun],
+              b[sortDescriptor.column as keyof StringFormattedRun],
               "HH:mm D/M/YY"
             );
             let cmp = first.isBefore(second) ? -1 : 1;
@@ -118,8 +119,8 @@ export default function AdminRecentRunsTable({ race }: RunsTableProp) {
             }
             return cmp;
           } else {
-            const first = a[sortDescriptor.column as keyof FormattedRun];
-            const second = b[sortDescriptor.column as keyof FormattedRun];
+            const first = a[sortDescriptor.column as keyof StringFormattedRun];
+            const second = b[sortDescriptor.column as keyof StringFormattedRun];
             let cmp =
               (parseInt(first as string) || first) <
               (parseInt(second as string) || second)
@@ -174,49 +175,49 @@ export default function AdminRecentRunsTable({ race }: RunsTableProp) {
   return (
     <div>
       <div className="flex flex-row gap-2 py-2">
-        <Input
-          isClearable
-          className="w-full"
-          placeholder="Search by name..."
-          startContent={<SearchIcon />}
-          value={searchValue}
-          onClear={() => onClear()}
-          onValueChange={onSearchChange}
-        />
-        <Dropdown>
-          <DropdownTrigger>
-            <Button className="capitalize" variant="bordered">
-              {selectedLocation}
-            </Button>
-          </DropdownTrigger>
-          <DropdownMenu
-            disallowEmptySelection
-            aria-label="Single selection example"
-            selectedKeys={selectedLocation}
-            selectionMode="single"
-            variant="flat"
-            onSelectionChange={(keys) => {
-              keys.currentKey && setSelectedLocation(keys.currentKey);
-            }}
-          >
-            {locations.map((location) => (
-              <DropdownItem key={location}>{location}</DropdownItem>
-            ))}
-          </DropdownMenu>
-        </Dropdown>
+      <Input
+      isClearable
+      className="w-full"
+      placeholder="Search by name..."
+      startContent={<SearchIcon />}
+      value={searchValue}
+      onClear={() => onClear()}
+      onValueChange={onSearchChange}
+      />
+      <Dropdown>
+      <DropdownTrigger>
+      <Button className="capitalize" variant="bordered">
+        {selectedLocation}
+      </Button>
+      </DropdownTrigger>
+      <DropdownMenu
+      disallowEmptySelection
+      aria-label="Single selection example"
+      selectedKeys={selectedLocation}
+      selectionMode="single"
+      variant="flat"
+      onSelectionChange={(keys) => {
+        if (keys.currentKey) setSelectedLocation(keys.currentKey);
+      }}
+      >
+      {locations.map((location) => (
+        <DropdownItem key={location}>{location}</DropdownItem>
+      ))}
+      </DropdownMenu>
+      </Dropdown>
       </div>
       <AdminTableComponent
-        columns={columns}
-        list={{ items: filterList }}
-        isLoading={isLoading}
-        tableProps={{
-          sortDescriptor: list.sortDescriptor || {
-            column: "start_time",
-            direction: "descending",
-          },
-          onSortChange: list.sort,
-          onRowAction: onRowClick,
-        }}
+      columns={columns}
+      list={{ items: filterList as Iterable<FormattedRun> }}
+      isLoading={isLoading}
+      tableProps={{
+      sortDescriptor: list.sortDescriptor || {
+      column: "start_time",
+      direction: "descending",
+      },
+      onSortChange: list.sort,
+      onRowAction: onRowClick,
+      }}
       />
     </div>
   );

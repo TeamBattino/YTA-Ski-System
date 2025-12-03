@@ -1,7 +1,7 @@
 "use client";
 import { useAsyncList } from "react-stately";
 import TableComponent from "./Table";
-import { getRecentRuns } from "@/lib/db-helper";
+import { FormattedRun, getRecentRuns } from "@/lib/db-helper";
 import { run as Run, race as Race } from "@/src/generated/client";
 import { useCallback, useMemo, useState } from "react";
 import {
@@ -16,7 +16,7 @@ import { SearchIcon } from "../icons/SearchIcon";
 import moment from "moment";
 // import { redirect } from "next/navigation";
 
-type FormattedRun = {
+type StringFormattedRun = {
   run_id: string;
   name: string;
   duration: string;
@@ -26,10 +26,10 @@ type FormattedRun = {
 };
 
 type RunsTableProp = {
-  race : Race;
-}
+  race: Race;
+};
 
-export default function RecentRunsTable({race}: RunsTableProp) {
+export default function RecentRunsTable({ race }: RunsTableProp) {
   const columns = [
     { key: "name", label: "Name", allowsSorting: true },
     { key: "duration", label: "Duration", allowsSorting: true },
@@ -42,7 +42,7 @@ export default function RecentRunsTable({race}: RunsTableProp) {
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("ALL");
-  const list = useAsyncList<FormattedRun>({
+  const list = useAsyncList<StringFormattedRun>({
     async load() {
       const recentRuns = await getRecentRuns(race.race_id);
       const formattedRuns = recentRuns.map((run: Run) => {
@@ -56,11 +56,11 @@ export default function RecentRunsTable({race}: RunsTableProp) {
             ...run,
             duration: formattedDuration,
             start_time: moment(run.start_time).format("HH:mm D/M/YY"),
-          } as unknown as FormattedRun;
+          } as unknown as StringFormattedRun;
         }
       });
       const nonNullFormattedRuns = formattedRuns.filter(
-        (run): run is FormattedRun => run !== undefined
+        (run): run is StringFormattedRun => run !== undefined
       );
 
       setIsLoading(false);
@@ -70,14 +70,14 @@ export default function RecentRunsTable({race}: RunsTableProp) {
     },
     async sort({ items, sortDescriptor }) {
       return {
-        items: items.sort((a: FormattedRun, b: FormattedRun) => {
+        items: items.sort((a: StringFormattedRun, b: StringFormattedRun) => {
           if (sortDescriptor.column === "start_time") {
             const first = moment(
-              a[sortDescriptor.column as keyof FormattedRun],
+              a[sortDescriptor.column as keyof StringFormattedRun],
               "HH:mm D/M/YY"
             );
             const second = moment(
-              b[sortDescriptor.column as keyof FormattedRun],
+              b[sortDescriptor.column as keyof StringFormattedRun],
               "HH:mm D/M/YY"
             );
             let cmp = first.isBefore(second) ? -1 : 1;
@@ -117,8 +117,8 @@ export default function RecentRunsTable({race}: RunsTableProp) {
             }
             return cmp;
           } else {
-            const first = a[sortDescriptor.column as keyof FormattedRun];
-            const second = b[sortDescriptor.column as keyof FormattedRun];
+            const first = a[sortDescriptor.column as keyof StringFormattedRun];
+            const second = b[sortDescriptor.column as keyof StringFormattedRun];
             let cmp =
               (parseInt(first as string) || first) <
               (parseInt(second as string) || second)
@@ -192,7 +192,7 @@ export default function RecentRunsTable({race}: RunsTableProp) {
             selectionMode="single"
             variant="flat"
             onSelectionChange={(keys) => {
-              keys.currentKey && setSelectedLocation(keys.currentKey);
+              if (keys.currentKey) setSelectedLocation(keys.currentKey);
             }}
           >
             {locations.map((location) => (
@@ -203,7 +203,7 @@ export default function RecentRunsTable({race}: RunsTableProp) {
       </div>
       <TableComponent
         columns={columns}
-        list={{ items: filterList }}
+        list={{ items: filterList as Iterable<FormattedRun> }}
         isLoading={isLoading}
         tableProps={{
           sortDescriptor: list.sortDescriptor || {

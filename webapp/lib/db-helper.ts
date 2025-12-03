@@ -12,6 +12,10 @@ export interface Consistency {
   race_id: string;
 }
 
+export type CurrentRace = {
+  race_id: string;
+}
+
 export type FormattedRun = {
   name: string;
   ski_pass: string;
@@ -159,6 +163,7 @@ export async function getRecentRuns(race_id: string) {
 
 /** Create */
 
+
 export async function createRacer(
   name: string,
   ldap: string,
@@ -166,16 +171,27 @@ export async function createRacer(
   location: string,
   race_id: string
 ) {
-  const newRacer = await prisma.racer.create({
-    data: {
-      name: name,
-      ldap: ldap,
-      ski_pass: ski_pass,
-      location: location,
-      race_id: race_id,
+  const newRacer = await prisma.racer.upsert({
+    where: {
+      racer_identifier: {
+        ski_pass,
+        race_id,
+      },
+    },
+    update: {
+      name,
+      ldap,
+      location,
+    },
+    create: {
+      name,
+      ldap,
+      ski_pass,
+      location,
+      race_id,
     },
   });
-  return newRacer;
+  return newRacer as Racer;
 }
 
 export async function createRun(run: Run) {
@@ -220,6 +236,18 @@ export async function getRaces() {
   return races;
 }
 
+export async function getCurrentRace() {
+  const currentRace = await prisma.$queryRaw<Race>`
+        SELECT
+            r.*
+        FROM
+            current_race cr
+        JOIN
+            race r ON cr.race_id = r.race_id
+    `;
+  return currentRace;
+}
+
 export async function getAdminByEmail(email: string) {
   const admins = await prisma.$queryRaw<Admin[]>`
         SELECT
@@ -233,14 +261,31 @@ export async function getAdminByEmail(email: string) {
 }
 
 export async function fetchRacerBySkiPass(ski_pass: string, race_id: string) {
-  const racer = await prisma.racer.findUnique({
+  let racer = (await prisma.racer.findUnique({
     where: {
       racer_identifier: {
         ski_pass: ski_pass,
         race_id: race_id,
       },
     },
-  });
+  })) as Racer;
+  if (!racer) {
+    racer = await prisma.$queryRaw<Racer>`
+      INSERT INTO racer(name, ldap, race_id, ski_pass, location)
+      VALUES (
+      'Unregistered User #${
+        (await prisma.$queryRaw<number>`SELECT COUNT(*) FROM racer;`) + 1
+      }',
+      'unregistered${
+        (await prisma.$queryRaw<number>`SELECT COUNT(*) FROM racer;`) + 1
+      }',
+      ${race_id},
+      ${ski_pass},
+      'ZRH'
+      )
+      RETURNING *;
+    `;
+  }
   return racer;
 }
 
@@ -263,6 +308,15 @@ export async function updateRun(run: Run) {
     },
   });
   return updatedRun;
+}
+
+export async function updateCurrentRace(race: Race) {
+  const updatedRace = await prisma.$queryRaw<CurrentRace>`
+    UPDATE current_race
+    SET race_id = ${race.race_id}
+  `;
+  
+  return updatedRace;
 }
 
 /** Delete */
