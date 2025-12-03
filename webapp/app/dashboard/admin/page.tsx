@@ -8,7 +8,7 @@ export default async function Page() {
   const races = await getRaces();
   const currentRace = await getCurrentRace();
   if (session && session.user) {
-    return <Admin session={session} races={races} adminRace={currentRace} />;
+    return <Admin races={races} adminRace={currentRace} />;
   } else {
     redirect("/dashboard/leaderboard");
   }

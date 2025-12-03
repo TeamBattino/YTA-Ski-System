@@ -12,7 +12,7 @@ type LeaderboardProp = {
 }
 
 export default function WithConsistency({races, currentRace}:LeaderboardProp) {
-  const [race, setRace] = useState<Race>();
+  const [race, setRace] = useState<Race>(currentRace);
 
   return (
     <>

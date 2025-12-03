@@ -163,6 +163,14 @@ export async function getRecentRuns(race_id: string) {
 
 /** Create */
 
+export async function createRace(name:string){
+  const newRace = await prisma.race.create({
+    data: {
+      name: name
+    },
+  });
+  return newRace;
+}
 
 export async function createRacer(
   name: string,
@@ -237,7 +245,7 @@ export async function getRaces() {
 }
 
 export async function getCurrentRace() {
-  const currentRace = await prisma.$queryRaw<Race>`
+  const currentRace = await prisma.$queryRaw<Race[]>`
         SELECT
             r.*
         FROM
@@ -245,7 +253,7 @@ export async function getCurrentRace() {
         JOIN
             race r ON cr.race_id = r.race_id
     `;
-  return currentRace;
+  return currentRace[0];
 }
 
 export async function getAdminByEmail(email: string) {

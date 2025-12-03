@@ -12,7 +12,7 @@ type LeaderboardProp = {
 };
 
 export default function WithoutConsistency({ races, currentRace }: LeaderboardProp) {
-  const [race, setRace] = useState<Race>();
+  const [race, setRace] = useState<Race>(currentRace);
   return (
     <>
       <h1 className="py-2 text-2xl font-bold">Leaderboards</h1>

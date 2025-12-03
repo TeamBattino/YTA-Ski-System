@@ -18,7 +18,7 @@ import {
 
 import { race as Race } from "@/src/generated/client";
 
-type SetRaceInterface = Dispatch<SetStateAction<Race | undefined>>;
+type SetRaceInterface = Dispatch<SetStateAction<Race>>;
 
 type RaceSelectProps = {
   races: Race[];
@@ -40,7 +40,7 @@ export default function RaceSelect({ races, setRace, currentRace }: RaceSelectPr
           className="w-[200px] justify-between"
         >
           {race
-            ? races.find((currentRace) => race === currentRace)?.name
+            ? races.find((singleRace) => race === singleRace)?.name
             : "Select race..."}
           <ChevronsUpDown className="opacity-50" />
         </Button>
@@ -51,25 +51,25 @@ export default function RaceSelect({ races, setRace, currentRace }: RaceSelectPr
           <CommandList>
             <CommandEmpty>No race found.</CommandEmpty>
             <CommandGroup>
-              {races.map((currentRace) =>
-                currentRace.name && currentRace.race_id ? (
+              {races.map((singleRace) =>
+                singleRace.name && singleRace.race_id ? (
                   <CommandItem
-                    key={currentRace.race_id}
-                    value={currentRace.name}
+                    key={singleRace.race_id}
+                    value={singleRace.name}
                     onSelect={(currentValue) => {
                       const newRaceValue = races.find(
                         (raceWithName) => currentValue === raceWithName.name
-                      );
+                      ) as Race;
                       setRace(newRaceValue);
                       setRaceLocal(newRaceValue);
                       setOpen(false);
                     }}
                   >
-                    {currentRace.name}
+                    {singleRace.name}
                     <Check
                       className={cn(
                         "ml-auto",
-                        currentRace === race ? "opacity-100" : "opacity-0"
+                        singleRace === race ? "opacity-100" : "opacity-0"
                       )}
                     />
                   </CommandItem>

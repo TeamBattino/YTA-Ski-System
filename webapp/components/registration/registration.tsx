@@ -16,7 +16,7 @@ export default function Registration({races, currentRace}: RegistrationProp) {
   const [ldap, setLdap] = useState<string>("");
   const [selectedLocation, setLocation] = useState<any>();
   const [ski_pass, setSkiPass] = useState<string>();
-  const [race, setRace] = useState<Race>();
+  const [race, setRace] = useState<Race>(currentRace);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string>(""); // for nfc reader
 
