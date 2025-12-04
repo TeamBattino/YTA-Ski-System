@@ -45,7 +45,7 @@ class AlpenhundeUI:
         self.root.bind("<Key>", self.onKeyPress)
 
     def onKeyPress(self, event: tk.Event):
-        if self.state_machine.current_state == StateMachineState.IDLE || (self.state_machine.current_state == StateMachineState.RUNNING && self.state_machine.next_user.rfid == None):
+        if self.state_machine.current_state == StateMachineState.IDLE or (self.state_machine.current_state == StateMachineState.RUNNING and self.state_machine.next_user.rfid == ""):
             self.rfid += event.char
             if event.char == "\r":
 

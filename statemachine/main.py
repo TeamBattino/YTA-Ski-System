@@ -43,7 +43,7 @@ ENV_API_URL = os.getenv("API_DOMAIN")
 ENV_AUTH_SECRET = os.getenv("AUTH_SECRET")
 
 """ Shared state variables here """
-statemachne = StateMachine(StateMachineState.IDLE, -1, User("", ""), False, False)
+statemachne = StateMachine(StateMachineState.IDLE, -1, User("", ""), False, False, User("",""))
 
 """ Threads created here """
 panic_event = Event()
@@ -75,15 +75,15 @@ def panic_button_call():
 
 def update_user():
     next_user = None
-    if statemachne.current_state == StateMachineState.RUNNING
+    if statemachne.current_state == StateMachineState.RUNNING:
         next_user = api.getUser(statemachne.next_user.rfid)
-    else
+    else:
         user = api.getUser(statemachne.user.rfid)
     if(next_user):
         statemachne.next_user = next_user
     else:
         statemachne.user = user
-        statemachne.next_user = None
+        statemachne.next_user = User("","")
 
 user_update_event = Event()
 ui = AlpenhundeUI(statemachne, user_update_event)
@@ -96,7 +96,7 @@ while True:
         ui.update_state()
         update_user()
         statemachne.loading = False
-        if statemachne.next_user == None:
+        if statemachne.next_user.rfid == "":
             statemachne.current_state = StateMachineState.REGISTERED
         user_update_event.clear()
     if not message_queue.empty():
@@ -122,9 +122,9 @@ while True:
         statemachne.loading = True
         ui.update_state()
         api.postRace(statemachne.user.rfid, statemachne.last_race_time)
-        if statemachne.next_user != None:
+        if statemachne.next_user.rfid != "":
             statemachne.user = statemachne.next_user
-            statemachne.next_user = None
+            statemachne.next_user = User("","")
             statemachne.current_state = StateMachineState.REGISTERED
         statemachne.loading = False
         race_finished_event.clear()
