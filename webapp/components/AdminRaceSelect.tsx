@@ -1,4 +1,4 @@
-import { useState, } from "react";
+import { useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -18,14 +18,14 @@ import {
 
 import { race as Race } from "@/src/generated/client";
 
-type SetRaceInterface = (race: {
-  name: string | null;
-  race_id: string;
-}) => Promise<void>;
-
 type AdminRaceSelectProps = {
   races: Race[];
-  setRace: SetRaceInterface;
+  setRace: React.Dispatch<
+    React.SetStateAction<{
+      name: string | null;
+      race_id: string;
+    }>
+  >;
   currentRace: Race;
 };
 
@@ -47,7 +47,8 @@ export default function AdminRaceSelect({
           className="w-[200px] justify-between"
         >
           {race
-            ? races.find((currentRace) => race.race_id === currentRace.race_id)?.name
+            ? races.find((currentRace) => race.race_id === currentRace.race_id)
+                ?.name
             : "Select race..."}
           <ChevronsUpDown className="opacity-50" />
         </Button>

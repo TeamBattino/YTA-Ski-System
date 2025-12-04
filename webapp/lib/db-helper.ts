@@ -119,22 +119,21 @@ export async function getConsistencyCount() {
 export async function getTopRuns(race_id: string) {
   const racersWithShortestRun = await prisma.$queryRaw<FormattedRun[]>`
     SELECT 
-      r.ski_pass,
-      r.race_id,
-      r.run_id,
-      r.start_time,
-      racer.name,
-      racer.ldap,
-      racer.location,
-      r.duration
+    r.ski_pass,
+    r.race_id,
+    r.run_id,
+    r.start_time,
+    racer.name,
+    racer.ldap,
+    racer.location,
+    r.duration
     FROM run r
     JOIN racer ON r.ski_pass = racer.ski_pass AND r.race_id = racer.race_id
     WHERE r.race_id = ${race_id}
     AND r.run_id IN (
-      SELECT run_id FROM run
-      WHERE race_id = ${race_id}
-      ORDER BY ski_pass, duration ASC
-      LIMIT 1
+    SELECT DISTINCT ON (ski_pass) run_id FROM run
+    WHERE race_id = ${race_id}
+    ORDER BY ski_pass, duration ASC
     )
     GROUP BY r.ski_pass, r.race_id, r.run_id, r.start_time, racer.name, racer.ldap, racer.location, r.duration
     ORDER BY r.duration ASC
@@ -363,8 +362,8 @@ export async function fetchRacerBySkiPass(ski_pass: string) {
     const userNumber = await prisma.$queryRaw<
       Array<{ next_racer_number: number }>
     >`SELECT COUNT(*)+1 AS next_racer_number FROM racer WHERE race_id = ${race.race_id}`;
-    const name = "Unregistered User #" + (userNumber[0].next_racer_number);
-    const ldap = "unregistered" + (userNumber[0].next_racer_number);
+    const name = "Unregistered User #" + userNumber[0].next_racer_number;
+    const ldap = "unregistered" + userNumber[0].next_racer_number;
     console.log("User number", userNumber[0].next_racer_number);
     const racers = await prisma.$queryRaw<Racer[]>`
       INSERT INTO racer(name, ldap, race_id, ski_pass, location)
@@ -377,7 +376,7 @@ export async function fetchRacerBySkiPass(ski_pass: string) {
       )
       RETURNING *;
     `;
-    racer= racers[0];
+    racer = racers[0];
   }
   console.log("new created racer", racer);
   return racer;

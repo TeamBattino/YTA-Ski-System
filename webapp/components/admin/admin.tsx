@@ -4,13 +4,11 @@ import React, { useState, useCallback } from "react";
 import AdminRecentRunsTable from "@/components/Tables/AdminRecentRunsTable";
 import { signOut } from "next-auth/react";
 import { race as Race } from "@/src/generated/client";
-import {
-  updateCurrentRace,
-  createRace,
-} from "@/lib/db-helper";
+import { updateCurrentRace, createRace } from "@/lib/db-helper";
 import RaceSelect from "@/components/RaceSelect";
 import AdminRaceSelect from "@/components/AdminRaceSelect";
 import ShowConsistencySwitch from "@/components/leaderboard/ShowConsistencySwitch";
+import { Button } from "@/components/common/button";
 
 type AdminProp = {
   races: Race[];
@@ -21,6 +19,7 @@ type AdminProp = {
 export default function Admin({ races, adminRace, defaultValue }: AdminProp) {
   const [race, setRace] = useState<Race>(adminRace);
   const [currentRace, setCurrentRace] = useState<Race>(adminRace);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   console.log(adminRace);
 
@@ -28,12 +27,14 @@ export default function Admin({ races, adminRace, defaultValue }: AdminProp) {
     return race.name !== null && race.name !== undefined;
   }
 
-  const currentRaceOnChange = useCallback(async (race: Race) => {
-    setCurrentRace(race);
-    if (hasValidName(race)) {
-      await updateCurrentRace(race);
+  const currentRaceOnChange = useCallback(async () => {
+    setIsLoading(true);
+    if (hasValidName(currentRace)) {
+      await updateCurrentRace(currentRace);
+      window.location.reload();
     }
-  }, []);
+    setIsLoading(false);
+  }, [currentRace]);
 
   const createNewRace = useCallback(async (name: string) => {
     const newRace = await createRace(name);
@@ -65,9 +66,19 @@ export default function Admin({ races, adminRace, defaultValue }: AdminProp) {
         CURRENT RACE:{" "}
         <AdminRaceSelect
           races={races}
-          setRace={currentRaceOnChange}
+          setRace={setCurrentRace}
           currentRace={currentRace}
         />
+        {currentRace.race_id != adminRace.race_id ? (
+            <Button
+            onClick={async () => await currentRaceOnChange()}
+            disabled={isLoading}
+            >
+            {isLoading ? "Saving..." : "Save Changes"}
+            </Button>
+        ) : (
+          <></>
+        )}
       </div>
       <ShowConsistencySwitch defaultValue={defaultValue} />
       <div>
