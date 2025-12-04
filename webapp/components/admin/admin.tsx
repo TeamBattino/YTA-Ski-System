@@ -7,7 +7,6 @@ import { race as Race } from "@/src/generated/client";
 import {
   updateCurrentRace,
   createRace,
-  updateShowConsistency,
 } from "@/lib/db-helper";
 import RaceSelect from "@/components/RaceSelect";
 import AdminRaceSelect from "@/components/AdminRaceSelect";
@@ -22,9 +21,6 @@ type AdminProp = {
 export default function Admin({ races, adminRace, defaultValue }: AdminProp) {
   const [race, setRace] = useState<Race>(adminRace);
   const [currentRace, setCurrentRace] = useState<Race>(adminRace);
-  const onConsistencyChange = useCallback(async () => {
-    await updateShowConsistency(!defaultValue);
-  }, [defaultValue]);
 
   console.log(adminRace);
 
@@ -73,7 +69,7 @@ export default function Admin({ races, adminRace, defaultValue }: AdminProp) {
           currentRace={currentRace}
         />
       </div>
-      <ShowConsistencySwitch defaultValue={defaultValue} onChange={onConsistencyChange} />
+      <ShowConsistencySwitch defaultValue={defaultValue} />
       <div>
         CREATE RACE: <br />
         <input
