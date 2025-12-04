@@ -360,11 +360,12 @@ export async function fetchRacerBySkiPass(ski_pass: string) {
   })) as Racer | null;
   console.log("Racer without ID", racer);
   if (racer == null) {
-    const userNumber =
-      await prisma.$queryRaw<Array<{ count: string }>>`SELECT COUNT(*) FROM racer WHERE race_id = ${race.race_id}`;
-    const name = "Unregistered User #" + userNumber[0].count;
-    const ldap = "unregistered" + userNumber[0].count;
-    console.log("User number", userNumber[0].count);
+    const userNumber = await prisma.$queryRaw<
+      Array<{ next_racer_number: number }>
+    >`SELECT COUNT(*)+1 AS next_racer_number FROM racer WHERE race_id = ${race.race_id}`;
+    const name = "Unregistered User #" + (userNumber[0].next_racer_number);
+    const ldap = "unregistered" + (userNumber[0].next_racer_number);
+    console.log("User number", userNumber[0].next_racer_number);
     racer = await prisma.$queryRaw<Racer>`
       INSERT INTO racer(name, ldap, race_id, ski_pass, location)
       VALUES (
