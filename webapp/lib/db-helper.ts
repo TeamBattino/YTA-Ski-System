@@ -366,7 +366,7 @@ export async function fetchRacerBySkiPass(ski_pass: string) {
     const name = "Unregistered User #" + (userNumber[0].next_racer_number);
     const ldap = "unregistered" + (userNumber[0].next_racer_number);
     console.log("User number", userNumber[0].next_racer_number);
-    racer = await prisma.$queryRaw<Racer>`
+    const racers = await prisma.$queryRaw<Racer[]>`
       INSERT INTO racer(name, ldap, race_id, ski_pass, location)
       VALUES (
       ${name},
@@ -377,6 +377,7 @@ export async function fetchRacerBySkiPass(ski_pass: string) {
       )
       RETURNING *;
     `;
+    racer= racers[0];
   }
   console.log("new created racer", racer);
   return racer;
