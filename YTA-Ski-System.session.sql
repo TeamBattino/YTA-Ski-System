@@ -1,5 +1,5 @@
 SELECT *
-FROM current_race;
+FROM settings;
 SELECT *
 FROM run;
 SELECT *
@@ -9,8 +9,9 @@ FROM racer;
 SELECT *
 FROM admin;
 SELECT r.*
-FROM current_race cr
-    JOIN race r ON cr.race_id = r.race_id;
+FROM settings s
+    JOIN race r ON s.value::uuid = r.race_id
+    WHERE s.key = 'current_race';
 SELECT r.ski_pass,
     r.race_id,
     r.run_id,
@@ -40,3 +41,8 @@ GROUP BY r.ski_pass,
     racer.location,
     r.duration
 ORDER BY r.duration ASC;
+SELECT
+            value
+        FROM
+            settings s
+        WHERE s.key = 'show_consistency';

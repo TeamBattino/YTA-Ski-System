@@ -140,12 +140,15 @@ export default function AdminRecentRunsTable({ race }: RunsTableProp) {
     },
   });
 
-  const onDeleteRun = useCallback(async (run_id: string) => {
-    console.log("delete run with id", run_id);
-    await deleteRun(run_id);
-    console.log("deleted");
-    await list.reload();
-  }, [list]);
+  const onDeleteRun = useCallback(
+    async (run_id: string) => {
+      console.log("delete run with id", run_id);
+      await deleteRun(run_id);
+      console.log("deleted");
+      await list.reload();
+    },
+    [list]
+  );
 
   const onSearchChange = useCallback((value: string) => {
     if (value) {
@@ -176,9 +179,9 @@ export default function AdminRecentRunsTable({ race }: RunsTableProp) {
 
   const onRowClick = (item: Key) => {
     const personToView = list.items.find((i) => i.name === item);
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    personToView &&
+    if (personToView) {
       redirect(`/dashboard/leaderboard/${personToView?.ski_pass}`);
+    }
   };
 
   return (

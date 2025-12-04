@@ -1,22 +1,19 @@
 "use client";
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { race as Race } from "@/src/generated/client";
 import RaceSelect from "@/components/RaceSelect";
-import ShowConsistencySwitch from "@/components/leaderboard/ShowConsistencySwitch";
 import ConsistencyTable from "@/components/Tables/ConsistencyTable";
 import TopRunsTable from "@/components/Tables/TopRunsTable";
 
 type LeaderboardProp = {
   races: Race[];
   currentRace: Race;
-  onChange: Dispatch<SetStateAction<boolean>>;
 };
 
 export default function WithConsistency({
   races,
   currentRace,
-  onChange,
 }: LeaderboardProp) {
   const [race, setRace] = useState<Race>(currentRace);
 
@@ -24,8 +21,6 @@ export default function WithConsistency({
     <>
       <h1 className="py-2 text-2xl font-bold">Leaderboards</h1>
       <RaceSelect races={races} setRace={setRace} currentRace={currentRace} />
-
-      <ShowConsistencySwitch defaultValue={true} onChange={onChange} />
 
       <h2 className="py-2 text-xl font-bold">⭐ Competitive Consistency</h2>
       {race ? (

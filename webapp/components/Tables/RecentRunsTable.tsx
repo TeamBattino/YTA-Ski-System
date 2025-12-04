@@ -3,7 +3,7 @@ import { useAsyncList } from "react-stately";
 import TableComponent from "./Table";
 import { FormattedRun, getRecentRuns } from "@/lib/db-helper";
 import { run as Run, race as Race } from "@/src/generated/client";
-import { useCallback, useMemo, useState } from "react";
+import { Key, useCallback, useMemo, useState } from "react";
 import {
   Button,
   Dropdown,
@@ -14,6 +14,7 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../icons/SearchIcon";
 import moment from "moment";
+import { redirect } from "next/navigation";
 // import { redirect } from "next/navigation";
 
 type StringFormattedRun = {
@@ -162,11 +163,12 @@ export default function RecentRunsTable({ race }: RunsTableProp) {
     });
   }, [list.items, searchValue, selectedLocation]);
 
-  /*const onRowClick = (item: Key) => {
+  const onRowClick = (item: Key) => {
     const personToView = list.items.find((i) => i.run_id === item);
-    personToView &&
+    if (personToView) {
       redirect(`/dashboard/leaderboard/${personToView?.ski_pass}`);
-  };*/
+    }
+  };
 
   return (
     <div>
@@ -212,7 +214,7 @@ export default function RecentRunsTable({ race }: RunsTableProp) {
             direction: "descending",
           },
           onSortChange: list.sort,
-          // onRowAction: onRowClick,
+          onRowAction: onRowClick,
         }}
       />
     </div>

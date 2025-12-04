@@ -1,22 +1,19 @@
 "use client";
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { race as Race } from "@/src/generated/client";
 import RaceSelect from "@/components/RaceSelect";
-import ShowConsistencySwitch from "@/components/leaderboard/ShowConsistencySwitch";
 import RecentRunsTable from "@/components/Tables/RecentRunsTable";
 import TopRunsTable from "@/components/Tables/TopRunsTable";
 
 type LeaderboardProp = {
   races: Race[];
   currentRace: Race;
-  onChange: Dispatch<SetStateAction<boolean>>;
 };
 
 export default function WithoutConsistency({
   races,
   currentRace,
-  onChange,
 }: LeaderboardProp) {
   const [race, setRace] = useState<Race>(currentRace);
   return (
@@ -24,14 +21,12 @@ export default function WithoutConsistency({
       <h1 className="py-2 text-2xl font-bold">Leaderboards</h1>
       <RaceSelect races={races} setRace={setRace} currentRace={currentRace} />
 
-      <ShowConsistencySwitch defaultValue={false} onChange={onChange} />
-
       <p>
         The Aim of the challenge is to have your two most recent runs be closest
         to each other in time.
       </p>
       <p>
-        View recent runs or toggle the switch again to view people&apos;s current
+        View recent runs or click an entry to view the person&apos;s current
         consistency.
       </p>
       <h2 className="py-2 text-xl font-bold">Recent Runs</h2>

@@ -1,13 +1,29 @@
-import Leaderboard from "@/components/leaderboard/Leaderboard";
-import { getRaces, getCurrentRace } from "@/lib/db-helper";
+import { getRaces, getCurrentRace, getShowConsistency } from "@/lib/db-helper";
+import WithConsistency from "@/components/leaderboard/WithConsistency";
+import WithoutConsistency from "@/components/leaderboard/WithoutConsistency";
 
 export default async function Page() {
   const races = await getRaces();
   const currentRace = await getCurrentRace();
+  const showConsistency = await getShowConsistency();
 
-  return (
+  if (showConsistency) {
+    return (
       <>
-        <Leaderboard races={races} currentRace={currentRace} />
+        <WithConsistency
+          races={races}
+          currentRace={currentRace}
+        />
       </>
     );
+  } else {
+    return (
+      <>
+        <WithoutConsistency
+          races={races}
+          currentRace={currentRace}
+        />
+      </>
+    );
+  }
 }

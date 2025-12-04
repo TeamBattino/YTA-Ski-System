@@ -4,24 +4,33 @@ import React, { useState, useCallback } from "react";
 import AdminRecentRunsTable from "@/components/Tables/AdminRecentRunsTable";
 import { signOut } from "next-auth/react";
 import { race as Race } from "@/src/generated/client";
-import { updateCurrentRace, createRace } from "@/lib/db-helper";
+import {
+  updateCurrentRace,
+  createRace,
+  updateShowConsistency,
+} from "@/lib/db-helper";
 import RaceSelect from "@/components/RaceSelect";
 import AdminRaceSelect from "@/components/AdminRaceSelect";
+import ShowConsistencySwitch from "@/components/leaderboard/ShowConsistencySwitch";
 
 type AdminProp = {
   races: Race[];
   adminRace: Race;
+  defaultValue: boolean;
 };
 
-export default function Admin({ races, adminRace }: AdminProp) {
+export default function Admin({ races, adminRace, defaultValue }: AdminProp) {
   const [race, setRace] = useState<Race>(adminRace);
   const [currentRace, setCurrentRace] = useState<Race>(adminRace);
+  const onConsistencyChange = useCallback(async () => {
+    await updateShowConsistency(!defaultValue);
+  }, [defaultValue]);
 
   console.log(adminRace);
 
   function hasValidName(race: Race): race is Race & { name: string } {
-  return race.name !== null && race.name !== undefined;
-}
+    return race.name !== null && race.name !== undefined;
+  }
 
   const currentRaceOnChange = useCallback(async (race: Race) => {
     setCurrentRace(race);
@@ -64,6 +73,7 @@ export default function Admin({ races, adminRace }: AdminProp) {
           currentRace={currentRace}
         />
       </div>
+      <ShowConsistencySwitch defaultValue={defaultValue} onChange={onConsistencyChange} />
       <div>
         CREATE RACE: <br />
         <input
