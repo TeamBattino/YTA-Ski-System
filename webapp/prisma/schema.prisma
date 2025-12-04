@@ -41,6 +41,7 @@ model admin {
   email String @unique
 }
 
-model current_race {
-  race_id String @db.Uuid @id
+model settings {
+  key String @id
+  value String
 }

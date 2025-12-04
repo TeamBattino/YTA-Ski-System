@@ -314,7 +314,7 @@ export async function getShowConsistency() {
             settings s
         WHERE s.key = 'show_consistency'
     `;
-  
+  console.log("Consistency", showConsistency);
   return showConsistency == "true";
 }
 
