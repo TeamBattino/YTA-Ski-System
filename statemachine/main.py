@@ -74,12 +74,16 @@ def panic_button_call():
     os.system('espeak -a 400 "RESET RACER"')
 
 def update_user():
-    user = api.getUser(statemachne.user.rfid)
-    if(statemachne.next_user):
-        statemachne.user = statemachne.next_user
-        statemachne.next_user = user
+    next_user = None
+    if statemachne.current_state == StateMachineState.RUNNING
+        next_user = api.getUser(statemachne.next_user.rfid)
+    else
+        user = api.getUser(statemachne.user.rfid)
+    if(next_user):
+        statemachne.next_user = next_user
     else:
-        statemachne.next_user = user
+        statemachne.user = user
+        statemachne.next_user = None
 
 user_update_event = Event()
 ui = AlpenhundeUI(statemachne, user_update_event)
@@ -92,7 +96,8 @@ while True:
         ui.update_state()
         update_user()
         statemachne.loading = False
-        statemachne.current_state = StateMachineState.REGISTERED
+        if statemachne.next_user == None:
+            statemachne.current_state = StateMachineState.REGISTERED
         user_update_event.clear()
     if not message_queue.empty():
         message = message_queue.get()
@@ -117,6 +122,10 @@ while True:
         statemachne.loading = True
         ui.update_state()
         api.postRace(statemachne.user.rfid, statemachne.last_race_time)
+        if statemachne.next_user != None:
+            statemachne.user = statemachne.next_user
+            statemachne.next_user = None
+            statemachne.current_state = StateMachineState.REGISTERED
         statemachne.loading = False
         race_finished_event.clear()
     if panic_event.is_set():
