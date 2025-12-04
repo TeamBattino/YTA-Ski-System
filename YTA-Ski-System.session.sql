@@ -46,3 +46,4 @@ SELECT
         FROM
             settings s
         WHERE s.key = 'show_consistency';
+SELECT COUNT(*) FROM racer;
