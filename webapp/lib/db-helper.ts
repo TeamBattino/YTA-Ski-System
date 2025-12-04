@@ -118,26 +118,26 @@ export async function getConsistencyCount() {
 
 export async function getTopRuns(race_id: string) {
   const racersWithShortestRun = await prisma.$queryRaw<FormattedRun[]>`
-    SELECT r.ski_pass,
-    r.race_id,
-    r.run_id,
-    racer.name,
-    racer.ldap,
-    racer.location,
-    racer.race_id,
-    MIN(r.duration) as duration
-FROM run r
-    JOIN racer ON r.ski_pass = racer.ski_pass
-    AND r.race_id = racer.race_id
-WHERE r.race_id = ${race_id}
-GROUP BY r.ski_pass,
-    r.run_id,
-    r.race_id,
-    racer.name,
-    racer.ldap,
-    racer.location,
-    racer.race_id
-ORDER BY duration ASC
+    SELECT 
+      r.ski_pass,
+      r.race_id,
+      r.run_id,
+      r.start_time,
+      racer.name,
+      racer.ldap,
+      racer.location,
+      r.duration
+    FROM run r
+    JOIN racer ON r.ski_pass = racer.ski_pass AND r.race_id = racer.race_id
+    WHERE r.race_id = ${race_id}
+    AND r.run_id IN (
+      SELECT run_id FROM run
+      WHERE race_id = ${race_id}
+      ORDER BY ski_pass, duration ASC
+      LIMIT 1
+    )
+    GROUP BY r.ski_pass, r.race_id, r.run_id, r.start_time, racer.name, racer.ldap, racer.location, r.duration
+    ORDER BY r.duration ASC
   `;
   return racersWithShortestRun;
 }
