@@ -41,6 +41,7 @@ export type Admin = {
 };
 
 export type Racer = {
+  racer_id: string;
   ski_pass: string;
   name: string;
   ldap: string;

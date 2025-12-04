@@ -19,9 +19,13 @@ export default function Admin({ races, adminRace }: AdminProp) {
 
   console.log(adminRace);
 
+  function hasValidName(race: Race): race is Race & { name: string } {
+  return race.name !== null && race.name !== undefined;
+}
+
   const currentRaceOnChange = useCallback(async (race: Race) => {
     setCurrentRace(race);
-    if (race.name !== null) {
+    if (hasValidName(race)) {
       await updateCurrentRace(race);
     }
   }, []);
