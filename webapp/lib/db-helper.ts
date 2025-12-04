@@ -307,7 +307,7 @@ export async function getCurrentRace() {
 }
 
 export async function getShowConsistency() {
-  const showConsistency = await prisma.$queryRaw<string>`
+  const showConsistency = await prisma.$queryRaw`
         SELECT
             value
         FROM
@@ -315,7 +315,7 @@ export async function getShowConsistency() {
         WHERE s.key = 'show_consistency'
     `;
   console.log("Consistency", showConsistency);
-  return showConsistency == "true";
+  return showConsistency[0]?.value == "true";
 }
 
 export async function getAdminByEmail(email: string) {
