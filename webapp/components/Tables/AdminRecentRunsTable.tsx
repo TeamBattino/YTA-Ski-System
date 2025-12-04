@@ -1,5 +1,5 @@
 "use client";
-import {useAsyncList} from "@react-stately/data";
+import { useAsyncList } from "@react-stately/data";
 import AdminTableComponent from "./AdminTable";
 import { getRecentRuns } from "@/lib/db-helper";
 import { Key, useCallback, useMemo, useState } from "react";
@@ -15,7 +15,7 @@ import { SearchIcon } from "../icons/SearchIcon";
 import moment from "moment";
 import { redirect } from "next/navigation";
 import { run as Run, race as Race } from "@/src/generated/client";
-import {FormattedRun} from '@/lib/db-helper';
+import { FormattedRun, deleteRun } from "@/lib/db-helper";
 
 type StringFormattedRun = {
   name: string;
@@ -24,6 +24,8 @@ type StringFormattedRun = {
   start_time: string;
   ski_pass: string;
   race_id: string;
+  ldap: string;
+  run_id: string;
 };
 
 type RunsTableProp = {
@@ -138,6 +140,13 @@ export default function AdminRecentRunsTable({ race }: RunsTableProp) {
     },
   });
 
+  const onDeleteRun = useCallback(async (run_id: string) => {
+    console.log("delete run with id", run_id);
+    await deleteRun(run_id);
+    console.log("deleted");
+    await list.reload();
+  }, [list]);
+
   const onSearchChange = useCallback((value: string) => {
     if (value) {
       setSearchValue(value);
@@ -175,49 +184,50 @@ export default function AdminRecentRunsTable({ race }: RunsTableProp) {
   return (
     <div>
       <div className="flex flex-row gap-2 py-2">
-      <Input
-      isClearable
-      className="w-full"
-      placeholder="Search by name..."
-      startContent={<SearchIcon />}
-      value={searchValue}
-      onClear={() => onClear()}
-      onValueChange={onSearchChange}
-      />
-      <Dropdown>
-      <DropdownTrigger>
-      <Button className="capitalize" variant="bordered">
-        {selectedLocation}
-      </Button>
-      </DropdownTrigger>
-      <DropdownMenu
-      disallowEmptySelection
-      aria-label="Single selection example"
-      selectedKeys={selectedLocation}
-      selectionMode="single"
-      variant="flat"
-      onSelectionChange={(keys) => {
-        if (keys.currentKey) setSelectedLocation(keys.currentKey);
-      }}
-      >
-      {locations.map((location) => (
-        <DropdownItem key={location}>{location}</DropdownItem>
-      ))}
-      </DropdownMenu>
-      </Dropdown>
+        <Input
+          isClearable
+          className="w-full"
+          placeholder="Search by name..."
+          startContent={<SearchIcon />}
+          value={searchValue}
+          onClear={() => onClear()}
+          onValueChange={onSearchChange}
+        />
+        <Dropdown>
+          <DropdownTrigger>
+            <Button className="capitalize" variant="bordered">
+              {selectedLocation}
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu
+            disallowEmptySelection
+            aria-label="Single selection example"
+            selectedKeys={selectedLocation}
+            selectionMode="single"
+            variant="flat"
+            onSelectionChange={(keys) => {
+              if (keys.currentKey) setSelectedLocation(keys.currentKey);
+            }}
+          >
+            {locations.map((location) => (
+              <DropdownItem key={location}>{location}</DropdownItem>
+            ))}
+          </DropdownMenu>
+        </Dropdown>
       </div>
       <AdminTableComponent
-      columns={columns}
-      list={{ items: filterList as Iterable<FormattedRun> }}
-      isLoading={isLoading}
-      tableProps={{
-      sortDescriptor: list.sortDescriptor || {
-      column: "start_time",
-      direction: "descending",
-      },
-      onSortChange: list.sort,
-      onRowAction: onRowClick,
-      }}
+        columns={columns}
+        onDeleteRun={onDeleteRun}
+        list={{ items: filterList as Iterable<FormattedRun> }}
+        isLoading={isLoading}
+        tableProps={{
+          sortDescriptor: list.sortDescriptor || {
+            column: "start_time",
+            direction: "descending",
+          },
+          onSortChange: list.sort,
+          onRowAction: onRowClick,
+        }}
       />
     </div>
   );

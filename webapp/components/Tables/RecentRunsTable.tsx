@@ -23,6 +23,7 @@ type StringFormattedRun = {
   location: string;
   start_time: string;
   ski_pass: string;
+  ldap: string;
 };
 
 type RunsTableProp = {

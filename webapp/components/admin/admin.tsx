@@ -26,10 +26,10 @@ export default function Admin({ races, adminRace }: AdminProp) {
     }
   }, []);
 
-  const createNewRace = useCallback(async (name:string) => {
+  const createNewRace = useCallback(async (name: string) => {
     const newRace = await createRace(name);
     console.log("New Race created!", newRace);
-  }, [])
+  }, []);
 
   return (
     <>
@@ -50,7 +50,8 @@ export default function Admin({ races, adminRace }: AdminProp) {
           <>Please select a race</>
         )}
       </div>
-      <br /><br />
+      <br />
+      <br />
       <div>
         CURRENT RACE:{" "}
         <AdminRaceSelect
@@ -67,12 +68,16 @@ export default function Admin({ races, adminRace }: AdminProp) {
           id="raceName"
           className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
         />
-        <button onClick={async () => {
-          const name = (document.getElementById("raceName") as HTMLInputElement).value;
-          if (name.trim()) {
-            await createNewRace(name.trim());
-          }
-        }}>
+        <button
+          onClick={async () => {
+            const name = (
+              document.getElementById("raceName") as HTMLInputElement
+            ).value;
+            if (name.trim()) {
+              await createNewRace(name.trim());
+            }
+          }}
+        >
           Create Race
         </button>
       </div>

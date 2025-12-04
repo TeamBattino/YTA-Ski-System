@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-async-client-component */
 "use client";
-import React, { useCallback } from "react";
+import React from "react";
 import { FormattedRun as Run } from "@/lib/db-helper";
 import {
   Table,
@@ -13,7 +13,6 @@ import {
   getKeyValue,
 } from "@nextui-org/react";
 
-import { deleteRun } from "@/lib/db-helper";
 
 type Column = {
   key: string;
@@ -26,6 +25,7 @@ export type TableComponentProps = {
   list: { items: Iterable<Run> };
   isLoading: boolean;
   tableProps?: React.ComponentProps<typeof Table>;
+  onDeleteRun: (run_id: string) => Promise<void>;
 };
 
 export default function AdminTableComponent({
@@ -33,18 +33,8 @@ export default function AdminTableComponent({
   list,
   isLoading,
   tableProps,
+  onDeleteRun
 }: TableComponentProps) {
-  const deleteRunById = useCallback(async (run_id: string) => {
-    try {
-      console.log("delete run with id", run_id);
-      await deleteRun(run_id);
-      console.log("deleted");
-      return;
-    } catch (error) {
-      console.error("Error registering racer: ", error);
-      alert("An error occurred. Please try again.: " + error);
-    }
-  }, []);
 
   return (
     <Table
@@ -74,7 +64,7 @@ export default function AdminTableComponent({
             {(columnKey) =>
               columnKey == "delete" ? (
                 <TableCell>
-                  <span onClick={async () => console.log("delete")}>
+                  <span onClick={async () => await onDeleteRun(item.run_id)}>
                     {"delete run"}
                   </span>
                 </TableCell>

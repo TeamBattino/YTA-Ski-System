@@ -47,7 +47,7 @@ export default function AdminRaceSelect({
           className="w-[200px] justify-between"
         >
           {race
-            ? races.find((currentRace) => race === currentRace)?.name
+            ? races.find((currentRace) => race.race_id === currentRace.race_id)?.name
             : "Select race..."}
           <ChevronsUpDown className="opacity-50" />
         </Button>

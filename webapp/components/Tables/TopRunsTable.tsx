@@ -1,10 +1,7 @@
 "use client";
 import { useAsyncList } from "react-stately";
 import TableComponent from "./Table";
-import {
-  getTopRuns,
-  Run,
-} from "@/lib/db-helper";
+import { getTopRuns, Run, FormattedRun } from "@/lib/db-helper";
 import { useCallback, useMemo, useState } from "react";
 import {
   Button,
@@ -16,22 +13,24 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../icons/SearchIcon";
 import moment from "moment";
-import { race as Race } from '@/src/generated/client';
+import { race as Race } from "@/src/generated/client";
 
-type FormattedRun = {
+type StringFormattedRun = {
   name: string;
   duration: string;
   location: string;
   start_time: string;
   ski_pass: string;
   race_id: string;
+  ldap: string;
+  run_id: string;
 };
 
 type RunsTableProp = {
-  race : Race;
-}
+  race: Race;
+};
 
-export default function TopRunsTable({race}: RunsTableProp) {
+export default function TopRunsTable({ race }: RunsTableProp) {
   const columns = [
     { key: "name", label: "Name", allowsSorting: true },
     { key: "duration", label: "Duration", allowsSorting: true },
@@ -44,7 +43,7 @@ export default function TopRunsTable({race}: RunsTableProp) {
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("ALL");
-  const list = useAsyncList<FormattedRun>({
+  const list = useAsyncList<StringFormattedRun>({
     async load() {
       const topRuns = await getTopRuns(race.race_id);
       const formattedRuns = topRuns.map((run: Run) => {
@@ -57,27 +56,27 @@ export default function TopRunsTable({race}: RunsTableProp) {
           ...run,
           duration: formattedDuration,
           start_time: moment(run.start_time).format("HH:mm D/M/YY"),
-        } as unknown as FormattedRun;
+        } as unknown as StringFormattedRun;
       });
-      const nonNullFormattedRuns = formattedRuns.filter(
-        (run): run is FormattedRun => run !== undefined
+      const nonNullStringFormattedRuns = formattedRuns.filter(
+        (run): run is StringFormattedRun => run !== undefined
       );
 
       setIsLoading(false);
       return {
-        items: nonNullFormattedRuns,
+        items: nonNullStringFormattedRuns,
       };
     },
     async sort({ items, sortDescriptor }) {
       return {
-        items: items.sort((a: FormattedRun, b: FormattedRun) => {
+        items: items.sort((a: StringFormattedRun, b: StringFormattedRun) => {
           if (sortDescriptor.column === "start_time") {
             const first = moment(
-              a[sortDescriptor.column as keyof FormattedRun],
+              a[sortDescriptor.column as keyof StringFormattedRun],
               "HH:mm D/M/YY"
             );
             const second = moment(
-              b[sortDescriptor.column as keyof FormattedRun],
+              b[sortDescriptor.column as keyof StringFormattedRun],
               "HH:mm D/M/YY"
             );
             let cmp = first.isBefore(second) ? -1 : 1;
@@ -117,8 +116,8 @@ export default function TopRunsTable({race}: RunsTableProp) {
             }
             return cmp;
           } else {
-            const first = a[sortDescriptor.column as keyof FormattedRun];
-            const second = b[sortDescriptor.column as keyof FormattedRun];
+            const first = a[sortDescriptor.column as keyof StringFormattedRun];
+            const second = b[sortDescriptor.column as keyof StringFormattedRun];
             let cmp =
               (parseInt(first as string) || first) <
               (parseInt(second as string) || second)
@@ -188,7 +187,7 @@ export default function TopRunsTable({race}: RunsTableProp) {
             selectionMode="single"
             variant="flat"
             onSelectionChange={(keys) => {
-              keys.currentKey && setSelectedLocation(keys.currentKey);
+              if (keys.currentKey) setSelectedLocation(keys.currentKey);
             }}
           >
             {locations.map((location) => (
@@ -199,7 +198,7 @@ export default function TopRunsTable({race}: RunsTableProp) {
       </div>
       <TableComponent
         columns={columns}
-        list={{ items: filterList }}
+        list={{ items: filterList as Iterable<FormattedRun> }}
         isLoading={isLoading}
         tableProps={{
           sortDescriptor: list.sortDescriptor || {
