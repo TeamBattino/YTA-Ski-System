@@ -31,7 +31,7 @@ export default function WithoutConsistency({
         to each other in time.
       </p>
       <p>
-        View recent runs or click an entry to view the persons current
+        View recent runs or toggle the switch again to view people&apos;s current
         consistency.
       </p>
       <h2 className="py-2 text-xl font-bold">Recent Runs</h2>
