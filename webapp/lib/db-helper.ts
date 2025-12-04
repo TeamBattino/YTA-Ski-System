@@ -307,7 +307,7 @@ export async function getCurrentRace() {
 }
 
 export async function getShowConsistency() {
-  const showConsistency = await prisma.$queryRaw`
+  const showConsistency = await prisma.$queryRaw<Array<{ value: string }>>`
         SELECT
             value
         FROM
