@@ -85,6 +85,7 @@ export async function getAllConsistency(race_id: string) {
                 ski_pass,
                 name,
                 ldap,
+                race_id,
                 location,
                 ABS(MAX(duration) - MIN(duration)) as consistency
             FROM
