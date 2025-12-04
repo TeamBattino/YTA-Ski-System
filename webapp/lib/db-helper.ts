@@ -14,7 +14,7 @@ export interface Consistency {
 
 export type CurrentRace = {
   race_id: string;
-}
+};
 
 export type FormattedRun = {
   name: string;
@@ -165,10 +165,10 @@ export async function getRecentRuns(race_id: string) {
 
 /** Create */
 
-export async function createRace(name:string){
+export async function createRace(name: string) {
   const newRace = await prisma.race.create({
     data: {
-      name: name
+      name: name,
     },
   });
   return newRace;
@@ -246,16 +246,76 @@ export async function getRaces() {
   return races;
 }
 
-export async function getCurrentRace() {
-  const currentRace = await prisma.$queryRaw<Race[]>`
+export async function getRacers() {
+  const racers = await prisma.$queryRaw<Racer[]>`
         SELECT
             r.*
         FROM
-            current_race cr
-        JOIN
-            race r ON cr.race_id = r.race_id
+            racer r
     `;
+  return racers;
+}
+
+export async function getRacer(ski_pass: string) {
+  const current_race = await getCurrentRace();
+  const racers = await prisma.$queryRaw<Racer[]>`
+    WITH RacerRuns AS (
+      SELECT
+        r.duration
+      FROM
+        run r
+      WHERE r.race_id = ${current_race.race_id} AND r.ski_pass = ${ski_pass}
+      GROUP BY r.race_id, r.ski_pass, r.duration, r.start_time
+      ORDER BY
+        r.start_time DESC
+      LIMIT 2
+    ),
+    Consistency AS (
+      SELECT
+        ABS(MAX(duration) - MIN(duration)) as consistency
+      FROM
+        RacerRuns
+      HAVING COUNT(*) = 2
+    )
+    SELECT
+      r.*,
+      c.consistency
+    FROM
+      racer r
+    LEFT JOIN
+      Consistency c ON 1=1
+    WHERE
+      r.ski_pass = ${ski_pass} AND r.race_id = ${current_race.race_id}  
+    `;
+  if (racers.length === 0) {
+    throw new Error("Racer not found");
+  }
+  return racers[0];
+}
+
+export async function getCurrentRace() {
+  const currentRace = await prisma.$queryRaw<Race[]>`
+    SELECT
+      r.*
+    FROM
+      settings s
+    JOIN
+      race r ON s.value::uuid = r.race_id
+    WHERE s.key = 'current_race'
+  `;
   return currentRace[0];
+}
+
+export async function getShowConsistency() {
+  const showConsistency = await prisma.$queryRaw<string>`
+        SELECT
+            value
+        FROM
+            settings s
+        WHERE s.key = 'show_consistency'
+    `;
+  
+  return showConsistency == "true";
 }
 
 export async function getAdminByEmail(email: string) {
@@ -270,12 +330,31 @@ export async function getAdminByEmail(email: string) {
   return admins;
 }
 
-export async function fetchRacerBySkiPass(ski_pass: string, race_id: string) {
+export async function getRacerRunsBySkipass(ski_pass: string) {
+  const current_race = await getCurrentRace();
+  const runsOfRacer = await prisma.$queryRaw<Run[]>`SELECT
+            r.*,
+            racer.name,
+            racer.ldap,
+            racer.location
+        FROM
+            run r
+        JOIN
+            racer ON r.ski_pass = racer.ski_pass  AND r.race_id = racer.race_id
+        WHERE r.race_id = ${current_race.race_id} AND racer.race_id = ${current_race.race_id} AND r.ski_pass = ${ski_pass}
+        GROUP BY racer.race_id, r.start_time, r.duration, r.ski_pass, r.run_id, r.race_id, racer.name, racer.ldap, racer.location
+        ORDER BY
+            r.start_time DESC`;
+  return runsOfRacer;
+}
+
+export async function fetchRacerBySkiPass(ski_pass: string) {
+  const race = await getCurrentRace();
   let racer = (await prisma.racer.findUnique({
     where: {
       racer_identifier: {
         ski_pass: ski_pass,
-        race_id: race_id,
+        race_id: race.race_id,
       },
     },
   })) as Racer;
@@ -289,7 +368,7 @@ export async function fetchRacerBySkiPass(ski_pass: string, race_id: string) {
       'unregistered${
         (await prisma.$queryRaw<number>`SELECT COUNT(*) FROM racer;`) + 1
       }',
-      ${race_id},
+      ${race.race_id},
       ${ski_pass},
       'ZRH'
       )
@@ -322,11 +401,21 @@ export async function updateRun(run: Run) {
 
 export async function updateCurrentRace(race: Race) {
   const updatedRace = await prisma.$queryRaw<CurrentRace>`
-    UPDATE current_race
-    SET race_id = ${race.race_id}
+    UPDATE settings
+    SET value = ${race.race_id}
+    WHERE key = 'current_race';
   `;
-  
+
   return updatedRace;
+}
+
+export async function updateShowConsistency(showConsistency: boolean) {
+  const updatedShowConsistency = await prisma.$queryRaw<string>`
+    UPDATE settings
+    SET value = ${showConsistency as unknown as string}
+    WHERE key = 'show_consistency';
+  `;
+  return updatedShowConsistency;
 }
 
 /** Delete */
