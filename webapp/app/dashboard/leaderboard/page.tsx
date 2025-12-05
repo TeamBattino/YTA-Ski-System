@@ -7,6 +7,7 @@ export default async function Page() {
   const currentRace = await getCurrentRace();
   const showConsistency = await getShowConsistency();
 
+  console.log("Show Consistency", showConsistency);
   if (showConsistency) {
     return (
       <>
