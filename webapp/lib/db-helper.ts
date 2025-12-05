@@ -369,7 +369,7 @@ export async function fetchRacerBySkiPass(ski_pass: string) {
       ${ldap},
       ${race.race_id},
       ${ski_pass},
-      'ZRH'
+      ''
       )
       RETURNING *;
     `;
