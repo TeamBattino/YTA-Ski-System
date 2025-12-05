@@ -20,6 +20,7 @@ export default function Admin({ races, adminRace, defaultValue }: AdminProp) {
   const [race, setRace] = useState<Race>(adminRace);
   const [currentRace, setCurrentRace] = useState<Race>(adminRace);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [raceName, setRaceName] = useState<string>("");
 
   console.log(adminRace);
 
@@ -47,13 +48,6 @@ export default function Admin({ races, adminRace, defaultValue }: AdminProp) {
         <RaceSelect races={races} setRace={setRace} currentRace={adminRace} />
       </div>
       <div>
-        <button
-          onClick={() => signOut({ redirectTo: "/dashboard/leaderboard" })}
-        >
-          Sign Out
-        </button>
-      </div>
-      <div>
         {race ? (
           <AdminRecentRunsTable race={race} />
         ) : (
@@ -70,37 +64,56 @@ export default function Admin({ races, adminRace, defaultValue }: AdminProp) {
           currentRace={currentRace}
         />
         {currentRace.race_id != adminRace.race_id ? (
-            <Button
+          <Button
             onClick={async () => await currentRaceOnChange()}
             disabled={isLoading}
-            >
-            {isLoading ? "Saving..." : "Save Changes"}
-            </Button>
+            className="m-4"
+          >
+            {isLoading ? "Saving..." : "Save Change"}
+          </Button>
         ) : (
           <></>
         )}
       </div>
       <ShowConsistencySwitch defaultValue={defaultValue} />
-      <div>
-        CREATE RACE: <br />
+      <div className="flex items-center space-x-2 my-4">
         <input
           type="text"
           placeholder="Enter race name"
           id="raceName"
-          className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
+          value={raceName}
+          onChange={(e) => setRaceName(e.target.value)}
+          className="rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
         />
-        <button
-          onClick={async () => {
-            const name = (
-              document.getElementById("raceName") as HTMLInputElement
-            ).value;
-            if (name.trim()) {
-              await createNewRace(name.trim());
-            }
-          }}
+        {raceName.trim() ? (
+          <Button
+            onClick={async () => {
+              const raceExists = races.some(
+                (r) => r.name?.toLowerCase() === raceName.trim().toLowerCase()
+              );
+              if (raceExists) {
+                alert("A race with this name already exists.");
+              } else {
+                await createNewRace(raceName.trim());
+                window.location.reload();
+              }
+              setRaceName("");
+            }}
+            className="mx-4"
+          >
+            Create Race
+          </Button>
+        ) : (
+          <></>
+        )}
+      </div>
+      <div>
+        <Button
+          onClick={() => signOut({ redirectTo: "/dashboard/leaderboard" })}
+          className="my-4"
         >
-          Create Race
-        </button>
+          Sign Out
+        </Button>
       </div>
     </>
   );
