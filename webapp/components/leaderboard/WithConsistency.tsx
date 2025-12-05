@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { race as Race } from "@/src/generated/client";
 import RaceSelect from "@/components/RaceSelect";
 import ConsistencyTable from "@/components/Tables/ConsistencyTable";
@@ -15,8 +16,11 @@ export default function WithConsistency({
   races,
   currentRace,
 }: LeaderboardProp) {
+  const router = useRouter();
   const [race, setRace] = useState<Race>(currentRace);
-
+  useEffect(() => {
+    router.refresh();
+  }, [router]);
   return (
     <>
       <h1 className="py-2 text-2xl font-bold">Leaderboards</h1>
