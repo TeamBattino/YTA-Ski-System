@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { race as Race } from "@/src/generated/client";
 import RaceSelect from "@/components/RaceSelect";
-import { useRouter } from "next/navigation"
 import RecentRunsTable from "@/components/Tables/RecentRunsTable";
 import TopRunsTable from "@/components/Tables/TopRunsTable";
 
@@ -17,10 +16,6 @@ export default function WithoutConsistency({
   currentRace,
 }: LeaderboardProp) {
   const [race, setRace] = useState<Race>(currentRace);
-  const router = useRouter();
-  useEffect(() => {
-      router.refresh();
-    }, [router]);
   return (
     <>
       <h1 className="py-2 text-2xl font-bold">Leaderboards</h1>
