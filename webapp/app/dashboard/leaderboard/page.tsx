@@ -2,6 +2,8 @@ import { getRaces, getCurrentRace, getShowConsistency } from "@/lib/db-helper";
 import WithConsistency from "@/components/leaderboard/WithConsistency";
 import WithoutConsistency from "@/components/leaderboard/WithoutConsistency";
 
+export const dynamic = 'force-dynamic';
+
 export default async function Page() {
   const races = await getRaces();
   const currentRace = await getCurrentRace();

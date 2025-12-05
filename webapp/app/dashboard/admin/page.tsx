@@ -3,6 +3,8 @@ import { auth } from "../../../auth";
 import { redirect } from "next/navigation";
 import { getRaces, getCurrentRace, getShowConsistency } from "@/lib/db-helper";
 
+export const dynamic = 'force-dynamic';
+
 export default async function Page() {
   const session = await auth();
   const races = await getRaces();
