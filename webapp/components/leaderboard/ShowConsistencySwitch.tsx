@@ -18,7 +18,6 @@ export default function ShowConsistencySwitch({
     await updateShowConsistency(!defaultValue);
     setShowConsistency(!showConsistency);
   }, [defaultValue, showConsistency]);
-  console.log("Consistency Switch", defaultValue);
   return (
     <div className="flex items-center space-x-2 my-4">
       <Label htmlFor="show-consistency">Show Consistency</Label>

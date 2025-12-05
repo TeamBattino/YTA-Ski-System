@@ -313,7 +313,6 @@ export async function getShowConsistency() {
             settings s
         WHERE s.key = 'show_consistency'
     `;
-  console.log("Consistency", showConsistency);
   return showConsistency[0]?.value == "true";
 }
 
@@ -357,14 +356,12 @@ export async function fetchRacerBySkiPass(ski_pass: string) {
       },
     },
   })) as Racer | null;
-  console.log("Racer without ID", racer);
   if (racer == null) {
     const userNumber = await prisma.$queryRaw<
       Array<{ next_racer_number: number }>
     >`SELECT COUNT(*)+1 AS next_racer_number FROM racer WHERE race_id = ${race.race_id}`;
     const name = "Unregistered User #" + userNumber[0].next_racer_number;
     const ldap = "unregistered" + userNumber[0].next_racer_number;
-    console.log("User number", userNumber[0].next_racer_number);
     const racers = await prisma.$queryRaw<Racer[]>`
       INSERT INTO racer(name, ldap, race_id, ski_pass, location)
       VALUES (
@@ -378,7 +375,6 @@ export async function fetchRacerBySkiPass(ski_pass: string) {
     `;
     racer = racers[0];
   }
-  console.log("new created racer", racer);
   return racer;
 }
 

@@ -22,8 +22,6 @@ export default function Admin({ races, adminRace, defaultValue }: AdminProp) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [raceName, setRaceName] = useState<string>("");
 
-  console.log(adminRace);
-
   function hasValidName(race: Race): race is Race & { name: string } {
     return race.name !== null && race.name !== undefined;
   }
