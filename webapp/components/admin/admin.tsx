@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from "react";
 import AdminRecentRunsTable from "@/components/Tables/AdminRecentRunsTable";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { race as Race } from "@/src/generated/client";
 import { updateCurrentRace, createRace } from "@/lib/db-helper";
 import RaceSelect from "@/components/RaceSelect";
@@ -21,6 +22,7 @@ export default function Admin({ races, adminRace, defaultValue }: AdminProp) {
   const [currentRace, setCurrentRace] = useState<Race>(adminRace);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [raceName, setRaceName] = useState<string>("");
+  const router = useRouter();
 
   function hasValidName(race: Race): race is Race & { name: string } {
     return race.name !== null && race.name !== undefined;
@@ -30,15 +32,17 @@ export default function Admin({ races, adminRace, defaultValue }: AdminProp) {
     setIsLoading(true);
     if (hasValidName(currentRace)) {
       await updateCurrentRace(currentRace);
+      router.refresh();
       window.location.reload();
     }
     setIsLoading(false);
-  }, [currentRace]);
+  }, [currentRace, router]);
 
   const createNewRace = useCallback(async (name: string) => {
     const newRace = await createRace(name);
     console.log("New Race created!", newRace);
-  }, []);
+    router.refresh();
+  }, [router]);
 
   return (
     <>
