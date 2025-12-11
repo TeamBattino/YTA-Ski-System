@@ -132,7 +132,7 @@ export async function getTopRuns(race_id: string) {
     WHERE r.race_id = ${race_id}
     AND r.run_id IN (
     SELECT DISTINCT ON (ski_pass) run_id FROM run
-    WHERE race_id = ${race_id}
+    WHERE race_id = ${race_id} AND duration > 0
     ORDER BY ski_pass, duration ASC
     )
     GROUP BY r.ski_pass, r.race_id, r.run_id, r.start_time, racer.name, racer.ldap, racer.location, r.duration
@@ -313,7 +313,6 @@ export async function getShowConsistency() {
             settings s
         WHERE s.key = 'show_consistency'
     `;
-    console.log("Show Consistency From DB", showConsistency[0]?.value == "true");
   return showConsistency[0]?.value == "true";
 }
 
