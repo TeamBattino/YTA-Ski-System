@@ -5,12 +5,15 @@
  */
 
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Image } from 'react-native';
 import { Button, Badge } from '@/components/atoms';
 import { InputField, NfcScanner } from '@/components/molecules';
 import { LocationSelector, RaceSelector } from '@/components/organisms';
 import { Colors, Typography } from '@/constants';
 import { Race, Location } from '@/types';
+
+// Header Logo - logo at: assets/images/ytads-logo.png
+const LOGO_IMAGE = require('@/assets/images/ytads_logo.png');
 
 // Mock races - will be fetched from API later
 const MOCK_RACES: Race[] = [
@@ -65,8 +68,14 @@ export default function Registration() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Title */}
-      <Text style={styles.title}>Registration</Text>
+      {/* Header Banner */}
+      <View style={styles.headerBanner}>
+        <Image 
+          source={LOGO_IMAGE} 
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
 
       {/* NFC Scanner */}
       <View style={styles.section}>
@@ -141,21 +150,33 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   content: {
-    padding: 20,
     alignItems: 'center',
   },
-  title: {
-    ...Typography.title,
-    color: Colors.primary,
-    marginBottom: 24,
-    marginTop: 10,
+  headerBanner: {
+    width: '93%',
+    height: 80,
+    backgroundColor: '#60a5fa', // Blue background like in the image
+    justifyContent: 'flex-start',
+    marginBottom: 8,
+    marginTop: 16,
+    marginLeft: 30,
+    marginRight: 30,
+    padding: 8,
+    paddingLeft: 20,
+    borderRadius: 8,
+  },
+  logo: {
+    width: '40%',
+    height: 62.14,
   },
   section: {
     width: '100%',
     maxWidth: 320,
     marginBottom: 20,
+    paddingHorizontal: 20,
   },
   spacer: {
     height: 40,
   },
 });
+

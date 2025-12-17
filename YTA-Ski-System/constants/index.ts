@@ -21,7 +21,7 @@ export const Colors = {
   primaryDark: '#1d4ed8',
 
   // Background
-  background: '#f9fafb',
+  background: '#ffffff',
   backgroundWhite: '#ffffff',
 
   // Text
