@@ -23,6 +23,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.badge.plus" color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="webview"
+        options={{
+          title: 'Leaderboard',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="trophy.fill" color={color} />,
+        }}
+      />
     </Tabs>
   );
 }
