@@ -1,5 +1,7 @@
+/* eslint-disable @next/next/no-async-client-component */
 "use client";
 import React from "react";
+import { FormattedRun as Run } from "@/lib/db-helper";
 import {
   Table,
   TableHeader,
@@ -7,15 +9,9 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  getKeyValue,
   Spinner,
-  Button,
+  getKeyValue,
 } from "@nextui-org/react";
-import {
-  deleteRun,
-} from "@/lib/db-helper";
-
-import { DeleteIcon } from "@/components/common/icons/lucide-delete";
 
 
 type Column = {
@@ -26,9 +22,10 @@ type Column = {
 
 export type TableComponentProps = {
   columns: Array<Column>;
-  list: { items: Iterable<any> };
+  list: { items: Iterable<Run> };
   isLoading: boolean;
   tableProps?: React.ComponentProps<typeof Table>;
+  onDeleteRun: (run_id: string) => Promise<void>;
 };
 
 export default function AdminTableComponent({
@@ -36,18 +33,8 @@ export default function AdminTableComponent({
   list,
   isLoading,
   tableProps,
+  onDeleteRun
 }: TableComponentProps) {
-  async function deleteRunById(
-    run_id: string
-  ): Promise<React.MouseEventHandler<HTMLButtonElement> | undefined> {
-    try {
-      await deleteRun(run_id);
-      return;
-    } catch (error) {
-      console.error("Error registering racer: ", error);
-      alert("An error occurred. Please try again.: " + error);
-    }
-  }
 
   return (
     <Table
@@ -73,16 +60,19 @@ export default function AdminTableComponent({
         loadingContent={<Spinner label="Loading..." />}
       >
         {(item) => (
-          <>
-            <TableRow key={item.run_id ? item.run_id : item.name}>
-              {(columnKey) => (
+          <TableRow key={item.run_id ? item.run_id : item.name}>
+            {(columnKey) =>
+              columnKey == "delete" ? (
+                <TableCell>
+                  <span onClick={async () => await onDeleteRun(item.run_id)}>
+                    {"delete run"}
+                  </span>
+                </TableCell>
+              ) : (
                 <TableCell>{getKeyValue(item, columnKey)}</TableCell>
-              )}
-            </TableRow>
-            <Button onPress={e => deleteRunById(item.run_id)}>
-              <DeleteIcon />
-            </Button>
-          </>
+              )
+            }
+          </TableRow>
         )}
       </TableBody>
     </Table>

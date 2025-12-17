@@ -1,4 +1,4 @@
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -18,15 +18,22 @@ import {
 
 import { race as Race } from "@/src/generated/client";
 
-type SetRaceInterface = Dispatch<SetStateAction<Race>>;
-
-type RaceSelectProps = {
+type AdminRaceSelectProps = {
   races: Race[];
-  setRace: SetRaceInterface;
+  setRace: React.Dispatch<
+    React.SetStateAction<{
+      name: string | null;
+      race_id: string;
+    }>
+  >;
   currentRace: Race;
 };
 
-export default function RaceSelect({ races, setRace, currentRace }: RaceSelectProps) {
+export default function AdminRaceSelect({
+  races,
+  setRace,
+  currentRace,
+}: AdminRaceSelectProps) {
   const [open, setOpen] = useState(false);
   const [race, setRaceLocal] = useState<Race>(currentRace);
 
@@ -40,7 +47,8 @@ export default function RaceSelect({ races, setRace, currentRace }: RaceSelectPr
           className="w-[200px] justify-between"
         >
           {race
-            ? races.find((singleRace) => race.race_id === singleRace.race_id)?.name
+            ? races.find((currentRace) => race.race_id === currentRace.race_id)
+                ?.name
             : "Select race..."}
           <ChevronsUpDown className="opacity-50" />
         </Button>
@@ -51,11 +59,11 @@ export default function RaceSelect({ races, setRace, currentRace }: RaceSelectPr
           <CommandList>
             <CommandEmpty>No race found.</CommandEmpty>
             <CommandGroup>
-              {races.map((singleRace) =>
-                singleRace.name && singleRace.race_id ? (
+              {races.map((currentRace) =>
+                currentRace.name && currentRace.race_id ? (
                   <CommandItem
-                    key={singleRace.race_id}
-                    value={singleRace.name}
+                    key={currentRace.race_id}
+                    value={currentRace.name}
                     onSelect={(currentValue) => {
                       const newRaceValue = races.find(
                         (raceWithName) => currentValue === raceWithName.name
@@ -65,11 +73,11 @@ export default function RaceSelect({ races, setRace, currentRace }: RaceSelectPr
                       setOpen(false);
                     }}
                   >
-                    {singleRace.name}
+                    {currentRace.name}
                     <Check
                       className={cn(
                         "ml-auto",
-                        singleRace === race ? "opacity-100" : "opacity-0"
+                        currentRace === race ? "opacity-100" : "opacity-0"
                       )}
                     />
                   </CommandItem>

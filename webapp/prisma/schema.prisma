@@ -41,3 +41,7 @@ model admin {
   email String @unique
 }
 
+model settings {
+  key String @id
+  value String
+}

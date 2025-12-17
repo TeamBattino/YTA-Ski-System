@@ -11,6 +11,8 @@ import {
   Spinner,
 } from "@nextui-org/react";
 
+import {FormattedRun} from '@/lib/db-helper';
+
 type Column = {
   key: string,
   label: string,
@@ -19,7 +21,7 @@ type Column = {
 
 export type TableComponentProps = {
   columns: Array<Column>;
-  list: { items: Iterable<any> };
+  list: { items: Iterable<FormattedRun> };
   isLoading: boolean;
   tableProps?: React.ComponentProps<typeof Table>;
 };
