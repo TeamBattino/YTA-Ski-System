@@ -51,7 +51,7 @@ export default function Registration() {
         }, 1000);
       } else {
         // Real NFC implementation (for Development Build)
-        // TODO: Implement with react-native-nfc-manager
+        // TODO @Michelmahadeva: Implement with react-native-nfc-manager
         setNfcMessage('NFC scanning...');
       }
     } catch (error) {
@@ -113,12 +113,12 @@ export default function Registration() {
       {/* NFC Scanner */}
       <View style={styles.section}>
         <TouchableOpacity style={styles.scanButton} onPress={handleNfcScan}>
-          <Text style={styles.scanButtonText}>📱 Scan Card with Phone</Text>
+          <Text style={styles.scanButtonText}>Scan Card with Phone</Text>
         </TouchableOpacity>
         {nfcMessage ? <Text style={styles.nfcMessage}>{nfcMessage}</Text> : null}
         {skiPass && (
           <View style={styles.skiPassBadge}>
-            <Text style={styles.skiPassText}>✅ Ski Pass: {skiPass}</Text>
+            <Text style={styles.skiPassText}>Ski Pass: {skiPass}</Text>
           </View>
         )}
       </View>
@@ -137,7 +137,7 @@ export default function Registration() {
 
       {/* LDAP Input */}
       <View style={styles.section}>
-        <Text style={styles.label}>Your LDAP (without @google)</Text>
+        <Text style={styles.label}>Your LDAP (without @google.com)</Text>
         <TextInput
           style={styles.input}
           value={ldap}
