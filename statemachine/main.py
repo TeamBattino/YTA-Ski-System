@@ -71,6 +71,8 @@ alpenhunde_thread.start()
 api = ApiClient(ENV_API_URL)
 
 cancel_timer = None
+last_call_time = 0
+DEBOUNCE_INTERVAL = 1.0  # seconds
 
 def transition_if_still_cancelling():
     """Timer callback: only moves to RUNNING if nothing else changed the state."""
@@ -78,8 +80,15 @@ def transition_if_still_cancelling():
         state_machine.current_state = StateMachineState.RUNNING
 
 def panic_button_call():
-    global cancel_timer
+    global cancel_timer, last_call_time
     
+    current_time = time.time()
+    
+    if current_time - last_call_time < DEBOUNCE_INTERVAL:
+        return 
+    
+    last_call_time = current_time
+
     if state_machine.current_state == StateMachineState.CANCELLING:
         if cancel_timer:
             cancel_timer.cancel()
