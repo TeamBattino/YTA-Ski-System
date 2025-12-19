@@ -45,13 +45,16 @@ class AlpenhundeUI:
         self.root.bind("<Key>", self.onKeyPress)
 
     def onKeyPress(self, event: tk.Event):
-        if self.state_machine.current_state == StateMachineState.IDLE:
+        if self.state_machine.current_state == StateMachineState.IDLE or (self.state_machine.current_state == StateMachineState.RUNNING and self.state_machine.next_user.rfid == ""):
             self.rfid += event.char
             if event.char == "\r":
 
                 os.system("espeak -a 400 'detected skee paass' &")
                 clean_rfid = self.rfid.strip().lower()
-                self.state_machine.user.rfid = clean_rfid
+                if self.state_machine.current_state == StateMachineState.IDLE:
+                    self.state_machine.user.rfid = clean_rfid
+                else:
+                    self.state_machine.next_user.rfid = clean_rfid
                 self.rfid = ""
                 self.user_update_event.set()
 

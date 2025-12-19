@@ -13,6 +13,9 @@ class ApiClient:
         if response.status_code == 404:
             print(f"User {ski_pass} not found")
             return User("Unregistered User","Unregistered User")
+        if response.status_code == 500:
+            print("Internal Server Error")
+            return User("Internal Server Error", "Internal Server Error")
         req_user = response.json()
         print(req_user)
         if response.status_code == 200:

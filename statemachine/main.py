@@ -43,7 +43,7 @@ ENV_API_URL = os.getenv("API_DOMAIN")
 ENV_AUTH_SECRET = os.getenv("AUTH_SECRET")
 
 """ Shared state variables here """
-statemachine = StateMachine(StateMachineState.IDLE, -1, User("", ""), False, False)
+statemachne = StateMachine(StateMachineState.IDLE, -1, User("", ""), False, False, User("",""))
 
 """ Threads created here """
 panic_event = Event()
@@ -93,12 +93,16 @@ def panic_button_call():
         cancel_timer.start()
 
 def update_user():
-    user = api.getUser(statemachine.user.rfid)
-    if(statemachine.next_user):
-        statemachine.user = statemachine.next_user
-        statemachine.next_user = user
+    next_user = None
+    if statemachne.current_state == StateMachineState.RUNNING:
+        next_user = api.getUser(statemachne.next_user.rfid)
     else:
-        statemachine.next_user = user
+        user = api.getUser(statemachne.user.rfid)
+    if(next_user):
+        statemachne.next_user = next_user
+    else:
+        statemachne.user = user
+        statemachne.next_user = User("","")
 
 user_update_event = Event()
 ui = AlpenhundeUI(statemachine, user_update_event)
@@ -110,8 +114,9 @@ while True:
         statemachine.loading = True
         ui.update_state()
         update_user()
-        statemachine.loading = False
-        statemachine.current_state = StateMachineState.REGISTERED
+        statemachne.loading = False
+        if statemachne.next_user.rfid == "":
+            statemachne.current_state = StateMachineState.REGISTERED
         user_update_event.clear()
     if not message_queue.empty():
         message = message_queue.get()
@@ -135,8 +140,12 @@ while True:
     if race_finished_event.is_set():
         statemachine.loading = True
         ui.update_state()
-        api.postRace(statemachine.user.rfid, statemachine.last_race_time)
-        statemachine.loading = False
+        api.postRace(statemachne.user.rfid, statemachne.last_race_time)
+        if statemachne.next_user.rfid != "":
+            statemachne.user = statemachne.next_user
+            statemachne.next_user = User("","")
+            statemachne.current_state = StateMachineState.REGISTERED
+        statemachne.loading = False
         race_finished_event.clear()
     if panic_event.is_set():
         panic_button_call()
