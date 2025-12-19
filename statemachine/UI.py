@@ -95,6 +95,11 @@ class AlpenhundeUI:
                     "Your time starts as soon as you open the gate.",
                     "READY",
                 )
+            case StateMachineState.CANCELLING:
+                 return (
+                        "Do you really want to cancel the run? \nPress again if yes.",
+                        "NOT_READY",
+                    )
             case StateMachineState.RUNNING:
                 if self.state_machine.next_user == None:
                     return (

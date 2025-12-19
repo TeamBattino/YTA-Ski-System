@@ -5,6 +5,7 @@ class StateMachineState(Enum):
     IDLE = 1
     REGISTERED = 2
     RUNNING = 3
+    CANCELLING = 4
 
 @dataclass
 class User:

@@ -69,9 +69,28 @@ alpenhunde_thread.start()
 """ Main thread Functions here """
 api = ApiClient(ENV_API_URL)
 
+cancel_timer = None
+
+def transition_if_still_cancelling():
+    """Timer callback: only moves to RUNNING if nothing else changed the state."""
+    if state_machine.current_state == StateMachineState.CANCELLING:
+        state_machine.current_state = StateMachineState.RUNNING
+
 def panic_button_call():
-    statemachine.current_state = StateMachineState.IDLE
-    os.system('espeak -a 400 "RESET RACER"')
+    global cancel_timer
+    
+    if state_machine.current_state == StateMachineState.CANCELLING:
+        if cancel_timer:
+            cancel_timer.cancel()
+        
+        state_machine.current_state = StateMachineState.IDLE
+        os.system('espeak -a 400 "RESET RACER" &')
+        
+    else:
+        state_machine.current_state = StateMachineState.CANCELLING
+        
+        cancel_timer = threading.Timer(5.0, transition_if_still_cancelling)
+        cancel_timer.start()
 
 def update_user():
     user = api.getUser(statemachine.user.rfid)
