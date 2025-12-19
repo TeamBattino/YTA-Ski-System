@@ -1,6 +1,7 @@
+/* eslint-disable @next/next/no-async-client-component */
 "use client";
 import React from "react";
-import { Spinner, Button } from "@nextui-org/react";
+import { FormattedRun as Run } from "@/lib/db-helper";
 import {
   Table,
   TableHeader,
@@ -8,13 +9,10 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Spinner,
   getKeyValue,
-  Tooltip,
-} from "@heroui/react";
+} from "@nextui-org/react";
 
-import { deleteRun } from "@/lib/db-helper";
-
-import { DeleteIcon } from "@/components/common/icons/lucide-delete";
 
 type Column = {
   key: string;
@@ -24,9 +22,10 @@ type Column = {
 
 export type TableComponentProps = {
   columns: Array<Column>;
-  list: { items: Iterable<any> };
+  list: { items: Iterable<Run> };
   isLoading: boolean;
   tableProps?: React.ComponentProps<typeof Table>;
+  onDeleteRun: (run_id: string) => Promise<void>;
 };
 
 export default function AdminTableComponent({
@@ -34,18 +33,8 @@ export default function AdminTableComponent({
   list,
   isLoading,
   tableProps,
+  onDeleteRun
 }: TableComponentProps) {
-  async function deleteRunById(
-    run_id: string
-  ): Promise<React.MouseEventHandler<HTMLButtonElement> | undefined> {
-    try {
-      await deleteRun(run_id);
-      return;
-    } catch (error) {
-      console.error("Error registering racer: ", error);
-      alert("An error occurred. Please try again.: " + error);
-    }
-  }
 
   return (
     <Table
@@ -71,25 +60,19 @@ export default function AdminTableComponent({
         loadingContent={<Spinner label="Loading..." />}
       >
         {(item) => (
-          <>
-            <TableRow key={item.run_id ? item.run_id : item.name}>
-              {(columnKey) =>
-                columnKey === "delete" ? (
-                  <TableCell>
-                    <div className="relative flex items-center gap-2">
-                      <Tooltip color="danger" content="Delete user">
-                        <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                          <DeleteIcon onClick={() => deleteRunById(item.run_id)}/>
-                        </span>
-                      </Tooltip>
-                    </div>
-                  </TableCell>
-                ) : (
-                  <TableCell>{getKeyValue(item, columnKey)}</TableCell>
-                )
-              }
-            </TableRow>
-          </>
+          <TableRow key={item.run_id ? item.run_id : item.name}>
+            {(columnKey) =>
+              columnKey == "delete" ? (
+                <TableCell>
+                  <span onClick={async () => await onDeleteRun(item.run_id)}>
+                    {"delete run"}
+                  </span>
+                </TableCell>
+              ) : (
+                <TableCell>{getKeyValue(item, columnKey)}</TableCell>
+              )
+            }
+          </TableRow>
         )}
       </TableBody>
     </Table>

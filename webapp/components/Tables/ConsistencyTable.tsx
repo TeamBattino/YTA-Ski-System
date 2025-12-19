@@ -1,7 +1,7 @@
 "use client";
 import { useAsyncList } from "react-stately";
 import TableComponent from "./Table";
-import { Consistency, getAllConsistency } from "@/lib/db-helper";
+import { Consistency, FormattedRun, getAllConsistency } from "@/lib/db-helper";
 import { useCallback, useMemo, useState } from "react";
 import {
   Button,
@@ -12,13 +12,13 @@ import {
   Input,
 } from "@nextui-org/react";
 import { SearchIcon } from "../icons/SearchIcon";
-import { race as Race } from '@/src/generated/client';
+import { race as Race } from "@/src/generated/client";
 
 type RunsTableProp = {
-  race : Race;
-}
+  race: Race;
+};
 
-export default function ConsistencyTable({race}: RunsTableProp) {
+export default function ConsistencyTable({ race }: RunsTableProp) {
   const columns = [
     { key: "name", label: "Name", allowsSorting: true },
     { key: "consistency", label: "Consistency", allowsSorting: true },
@@ -33,7 +33,7 @@ export default function ConsistencyTable({race}: RunsTableProp) {
   const list = useAsyncList<Consistency>({
     async load() {
       const consistency = await getAllConsistency(race.race_id);
-      
+
       setIsLoading(false);
       consistency.map((run: Consistency) => {
         run.consistency = run.consistency / 10000;
@@ -115,7 +115,7 @@ export default function ConsistencyTable({race}: RunsTableProp) {
             selectionMode="single"
             variant="flat"
             onSelectionChange={(keys) => {
-              keys.currentKey && setSelectedLocation(keys.currentKey);
+              if (keys.currentKey) setSelectedLocation(keys.currentKey);
             }}
           >
             {locations.map((location) => (
@@ -126,7 +126,7 @@ export default function ConsistencyTable({race}: RunsTableProp) {
       </div>
       <TableComponent
         columns={columns}
-        list={{ items: filterList }}
+        list={{ items: filterList as Iterable<FormattedRun> }}
         isLoading={isLoading}
         tableProps={{
           sortDescriptor: list.sortDescriptor || {

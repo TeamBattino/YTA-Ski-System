@@ -8,15 +8,19 @@ import TopRunsTable from "@/components/Tables/TopRunsTable";
 
 type LeaderboardProp = {
   races: Race[];
-}
+  currentRace: Race;
+};
 
-export default function WithConsistency({races}:LeaderboardProp) {
-  const [race, setRace] = useState<Race>();
+export default function WithConsistency({
+  races,
+  currentRace,
+}: LeaderboardProp) {
+  const [race, setRace] = useState<Race>(currentRace);
 
   return (
     <>
       <h1 className="py-2 text-2xl font-bold">Leaderboards</h1>
-      <RaceSelect races={races} setRace={setRace} />
+      <RaceSelect races={races} setRace={setRace} currentRace={currentRace} />
 
       <h2 className="py-2 text-xl font-bold">⭐ Competitive Consistency</h2>
       {race ? (

@@ -12,6 +12,10 @@ export interface Consistency {
   race_id: string;
 }
 
+export type CurrentRace = {
+  race_id: string;
+};
+
 export type FormattedRun = {
   name: string;
   ski_pass: string;
@@ -37,6 +41,7 @@ export type Admin = {
 };
 
 export type Racer = {
+  racer_id: string;
   ski_pass: string;
   name: string;
   ldap: string;
@@ -80,6 +85,7 @@ export async function getAllConsistency(race_id: string) {
                 ski_pass,
                 name,
                 ldap,
+                race_id,
                 location,
                 ABS(MAX(duration) - MIN(duration)) as consistency
             FROM
@@ -112,26 +118,25 @@ export async function getConsistencyCount() {
 
 export async function getTopRuns(race_id: string) {
   const racersWithShortestRun = await prisma.$queryRaw<FormattedRun[]>`
-    SELECT r.ski_pass,
+    SELECT 
+    r.ski_pass,
     r.race_id,
     r.run_id,
+    r.start_time,
     racer.name,
     racer.ldap,
     racer.location,
-    racer.race_id,
-    MIN(r.duration) as duration
-FROM run r
-    JOIN racer ON r.ski_pass = racer.ski_pass
-    AND r.race_id = racer.race_id
-WHERE r.race_id = ${race_id}
-GROUP BY r.ski_pass,
-    r.run_id,
-    r.race_id,
-    racer.name,
-    racer.ldap,
-    racer.location,
-    racer.race_id
-ORDER BY duration ASC
+    r.duration
+    FROM run r
+    JOIN racer ON r.ski_pass = racer.ski_pass AND r.race_id = racer.race_id
+    WHERE r.race_id = ${race_id}
+    AND r.run_id IN (
+    SELECT DISTINCT ON (ski_pass) run_id FROM run
+    WHERE race_id = ${race_id} AND duration > 0
+    ORDER BY ski_pass, duration ASC
+    )
+    GROUP BY r.ski_pass, r.race_id, r.run_id, r.start_time, racer.name, racer.ldap, racer.location, r.duration
+    ORDER BY r.duration ASC
   `;
   return racersWithShortestRun;
 }
@@ -159,6 +164,15 @@ export async function getRecentRuns(race_id: string) {
 
 /** Create */
 
+export async function createRace(name: string) {
+  const newRace = await prisma.race.create({
+    data: {
+      name: name,
+    },
+  });
+  return newRace;
+}
+
 export async function createRacer(
   name: string,
   ldap: string,
@@ -166,16 +180,27 @@ export async function createRacer(
   location: string,
   race_id: string
 ) {
-  const newRacer = await prisma.racer.create({
-    data: {
-      name: name,
-      ldap: ldap,
-      ski_pass: ski_pass,
-      location: location,
-      race_id: race_id,
+  const newRacer = await prisma.racer.upsert({
+    where: {
+      racer_identifier: {
+        ski_pass,
+        race_id,
+      },
+    },
+    update: {
+      name,
+      ldap,
+      location,
+    },
+    create: {
+      name,
+      ldap,
+      ski_pass,
+      location,
+      race_id,
     },
   });
-  return newRacer;
+  return newRacer as Racer;
 }
 
 export async function createRun(run: Run) {
@@ -220,6 +245,77 @@ export async function getRaces() {
   return races;
 }
 
+export async function getRacers() {
+  const racers = await prisma.$queryRaw<Racer[]>`
+        SELECT
+            r.*
+        FROM
+            racer r
+    `;
+  return racers;
+}
+
+export async function getRacer(ski_pass: string) {
+  const current_race = await getCurrentRace();
+  const racers = await prisma.$queryRaw<Racer[]>`
+    WITH RacerRuns AS (
+      SELECT
+        r.duration
+      FROM
+        run r
+      WHERE r.race_id = ${current_race.race_id} AND r.ski_pass = ${ski_pass}
+      GROUP BY r.race_id, r.ski_pass, r.duration, r.start_time
+      ORDER BY
+        r.start_time DESC
+      LIMIT 2
+    ),
+    Consistency AS (
+      SELECT
+        ABS(MAX(duration) - MIN(duration)) as consistency
+      FROM
+        RacerRuns
+      HAVING COUNT(*) = 2
+    )
+    SELECT
+      r.*,
+      c.consistency
+    FROM
+      racer r
+    LEFT JOIN
+      Consistency c ON 1=1
+    WHERE
+      r.ski_pass = ${ski_pass} AND r.race_id = ${current_race.race_id}  
+    `;
+  if (racers.length === 0) {
+    throw new Error("Racer not found");
+  }
+  return racers[0];
+}
+
+export async function getCurrentRace() {
+  const currentRace = await prisma.$queryRaw<Race[]>`
+    SELECT
+      r.*
+    FROM
+      settings s
+    JOIN
+      race r ON s.value::uuid = r.race_id
+    WHERE s.key = 'current_race'
+  `;
+  return currentRace[0];
+}
+
+export async function getShowConsistency() {
+  const showConsistency = await prisma.$queryRaw<Array<{ value: string }>>`
+        SELECT
+            value
+        FROM
+            settings s
+        WHERE s.key = 'show_consistency'
+    `;
+  return showConsistency[0]?.value == "true";
+}
+
 export async function getAdminByEmail(email: string) {
   const admins = await prisma.$queryRaw<Admin[]>`
         SELECT
@@ -232,15 +328,53 @@ export async function getAdminByEmail(email: string) {
   return admins;
 }
 
-export async function fetchRacerBySkiPass(ski_pass: string, race_id: string) {
-  const racer = await prisma.racer.findUnique({
+export async function getRacerRunsBySkipass(ski_pass: string) {
+  const current_race = await getCurrentRace();
+  const runsOfRacer = await prisma.$queryRaw<Run[]>`SELECT
+            r.*,
+            racer.name,
+            racer.ldap,
+            racer.location
+        FROM
+            run r
+        JOIN
+            racer ON r.ski_pass = racer.ski_pass  AND r.race_id = racer.race_id
+        WHERE r.race_id = ${current_race.race_id} AND racer.race_id = ${current_race.race_id} AND r.ski_pass = ${ski_pass}
+        GROUP BY racer.race_id, r.start_time, r.duration, r.ski_pass, r.run_id, r.race_id, racer.name, racer.ldap, racer.location
+        ORDER BY
+            r.start_time DESC`;
+  return runsOfRacer;
+}
+
+export async function fetchRacerBySkiPass(ski_pass: string) {
+  const race = await getCurrentRace();
+  let racer = (await prisma.racer.findUnique({
     where: {
       racer_identifier: {
         ski_pass: ski_pass,
-        race_id: race_id,
+        race_id: race.race_id,
       },
     },
-  });
+  })) as Racer | null;
+  if (racer == null) {
+    const userNumber = await prisma.$queryRaw<
+      Array<{ next_racer_number: number }>
+    >`SELECT COUNT(*)+1 AS next_racer_number FROM racer WHERE race_id = ${race.race_id}`;
+    const name = "Unregistered User #" + userNumber[0].next_racer_number;
+    const ldap = "unregistered" + userNumber[0].next_racer_number;
+    const racers = await prisma.$queryRaw<Racer[]>`
+      INSERT INTO racer(name, ldap, race_id, ski_pass, location)
+      VALUES (
+      ${name},
+      ${ldap},
+      ${race.race_id},
+      ${ski_pass},
+      ''
+      )
+      RETURNING *;
+    `;
+    racer = racers[0];
+  }
   return racer;
 }
 
@@ -263,6 +397,25 @@ export async function updateRun(run: Run) {
     },
   });
   return updatedRun;
+}
+
+export async function updateCurrentRace(race: Race) {
+  const updatedRace = await prisma.$queryRaw<CurrentRace>`
+    UPDATE settings
+    SET value = ${race.race_id}
+    WHERE key = 'current_race';
+  `;
+
+  return updatedRace;
+}
+
+export async function updateShowConsistency(showConsistency: boolean) {
+  const updatedShowConsistency = await prisma.$queryRaw<string>`
+    UPDATE settings
+    SET value = ${showConsistency as unknown as string}
+    WHERE key = 'show_consistency';
+  `;
+  return updatedShowConsistency;
 }
 
 /** Delete */

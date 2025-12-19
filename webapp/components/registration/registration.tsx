@@ -8,14 +8,15 @@ import { race as Race } from "@/src/generated/client";
 
 type RegistrationProp = {
   races: Race[];
+  currentRace: Race;
 }
 
-export default function Registration({races}: RegistrationProp) {
+export default function Registration({races, currentRace}: RegistrationProp) {
   const [name, setName] = useState<string>("");
   const [ldap, setLdap] = useState<string>("");
   const [selectedLocation, setLocation] = useState<any>();
   const [ski_pass, setSkiPass] = useState<string>();
-  const [race, setRace] = useState<Race>();
+  const [race, setRace] = useState<Race>(currentRace);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string>(""); // for nfc reader
 
@@ -169,7 +170,7 @@ export default function Registration({races}: RegistrationProp) {
         </div>
       </div>
 
-      <RaceSelect races={races} setRace={setRace} />
+      <RaceSelect races={races} setRace={setRace} currentRace={currentRace} />
 
       <br />
       <br />

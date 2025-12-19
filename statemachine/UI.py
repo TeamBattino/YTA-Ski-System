@@ -82,8 +82,9 @@ class AlpenhundeUI:
         match self.state_machine.current_state:
             case StateMachineState.IDLE:
                 return (
-                    "Please Close the gate (the long rod infront)\n"
-                    "<- Then Scan your Badge on the gray NFC reader on the Left",
+                    "Please close the gate rod\n"
+                    "<- Then scan only one badge on the left gray reader\n"
+                    "Your scan is complete once the red light blinks once",
                     "READY",
                 )
             case StateMachineState.REGISTERED:
@@ -97,6 +98,11 @@ class AlpenhundeUI:
                     "Your time starts as soon as you open the gate.",
                     "READY",
                 )
+            case StateMachineState.CANCELLING:
+                 return (
+                        "Do you really want to cancel the run? \nPress again if yes.",
+                        "NOT_READY",
+                    )
             case StateMachineState.RUNNING:
                 if self.state_machine.next_user == None:
                     return (

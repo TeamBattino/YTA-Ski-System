@@ -1,7 +1,11 @@
 import Registration from "@/components/registration/registration";
-import { getRaces } from "@/lib/db-helper";
+import { getRaces, getCurrentRace } from "@/lib/db-helper";
+
+export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const races = await getRaces();
-  return <Registration races={races}/>
+  const currentRace = await getCurrentRace();
+
+  return <Registration races={races} currentRace={currentRace} />;
 }
