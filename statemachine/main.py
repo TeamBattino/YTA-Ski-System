@@ -61,7 +61,7 @@ alpenhunde_update_event = Event()
 alpenhunde_silent_update_event = Event()
 race_finished_event = Event()
 def run_alpenhunde():
-    Alpenhunde(alpenhunde_update_event, alpenhunde_silent_update_event, race_finished_event,  statemachine).run()
+    Alpenhunde(alpenhunde_update_event, alpenhunde_silent_update_event, race_finished_event,  state_machine).run()
 
 alpenhunde_thread = Thread(target=run_alpenhunde, daemon=True)
 alpenhunde_thread.start()
@@ -105,13 +105,13 @@ def update_user():
         state_machine.next_user = User("","")
 
 user_update_event = Event()
-ui = AlpenhundeUI(statemachine, user_update_event)
+ui = AlpenhundeUI(state_machine, user_update_event)
 """ Main thread Loop here """
 while True:
     ui.update_state()
     if user_update_event.is_set():
         alpenhunde_update_event.set()
-        statemachine.loading = True
+        state_machine.loading = True
         ui.update_state()
         update_user()
         state_machine.loading = False
@@ -124,13 +124,13 @@ while True:
             case "UpdateAlpenhunde":
                 print("Update Alpenhunde")
                 alpenhunde_update_event.set()
-                statemachine.connection_issues = False
+                state_machine.connection_issues = False
             case "WSConnected":
                 print("WebSocket connected")
-                statemachine.connection_issues = False
+                state_machine.connection_issues = False
             case "WSError":
                 print("WebSocket error")
-                statemachine.connection_issues = True
+                state_machine.connection_issues = True
                 os.system('espeak -a 400 "Websocket disconnect detected. Reconnecting"')
             case "WSClosed":
                 print("WebSocket closed")
@@ -138,7 +138,7 @@ while True:
                 print("Unknown message")
         message_queue.task_done()
     if race_finished_event.is_set():
-        statemachine.loading = True
+        state_machine.loading = True
         ui.update_state()
         api.postRace(state_machine.user.rfid, state_machine.last_race_time)
         if state_machine.next_user.rfid != "":
