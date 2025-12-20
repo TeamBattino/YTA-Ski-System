@@ -1,83 +1,118 @@
-/**
- * Registration Screen
- * 
- * UI for user registration with ski pass scanning.
- */
+import React, { useState, useEffect } from "react";
+import { View, ScrollView, StyleSheet, Image, Alert, Platform } from "react-native";
+import NfcManager, { NfcTech } from "react-native-nfc-manager";
+import { Button } from "@/components/atoms";
+import { InputField, NfcScanner } from "@/components/molecules";
+import { LocationSelector, RaceSelector } from "@/components/organisms";
+import { Colors } from "@/constants";
+import { Race, Location } from "@/types";
 
-import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Image } from 'react-native';
-import { Button, Badge } from '@/components/atoms';
-import { InputField, NfcScanner } from '@/components/molecules';
-import { LocationSelector, RaceSelector } from '@/components/organisms';
-import { Colors, Typography } from '@/constants';
-import { Race, Location } from '@/types';
-
-// Header Logo - logo at: assets/images/ytads-logo.png
-const LOGO_IMAGE = require('@/assets/images/ytads_logo.png');
-
-// Mock races - will be fetched from API later
-const MOCK_RACES: Race[] = [
-  { race_id: '1', name: '2026' },
-  { race_id: '2', name: '2025' },
-];
+const LOGO_IMAGE = require("@/assets/images/ytads_logo.png");
 
 export default function Registration() {
   // Form State
-  const [name, setName] = useState('');
-  const [ldap, setLdap] = useState('');
+  const [name, setName] = useState("");
+  const [ldap, setLdap] = useState("");
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [selectedRace, setSelectedRace] = useState<Race | null>(null);
-  
+  const [races, setRaces] = useState<Race[]>([]);
+
   // NFC State
   const [skiPass, setSkiPass] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
-  const [nfcMessage, setNfcMessage] = useState('');
-  
+  const [nfcMessage, setNfcMessage] = useState("Ready to scan");
+
   // Submit State
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // TODO: Implement NFC scan
-  const handleNfcScan = () => {
-    setIsScanning(true);
-    setNfcMessage('Scanning...');
-    
-    // TODO: Replace with real NFC implementation
-    setTimeout(() => {
-      setSkiPass('04a2c3d4e5f6');
-      setNfcMessage('Scan successful!');
-      setIsScanning(false);
-    }, 1000);
+  // 1. Initialize NFC Manager and Fetch Races
+  useEffect(() => {
+    NfcManager.start();
+    fetchRaces();
+
+    return () => {
+      NfcManager.cancelTechnologyRequest().catch(() => 0);
+    };
+  }, []);
+
+  const fetchRaces = async () => {
+    try {
+      const response = await fetch("http://ski.batti.no/api/races");
+      if (response.ok) {
+        const data = await response.json();
+        setRaces(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch races:", error);
+      Alert.alert("Error", "Could not load races. Please check your connection.");
+    }
   };
 
-  // TODO: Implement form submission
-  const handleSubmit = () => {
+  const handleNfcScan = async () => {
+    try {
+      setIsScanning(true);
+      setNfcMessage("Scan your ski pass...");
+
+      await NfcManager.requestTechnology(NfcTech.Ndef);
+      const tag = await NfcManager.getTag();
+      
+      if (tag?.id) {
+        setSkiPass(tag.id);
+        setNfcMessage("Scan successful!");
+      }
+    } catch (ex) {
+      console.warn(ex);
+      setNfcMessage("Scan canceled or failed.");
+    } finally {
+      NfcManager.cancelTechnologyRequest();
+      setIsScanning(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!name || !ldap || !selectedLocation || !selectedRace || !skiPass) {
+      Alert.alert("Missing Fields", "Please complete the form and scan your pass.");
+      return;
+    }
+
     setIsSubmitting(true);
-    
-    // TODO: Replace with real API call
-    setTimeout(() => {
-      console.log('Registration data:', {
-        name,
-        ldap,
-        location: selectedLocation,
-        race: selectedRace,
-        skiPass,
+    try {
+      const response = await fetch("http://ski.batti.no/api/racers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          ldap,
+          location: selectedLocation,
+          race_id: selectedRace.race_id,
+          ski_pass: skiPass,
+        }),
       });
+
+      if (response.ok) {
+        Alert.alert("Success", "You are now registered!");
+        // Clear form
+        setName("");
+        setLdap("");
+        setSkiPass(null);
+        setNfcMessage("Ready to scan");
+      } else {
+        const errData = await response.json();
+        Alert.alert("Error", errData.message || "Registration failed.");
+      }
+    } catch (error) {
+      Alert.alert("Network Error", "Could not reach the server.");
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Header Banner */}
       <View style={styles.headerBanner}>
-        <Image 
-          source={LOGO_IMAGE} 
-          style={styles.logo}
-          resizeMode="contain"
-        />
+        <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
       </View>
 
-      {/* NFC Scanner */}
       <View style={styles.section}>
         <NfcScanner
           onScan={handleNfcScan}
@@ -87,96 +122,60 @@ export default function Registration() {
         />
       </View>
 
-      {/* Name Input */}
-      <View style={styles.section}>
+      <View style={styles.formContainer}>
         <InputField
           label="Your Name"
           value={name}
           onChangeText={setName}
-          placeholder="Enter your name"
+          placeholder="First Last"
         />
-      </View>
 
-      {/* LDAP Input */}
-      <View style={styles.section}>
         <InputField
-          label="Your LDAP (without @google.com)"
+          label="Your LDAP"
           value={ldap}
           onChangeText={setLdap}
-          placeholder="Enter your LDAP"
+          placeholder="username"
           autoCapitalize="none"
-          autoCorrect={false}
         />
-      </View>
 
-      {/* Location Selector */}
-      <View style={styles.section}>
         <LocationSelector
           selectedLocation={selectedLocation}
           onSelect={setSelectedLocation}
         />
-      </View>
 
-      {/* Race Selector */}
-      <View style={styles.section}>
         <RaceSelector
-          races={MOCK_RACES}
+          races={races}
           selectedRace={selectedRace}
           onSelect={setSelectedRace}
         />
-      </View>
 
-      {/* Register Button */}
-      <View style={styles.section}>
         <Button
-          title={isSubmitting ? 'Registering...' : 'Register'}
+          title={isSubmitting ? "Registering..." : "Register"}
           onPress={handleSubmit}
           loading={isSubmitting}
-          disabled={isSubmitting}
+          disabled={isSubmitting || isScanning}
           size="lg"
           fullWidth
         />
       </View>
-
-      {/* Spacer */}
-      <View style={styles.spacer} />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  content: {
-    alignItems: 'center',
-  },
+  container: { flex: 1, backgroundColor: Colors.background },
+  content: { alignItems: "center", paddingBottom: 40 },
   headerBanner: {
-    width: '93%',
+    width: "90%",
     height: 80,
-    backgroundColor: '#60a5fa', // Blue background like in the image
-    justifyContent: 'flex-start',
-    marginBottom: 8,
-    marginTop: 16,
-    marginLeft: 30,
-    marginRight: 30,
-    padding: 8,
-    paddingLeft: 20,
-    borderRadius: 8,
-  },
-  logo: {
-    width: '40%',
-    height: 62.14,
-  },
-  section: {
-    width: '100%',
-    maxWidth: 320,
+    backgroundColor: "#60a5fa",
+    justifyContent: "center",
+    marginTop: 20,
     marginBottom: 20,
     paddingHorizontal: 20,
+    borderRadius: 12,
   },
-  spacer: {
-    height: 40,
-  },
+  logo: { width: 120, height: 50 },
+  formContainer: { width: "100%", maxWidth: 340, gap: 15 },
+  section: { width: "100%", maxWidth: 340, marginBottom: 10 },
 });
-
