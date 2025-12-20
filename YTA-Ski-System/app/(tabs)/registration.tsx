@@ -25,7 +25,6 @@ export default function Registration() {
   // Submit State
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 1. Initialize NFC Manager and Fetch Races
   useEffect(() => {
     NfcManager.start();
     fetchRaces();
