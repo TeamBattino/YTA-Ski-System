@@ -1,8 +1,8 @@
---INSERT INTO admin(email) VALUES ('michel.mahadeva@gmail.com');
---INSERT INTO admin(email) VALUES ('floew@google.com');
---INSERT INTO race(race_id, name) VALUES ('6d3173f4-823b-4e05-a4d7-b2decacc7ade', '2026');
---INSERT INTO settings(key, value) VALUES ('current_race', '6d3173f4-823b-4e05-a4d7-b2decacc7ade');
---INSERT INTO settings(key, value) VALUES ('show_consistency', 'false');
+INSERT INTO admin(email) VALUES ('michel.mahadeva@gmail.com');
+INSERT INTO admin(email) VALUES ('floew@google.com');
+INSERT INTO race(race_id, name) VALUES ('6d3173f4-823b-4e05-a4d7-b2decacc7ade', '2026');
+INSERT INTO settings(key, value) VALUES ('current_race', '6d3173f4-823b-4e05-a4d7-b2decacc7ade');
+INSERT INTO settings(key, value) VALUES ('show_consistency', 'false');
 SELECT *
 FROM settings;
 SELECT *

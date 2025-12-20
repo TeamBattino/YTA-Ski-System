@@ -11,6 +11,7 @@ from api import ApiClient
 import time
 import socket
 import requests
+import threading
 
 """ INITIALIZATION """
 def is_web_reachable(url, timeout=3):
@@ -43,7 +44,7 @@ ENV_API_URL = os.getenv("API_DOMAIN")
 ENV_AUTH_SECRET = os.getenv("AUTH_SECRET")
 
 """ Shared state variables here """
-statemachine = StateMachine(StateMachineState.IDLE, -1, User("", ""), False, False)
+state_machine = StateMachine(StateMachineState.IDLE, -1, User("", ""), False, False, User("",""))
 
 """ Threads created here """
 panic_event = Event()
@@ -61,7 +62,7 @@ alpenhunde_update_event = Event()
 alpenhunde_silent_update_event = Event()
 race_finished_event = Event()
 def run_alpenhunde():
-    Alpenhunde(alpenhunde_update_event, alpenhunde_silent_update_event, race_finished_event,  statemachine).run()
+    Alpenhunde(alpenhunde_update_event, alpenhunde_silent_update_event, race_finished_event,  state_machine).run()
 
 alpenhunde_thread = Thread(target=run_alpenhunde, daemon=True)
 alpenhunde_thread.start()
@@ -69,30 +70,63 @@ alpenhunde_thread.start()
 """ Main thread Functions here """
 api = ApiClient(ENV_API_URL)
 
+cancel_timer = None
+last_call_time = 0
+DEBOUNCE_INTERVAL = 1.0  # seconds
+
+def transition_if_still_cancelling():
+    """Timer callback: only moves to RUNNING if nothing else changed the state."""
+    if state_machine.current_state == StateMachineState.CANCELLING:
+        state_machine.current_state = StateMachineState.RUNNING
+
 def panic_button_call():
-    statemachine.current_state = StateMachineState.IDLE
-    os.system('espeak -a 400 "RESET RACER"')
+    global cancel_timer, last_call_time
+    
+    current_time = time.time()
+    
+    if current_time - last_call_time < DEBOUNCE_INTERVAL:
+        return 
+    
+    last_call_time = current_time
+
+    if state_machine.current_state == StateMachineState.CANCELLING:
+        if cancel_timer:
+            cancel_timer.cancel()
+        
+        state_machine.current_state = StateMachineState.IDLE
+        os.system('espeak -a 400 "RESET RACER" &')
+        
+    if state_machine.current_state == StateMachineState.RUNNING:
+        state_machine.current_state = StateMachineState.CANCELLING
+        
+        cancel_timer = threading.Timer(5.0, transition_if_still_cancelling)
+        cancel_timer.start()
 
 def update_user():
-    user = api.getUser(statemachine.user.rfid)
-    if(statemachine.next_user):
-        statemachine.user = statemachine.next_user
-        statemachine.next_user = user
+    next_user = None
+    if state_machine.current_state == StateMachineState.RUNNING:
+        next_user = api.getUser(state_machine.next_user.rfid)
     else:
-        statemachine.next_user = user
+        user = api.getUser(state_machine.user.rfid)
+    if(next_user):
+        state_machine.next_user = next_user
+    else:
+        state_machine.user = user
+        state_machine.next_user = User("","")
 
 user_update_event = Event()
-ui = AlpenhundeUI(statemachine, user_update_event)
+ui = AlpenhundeUI(state_machine, user_update_event)
 """ Main thread Loop here """
 while True:
     ui.update_state()
     if user_update_event.is_set():
         alpenhunde_update_event.set()
-        statemachine.loading = True
+        state_machine.loading = True
         ui.update_state()
         update_user()
-        statemachine.loading = False
-        statemachine.current_state = StateMachineState.REGISTERED
+        state_machine.loading = False
+        if state_machine.next_user.rfid == "":
+            state_machine.current_state = StateMachineState.REGISTERED
         user_update_event.clear()
     if not message_queue.empty():
         message = message_queue.get()
@@ -100,13 +134,13 @@ while True:
             case "UpdateAlpenhunde":
                 print("Update Alpenhunde")
                 alpenhunde_update_event.set()
-                statemachine.connection_issues = False
+                state_machine.connection_issues = False
             case "WSConnected":
                 print("WebSocket connected")
-                statemachine.connection_issues = False
+                state_machine.connection_issues = False
             case "WSError":
                 print("WebSocket error")
-                statemachine.connection_issues = True
+                state_machine.connection_issues = True
                 os.system('espeak -a 400 "Websocket disconnect detected. Reconnecting"')
             case "WSClosed":
                 print("WebSocket closed")
@@ -114,10 +148,14 @@ while True:
                 print("Unknown message")
         message_queue.task_done()
     if race_finished_event.is_set():
-        statemachine.loading = True
+        state_machine.loading = True
         ui.update_state()
-        api.postRace(statemachine.user.rfid, statemachine.last_race_time)
-        statemachine.loading = False
+        api.postRace(state_machine.user.rfid, state_machine.last_race_time)
+        if state_machine.next_user.rfid != "":
+            state_machine.user = state_machine.next_user
+            state_machine.next_user = User("","")
+            state_machine.current_state = StateMachineState.REGISTERED
+        state_machine.loading = False
         race_finished_event.clear()
     if panic_event.is_set():
         panic_button_call()
