@@ -52,7 +52,7 @@ export default function Registration() {
       setIsScanning(true);
       setNfcMessage("Scan your ski pass...");
 
-      await NfcManager.requestTechnology(NfcTech.Iso15693IOS);
+      await NfcManager.requestTechnology(NfcTech.Ndef);
       const tag = await NfcManager.getTag();
       
       if (tag?.id) {
