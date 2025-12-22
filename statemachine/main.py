@@ -94,6 +94,8 @@ def panic_button_call():
             cancel_timer.cancel()
         
         state_machine.current_state = StateMachineState.IDLE
+        state_machine.user = None
+        state_machine.next_user = None
         os.system('espeak -a 400 "RESET RACER" &')
         
     if state_machine.current_state == StateMachineState.RUNNING:
