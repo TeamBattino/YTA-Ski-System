@@ -1,1 +1,4 @@
 YTA-Ski-System.session.sql
+YTA-Ski-System.env
+node_modules/
+YTA-Ski-System/node_modules/
