@@ -29,26 +29,33 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  if (!req.body)
+    return NextResponse.json(
+      { message: "Error: body is empty" },
+      { status: 400 }
+    );
   try {
-    const url = new URL(req.url);
-    const ski_pass = url.searchParams.get("ski_pass");
-    const ldap = url.searchParams.get("ldap");
-    const name = url.searchParams.get("name");
-    const location = url.searchParams.get("location");
-    const race_id = url.searchParams.get("race_id");
+    const data = await req.json(); // omit run_id for create operation
 
-    if (!ski_pass || !ldap || !name || !location || !race_id) {
+    if (
+      !data ||
+      !data.ski_pass ||
+      !data.ldap ||
+      !data.name ||
+      !data.location ||
+      !data.race_id
+    ) {
       return NextResponse.json(
-        { message: "Every attribute needed" },
-        { status: 403 }
+        { message: "Missing required fields" },
+        { status: 400 }
       );
     } else {
       const racerData = await createRacer(
-        name,
-        ldap,
-        ski_pass,
-        location,
-        race_id
+        data.name,
+        data.ldap,
+        data.ski_pass,
+        data.location,
+        data.race_id
       );
       if (!racerData) {
         return NextResponse.json(
