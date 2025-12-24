@@ -48,7 +48,7 @@ export default function RecentRunsTable({ race }: RunsTableProp) {
     async load() {
       const recentRuns = await getRecentRuns(race.race_id);
       const formattedRuns = recentRuns.map((run: Run) => {
-        if (run.duration) {
+        if (run.duration && run.race_id === race.race_id) {
           const durationMilliseconds = run.duration / 10;
           const duration = moment.duration(durationMilliseconds);
           const formattedDuration = moment

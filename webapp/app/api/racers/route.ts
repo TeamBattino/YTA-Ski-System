@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   try {
-    const data: PostRunProps = await req.json(); // omit run_id for create operation
+    const data = await req.json(); // omit run_id for create operation
 
     if (
       !data ||
