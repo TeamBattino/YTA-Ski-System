@@ -48,7 +48,7 @@ export default function RecentRunsTable({ race }: RunsTableProp) {
     async load() {
       const recentRuns = await getRecentRuns(race.race_id);
       const formattedRuns = recentRuns.map((run: Run) => {
-        if (run.duration) {
+        if (run.duration && run.race_id === race.race_id) {
           const durationMilliseconds = run.duration / 10;
           const duration = moment.duration(durationMilliseconds);
           const formattedDuration = moment
@@ -123,7 +123,7 @@ export default function RecentRunsTable({ race }: RunsTableProp) {
             const second = b[sortDescriptor.column as keyof StringFormattedRun];
             let cmp =
               (parseInt(first as string) || first) <
-              (parseInt(second as string) || second)
+                (parseInt(second as string) || second)
                 ? -1
                 : 1;
 
