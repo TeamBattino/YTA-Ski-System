@@ -6,6 +6,7 @@ import { InputField, NfcScanner } from "@/components/molecules";
 import { LocationSelector, RaceSelector } from "@/components/organisms";
 import { Colors } from "@/constants";
 import { Race, Location } from "@/types";
+import { AUTH_SECRET } from "@env";
 
 const LOGO_IMAGE = require("@/assets/images/ytads_logo.png");
 
@@ -54,7 +55,7 @@ export default function Registration() {
 
       await NfcManager.requestTechnology(NfcTech.Ndef);
       const tag = await NfcManager.getTag();
-      
+
       if (tag?.id) {
         setSkiPass(tag.id);
         setNfcMessage("Scan successful!");
@@ -78,7 +79,10 @@ export default function Registration() {
     try {
       const response = await fetch("http://ski.batti.no/api/racers", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "secret-key": AUTH_SECRET
+        },
         body: JSON.stringify({
           name,
           ldap,
