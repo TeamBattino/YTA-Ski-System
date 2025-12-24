@@ -25,6 +25,7 @@ type StringFormattedRun = {
   start_time: string;
   ski_pass: string;
   ldap: string;
+  race_id: string;
 };
 
 type RunsTableProp = {
@@ -153,15 +154,19 @@ export default function RecentRunsTable({ race }: RunsTableProp) {
   const filterList = useMemo(() => {
     return list.items.filter((item) => {
       if (selectedLocation === "ALL") {
-        return item.name.toLowerCase().includes(searchValue.toLowerCase());
+        return (
+          item.name.toLowerCase().includes(searchValue.toLowerCase()) &&
+          item.race_id === race.race_id
+        );
       } else {
         return (
           item.name.toLowerCase().includes(searchValue.toLowerCase()) &&
-          item.location === selectedLocation
+          item.location === selectedLocation &&
+          item.race_id === race.race_id
         );
       }
     });
-  }, [list.items, searchValue, selectedLocation]);
+  }, [list.items, searchValue, selectedLocation, race.race_id]);
 
   const onRowClick = (item: Key) => {
     const personToView = list.items.find((i) => i.run_id === item);
