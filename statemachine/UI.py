@@ -82,9 +82,8 @@ class AlpenhundeUI:
         match self.state_machine.current_state:
             case StateMachineState.IDLE:
                 return (
-                    "Please close the gate rod\n"
-                    "<- Then scan only one badge on the left gray reader\n"
-                    "Your scan is complete once the red light blinks once",
+                    "Close the gate"
+                    " - Then    scan your badge on the left"
                     "READY",
                 )
             case StateMachineState.REGISTERED:
