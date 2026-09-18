@@ -1,5 +1,7 @@
 "use server";
 
+import { requireAdmin } from "@/lib/require-admin";
+
 import prisma from "./prisma";
 
 /** Types */
@@ -165,6 +167,7 @@ export async function getRecentRuns(race_id: string) {
 /** Create */
 
 export async function createRace(name: string) {
+  await requireAdmin();
   const newRace = await prisma.race.create({
     data: {
       name: name,
@@ -201,35 +204,6 @@ export async function createRacer(
     },
   });
   return newRacer as Racer;
-}
-
-export async function createRun(run: Run) {
-  // Check if the ski_pass exists in the racer table
-  const racerExists = await prisma.racer.findUnique({
-    where: {
-      racer_identifier: {
-        ski_pass: run.ski_pass,
-        race_id: run.race_id,
-      },
-    },
-  });
-
-  if (!racerExists) {
-    throw new Error(
-      `Racer with ski_pass ${run.ski_pass} and race_id ${run.race_id} does not exist.`
-    );
-  }
-
-  // If racer exists, create the run
-  const newRun = await prisma.run.create({
-    data: {
-      start_time: run.start_time,
-      duration: run.duration,
-      ski_pass: run.ski_pass,
-      race_id: run.race_id,
-    },
-  });
-  return newRun;
 }
 
 /** Read */
@@ -317,6 +291,7 @@ export async function getShowConsistency() {
 }
 
 export async function getAdminByEmail(email: string) {
+  await requireAdmin();
   const admins = await prisma.$queryRaw<Admin[]>`
         SELECT
             *
@@ -385,6 +360,7 @@ export async function fetchRacers() {
 
 /** Update */
 export async function updateRun(run: Run) {
+  await requireAdmin();
   const updatedRun = await prisma.run.update({
     where: {
       run_id: run.run_id,
@@ -400,6 +376,7 @@ export async function updateRun(run: Run) {
 }
 
 export async function updateCurrentRace(race: Race) {
+  await requireAdmin();
   const updatedRace = await prisma.$queryRaw<CurrentRace>`
     UPDATE settings
     SET value = ${race.race_id}
@@ -410,6 +387,7 @@ export async function updateCurrentRace(race: Race) {
 }
 
 export async function updateShowConsistency(showConsistency: boolean) {
+  await requireAdmin();
   const updatedShowConsistency = await prisma.$queryRaw<string>`
     UPDATE settings
     SET value = ${showConsistency as unknown as string}
@@ -420,6 +398,7 @@ export async function updateShowConsistency(showConsistency: boolean) {
 
 /** Delete */
 export async function deleteRun(run_id: string) {
+  await requireAdmin();
   await prisma.run
     .delete({
       where: {

@@ -1,4 +1,6 @@
-import {  updateRun, createRun, Run, getCurrentRace } from '@/lib/db-helper';
+import { createRun } from "@/lib/run-store";
+import { requireAdmin } from "@/lib/require-admin";
+import {  updateRun, Run, getCurrentRace } from '@/lib/db-helper';
 import { NextResponse } from 'next/server';
 
 type PostRunProps = {
@@ -41,6 +43,11 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req: Request) {
+  try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
   if (!req.body) return NextResponse.json({ message: 'Error: body is empty' }, { status: 400 });
   try {
     const data: Run = await req.json();
